@@ -1,0 +1,68 @@
+{% extends 'pages/shared/base.html' %}
+{% load bootstrap_icons %}
+{% load i18n %}
+
+{% block title %}{% trans "Register" %}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6 col-lg-5">
+    <div class="card border-0 shadow-sm rounded-4 mt-5">
+      <div class="card-body p-4 p-md-5">
+        <div class="text-center mb-4">
+          <h2 class="fw-bold mb-1">{% trans "Create Account" %}</h2>
+          <p class="text-muted">{% trans "Join us and start shopping" %}</p>
+        </div>
+
+        {% if form.non_field_errors %}
+          <div class="alert alert-danger">
+            {% for error in form.non_field_errors %}
+              {{ error }}
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <form method="POST" novalidate>
+          {% csrf_token %}
+          
+          {% for field in form %}
+            <div class="mb-3">
+              <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+              {{ field }}
+              {% if field.help_text and field.name != 'password' %}
+                <small class="form-text text-muted">{{ field.help_text }}</small>
+              {% endif %}
+              {% if field.errors %}
+                <div class="invalid-feedback d-block">
+                  {% for error in field.errors %}{{ error }}{% endfor %}
+                </div>
+              {% endif %}
+            </div>
+          {% endfor %}
+
+          <button type="submit" class="btn btn-dark w-100 py-2 rounded-pill fw-bold mt-3">
+            {% trans "Create Account" %}
+          </button>
+        </form>
+
+        <div class="text-center mt-4">
+          <p class="text-muted mb-0">
+            {% trans "Already have an account?" %}
+            <a href="{% url 'login' %}" class="text-decoration-none fw-bold">
+              {% trans "Sign In" %}
+            </a>
+          </p>
+        </div>
+
+        <hr class="my-4">
+
+        <div class="text-center">
+          <a href="{% url 'home' %}" class="text-muted text-decoration-none small">
+            {% bs_icon 'house' size='1em' %} {% trans "Back to Home" %}
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

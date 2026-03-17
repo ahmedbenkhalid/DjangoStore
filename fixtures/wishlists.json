@@ -1,0 +1,22 @@
+[
+  {"model": "products.wishlist", "pk": 1, "fields": {"user": 1, "product": 2, "created_at": "2024-01-25T10:00:00Z"}},
+  {"model": "products.wishlist", "pk": 2, "fields": {"user": 1, "product": 6, "created_at": "2024-01-26T10:00:00Z"}},
+  {"model": "products.wishlist", "pk": 3, "fields": {"user": 2, "product": 1, "created_at": "2024-01-27T10:00:00Z"}},
+  {"model": "products.wishlist", "pk": 4, "fields": {"user": 2, "product": 9, "created_at": "2024-01-28T10:00:00Z"}},
+  {"model": "products.wishlist", "pk": 5, "fields": {"user": 3, "product": 10, "created_at": "2024-01-29T10:00:00Z"}},
+  {"model": "products.wishlist", "pk": 6, "fields": {"user": 4, "product": 16, "created_at": "2024-01-30T10:00:00Z"}},
+  {"model": "products.wishlist", "pk": 7, "fields": {"user": 5, "product": 13, "created_at": "2024-01-31T10:00:00Z"}},
+  {"model": "products.wishlist", "pk": 8, "fields": {"user": 6, "product": 7, "created_at": "2024-02-01T10:00:00Z"}},
+  {"model": "products.wishlist", "pk": 9, "fields": {"user": 7, "product": 14, "created_at": "2024-02-02T10:00:00Z"}},
+  {"model": "products.wishlist", "pk": 10, "fields": {"user": 8, "product": 3, "created_at": "2024-02-03T10:00:00Z"}},
+  {"model": "products.wishlist", "pk": 11, "fields": {"user": 9, "product": 8, "created_at": "2024-02-04T10:00:00Z"}},
+  {"model": "products.wishlist", "pk": 12, "fields": {"user": 10, "product": 12, "created_at": "2024-02-05T10:00:00Z"}},
+  {"model": "products.wishlist", "pk": 13, "fields": {"user": 11, "product": 4, "created_at": "2024-02-06T10:00:00Z"}},
+  {"model": "products.wishlist", "pk": 14, "fields": {"user": 12, "product": 5, "created_at": "2024-02-07T10:00:00Z"}},
+  {"model": "products.wishlist", "pk": 15, "fields": {"user": 13, "product": 15, "created_at": "2024-02-08T10:00:00Z"}},
+  {"model": "products.wishlist", "pk": 16, "fields": {"user": 14, "product": 17, "created_at": "2024-02-09T10:00:00Z"}},
+  {"model": "products.wishlist", "pk": 17, "fields": {"user": 15, "product": 18, "created_at": "2024-02-10T10:00:00Z"}},
+  {"model": "products.wishlist", "pk": 18, "fields": {"user": 16, "product": 19, "created_at": "2024-02-11T10:00:00Z"}},
+  {"model": "products.wishlist", "pk": 19, "fields": {"user": 17, "product": 11, "created_at": "2024-02-12T10:00:00Z"}},
+  {"model": "products.wishlist", "pk": 20, "fields": {"user": 18, "product": 20, "created_at": "2024-02-13T10:00:00Z"}}
+]

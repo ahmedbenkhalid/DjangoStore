@@ -1,0 +1,26 @@
+{% load i18n %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <span class="fw-bold text-uppercase" style="font-size: .7rem; letter-spacing: .1em;">{% trans "Subtotal:" %}</span>
+  <span class="fw-bold" style="font-size: .9rem;">{% if request.LANGUAGE_CODE == 'ar' %}ج.م{% else %}EGP{% endif %} {{ cart_total }}</span>
+</div>
+
+<a href="{% url 'cart:detail' %}"
+   class="btn btn-outline-dark rounded-pill w-100 fw-bold text-uppercase mb-2"
+   style="font-size: .72rem; letter-spacing: .08em;">
+  {% trans "View Cart" %}
+</a>
+
+{% if user.is_authenticated %}
+<a href="{% url 'orders:checkout' %}"
+   class="btn btn-dark rounded-pill w-100 fw-bold text-uppercase"
+   style="font-size: .72rem; letter-spacing: .08em; background: #2e7d32;">
+  {% trans "Checkout" %}
+</a>
+{% else %}
+<button type="button" class="btn btn-dark rounded-pill w-100 fw-bold text-uppercase"
+   style="font-size: .72rem; letter-spacing: .08em; background: #2e7d32;"
+   data-bs-toggle="modal" data-bs-target="#authModal">
+  {% trans "Checkout" %}
+</button>
+{% endif %}

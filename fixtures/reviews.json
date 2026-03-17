@@ -1,0 +1,22 @@
+[
+  {"model": "products.review", "pk": 1, "fields": {"product": 1, "user": 1, "rating": 5, "comment": "Amazing phone! Best camera I've ever used.", "created_at": "2024-01-20T10:00:00Z", "updated_at": "2024-01-20T10:00:00Z"}},
+  {"model": "products.review", "pk": 2, "fields": {"product": 2, "user": 2, "rating": 4, "comment": "Great phone but a bit pricey.", "created_at": "2024-01-21T10:00:00Z", "updated_at": "2024-01-21T10:00:00Z"}},
+  {"model": "products.review", "pk": 3, "fields": {"product": 3, "user": 3, "rating": 5, "comment": "Best noise cancelling headphones I've owned!", "created_at": "2024-01-22T10:00:00Z", "updated_at": "2024-01-22T10:00:00Z"}},
+  {"model": "products.review", "pk": 4, "fields": {"product": 4, "user": 4, "rating": 4, "comment": "Comfortable and stylish.", "created_at": "2024-01-23T10:00:00Z", "updated_at": "2024-01-23T10:00:00Z"}},
+  {"model": "products.review", "pk": 5, "fields": {"product": 5, "user": 5, "rating": 5, "comment": "Great running shoes, very comfortable.", "created_at": "2024-01-24T10:00:00Z", "updated_at": "2024-01-24T10:00:00Z"}},
+  {"model": "products.review", "pk": 6, "fields": {"product": 6, "user": 6, "rating": 4, "comment": "Powerful laptop for work and gaming.", "created_at": "2024-01-25T10:00:00Z", "updated_at": "2024-01-25T10:00:00Z"}},
+  {"model": "products.review", "pk": 7, "fields": {"product": 7, "user": 7, "rating": 5, "comment": "Love the convertible design!", "created_at": "2024-01-26T10:00:00Z", "updated_at": "2024-01-26T10:00:00Z"}},
+  {"model": "products.review", "pk": 8, "fields": {"product": 8, "user": 8, "rating": 4, "comment": "Perfect business laptop.", "created_at": "2024-01-27T10:00:00Z", "updated_at": "2024-01-27T10:00:00Z"}},
+  {"model": "products.review", "pk": 9, "fields": {"product": 9, "user": 9, "rating": 5, "comment": "Stunning picture quality!", "created_at": "2024-01-28T10:00:00Z", "updated_at": "2024-01-28T10:00:00Z"}},
+  {"model": "products.review", "pk": 10, "fields": {"product": 10, "user": 10, "rating": 5, "comment": "Professional grade camera.", "created_at": "2024-01-29T10:00:00Z", "updated_at": "2024-01-29T10:00:00Z"}},
+  {"model": "products.review", "pk": 11, "fields": {"product": 11, "user": 11, "rating": 4, "comment": "Great value for money!", "created_at": "2024-01-30T10:00:00Z", "updated_at": "2024-01-30T10:00:00Z"}},
+  {"model": "products.review", "pk": 12, "fields": {"product": 12, "user": 12, "rating": 3, "comment": "Good phone but limited apps.", "created_at": "2024-01-31T10:00:00Z", "updated_at": "2024-01-31T10:00:00Z"}},
+  {"model": "products.review", "pk": 13, "fields": {"product": 13, "user": 13, "rating": 5, "comment": "Best gaming phone ever!", "created_at": "2024-02-01T10:00:00Z", "updated_at": "2024-02-01T10:00:00Z"}},
+  {"model": "products.review", "pk": 14, "fields": {"product": 14, "user": 14, "rating": 4, "comment": "Great tablet for productivity.", "created_at": "2024-02-02T10:00:00Z", "updated_at": "2024-02-02T10:00:00Z"}},
+  {"model": "products.review", "pk": 15, "fields": {"product": 15, "user": 15, "rating": 3, "comment": "Nice smart display.", "created_at": "2024-02-03T10:00:00Z", "updated_at": "2024-02-03T10:00:00Z"}},
+  {"model": "products.review", "pk": 16, "fields": {"product": 16, "user": 16, "rating": 5, "comment": "Love the stock Android experience!", "created_at": "2024-02-04T10:00:00Z", "updated_at": "2024-02-04T10:00:00Z"}},
+  {"model": "products.review", "pk": 17, "fields": {"product": 17, "user": 17, "rating": 4, "comment": "Cool design and comfortable.", "created_at": "2024-02-05T10:00:00Z", "updated_at": "2024-02-05T10:00:00Z"}},
+  {"model": "products.review", "pk": 18, "fields": {"product": 18, "user": 18, "rating": 5, "comment": "Perfect for CrossFit training!", "created_at": "2024-02-06T10:00:00Z", "updated_at": "2024-02-06T10:00:00Z"}},
+  {"model": "products.review", "pk": 19, "fields": {"product": 19, "user": 19, "rating": 4, "comment": "Great basketball shoes.", "created_at": "2024-02-07T10:00:00Z", "updated_at": "2024-02-07T10:00:00Z"}},
+  {"model": "products.review", "pk": 20, "fields": {"product": 20, "user": 20, "rating": 3, "comment": "Decent for the price.", "created_at": "2024-02-08T10:00:00Z", "updated_at": "2024-02-08T10:00:00Z"}}
+]

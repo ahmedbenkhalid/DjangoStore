@@ -1,0 +1,280 @@
+{% load django_bootstrap5 %}
+{% load bootstrap_icons %}
+{% load i18n %}
+
+<nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom py-2 sticky-top shadow-sm">
+  <div class="container">
+
+    <a class="navbar-brand fw-bold m-0" href="{% url 'home' %}">
+      SMART S3R.
+    </a>
+
+    <div class="d-flex d-lg-none align-items-center gap-2">
+      <button class="btn btn-link text-dark p-0 text-decoration-none" type="button" data-bs-toggle="collapse"
+        data-bs-target="#mobileSearch" aria-label="Toggle search">
+        <i class="bi bi-search icon-lg"></i>
+      </button>
+      {% if user.is_authenticated %}
+      <a href="#cartOffcanvas" data-bs-toggle="offcanvas" aria-controls="cartOffcanvas"
+        class="btn btn-link text-dark p-0 text-decoration-none position-relative">
+        <i class="bi bi-cart icon-lg"></i>
+        {% if cart_count > 0 %}
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger cart-badge">
+          {% if cart_count < 10 %}{{ cart_count }}{% else %}9+{% endif %} </span>
+            {% endif %}
+      </a>
+      {% endif %}
+
+      <button class="navbar-toggler border-0 p-0 ms-1 shadow-none" type="button" data-bs-toggle="collapse"
+        data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <i class="bi bi-list mobile-nav-btn"></i>
+      </button>
+
+      {% if not user.is_authenticated %}
+      <a href="{% url 'register' %}" class="btn btn-dark btn-sm rounded-pill px-2 fw-bold text-uppercase btn-join-us">{% trans "Join Us" %}</a>
+      {% endif %}
+    </div>
+
+    <div class="d-none d-lg-block flex-grow-1 mx-4 position-relative js-search-wrapper search-wrapper">
+      <form action="{% url 'search' %}" method="get" autocomplete="off">
+        <div class="input-group bg-white border shadow-sm rounded-0 position-relative" style="height: 44px; overflow: visible;">
+          <span class="input-group-text bg-white border-0 px-3">
+            <i class="bi bi-search" style="font-size: 1.1rem;"></i>
+          </span>
+          <input type="text" name="q" class="form-control border-0 px-2 js-search-input search-input"
+            placeholder='{% trans "Search for products..." %}'>
+          
+          <!-- Clear button: absolute with hover effect -->
+          <button type="button" class="btn btn-link text-muted border-0 p-0 d-none js-search-clear shadow-none position-absolute d-flex align-items-center justify-content-center search-clear">
+            <i class="bi bi-x" style="font-size: 1.4rem;"></i>
+          </button>
+
+          <button class="btn btn-dark px-4 rounded-0 d-flex align-items-center justify-content-center search-btn" type="submit">
+            <i class="bi bi-arrow-right" style="font-size: 1.1rem;"></i>
+          </button>
+
+          <div class="dropdown-menu w-100 border-0 shadow-lg mt-2 rounded-3 js-search-dropdown search-dropdown">
+            <div class="js-search-results"></div>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item text-center text-muted py-2 js-search-all" href="#">
+              {% trans "View all results" %}
+            </a>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div class="d-none d-lg-none align-items-center gap-2">
+      <!-- Hidden this redundant block as we'll handle icons in the mobile-menu and desktop-menu -->
+    </div>
+
+    <div class="collapse d-lg-none w-100 mt-2" id="mobileSearch">
+      <div class="js-search-wrapper mobile-search-wrapper">
+        <form action="{% url 'search' %}" method="get" autocomplete="off">
+          <div class="input-group bg-white border shadow-sm rounded-0 position-relative mobile-search-input" style="overflow: visible;">
+            <span class="input-group-text bg-white border-0 px-3">
+              <i class="bi bi-search" style="font-size: 1.1rem;"></i>
+            </span>
+            <input type="text" name="q" class="form-control border-0 px-2 js-search-input search-input"
+              placeholder='{% trans "Search for products..." %}'>
+            
+            <button type="button" class="btn btn-link text-muted border-0 p-0 d-none js-search-clear shadow-none position-absolute d-flex align-items-center justify-content-center search-clear">
+              <i class="bi bi-x" style="font-size: 1.3rem;"></i>
+            </button>
+
+            <button class="btn btn-dark px-3 rounded-0 d-flex align-items-center justify-content-center search-btn" type="submit">
+              <i class="bi bi-arrow-right" style="font-size: 1.1rem;"></i>
+            </button>
+          <div class="dropdown-menu w-100 border-0 shadow-lg mt-2 rounded-3 js-search-dropdown search-dropdown" style="display: none;">
+              <div class="js-search-results"></div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  <div class="d-none d-lg-flex align-items-center gap-4">
+    <div class="d-flex align-items-center gap-3">
+      <a class="text-decoration-none text-dark fw-bold text-uppercase nav-link-uppercase" href="{% url 'products:products' %}">{% trans "Shop" %}</a>
+      <a class="text-decoration-none text-dark fw-bold text-uppercase nav-link-uppercase" href="{% url 'about' %}">{% trans "About Us" %}</a>
+      <div class="dropdown">
+        <a class="text-decoration-none text-dark fw-bold text-uppercase dropdown-toggle nav-link-uppercase" href="#" role="button" data-bs-toggle="dropdown"
+          aria-expanded="false">
+          {% trans "Categories" %}
+        </a>
+        <ul class="dropdown-menu shadow-sm border-0">
+          {% for cat in menu_categories %}
+          <li><a class="dropdown-item fw-bold"
+              href="{% url 'products:products' %}?category={{ cat.slug }}"
+              style="font-size: 0.8rem;">{{ cat.name }}</a></li>
+          {% endfor %}
+          {% if has_more_categories %}
+          <li>
+            <hr class="dropdown-divider">
+          </li>
+            <li><a class="dropdown-item fw-bold text-muted" href="{% url 'products:products' %}" style="font-size: 0.8rem;">{% trans "All Categories" %}</a></li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+
+    <div class="d-flex align-items-center gap-3 border-start ps-4">
+      <div class="dropdown">
+        <a class="text-decoration-none text-dark fw-bold text-uppercase dropdown-toggle btn-language" style="font-size: 0.7rem;"
+          href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+          {% if request.LANGUAGE_CODE == 'ar' %}AR{% else %}EN{% endif %}
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 lang-dropdown">
+          <li>
+            <form action="{% url 'set_language' %}" method="post" class="d-inline">
+              {% csrf_token %}
+              <input name="next" type="hidden" value="/">
+              <input name="language" type="hidden" value="en">
+              <button type="submit"
+                class="dropdown-item fw-bold text-center {% if request.LANGUAGE_CODE != 'ar' %}active{% endif %}"
+                style="font-size: 0.8rem;">EN</button>
+            </form>
+          </li>
+          <li>
+            <form action="{% url 'set_language' %}" method="post" class="d-inline">
+              {% csrf_token %}
+              <input name="next" type="hidden" value="/">
+              <input name="language" type="hidden" value="ar">
+              <button type="submit"
+                class="dropdown-item fw-bold text-center {% if request.LANGUAGE_CODE == 'ar' %}active{% endif %}"
+                style="font-size: 0.8rem;">AR</button>
+            </form>
+          </li>
+        </ul>
+      </div>
+
+      <div class="d-flex align-items-center gap-3">
+        {% if user.is_authenticated %}
+        <a href="{% url 'wishlist' %}" class="text-dark position-relative text-decoration-none p-1">
+          <i class="bi bi-heart icon-xxl"></i>
+          {% if wishlist_count > 0 %}
+          <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger wishlist-badge">
+            {% if wishlist_count < 10 %}{{ wishlist_count }}{% else %}9+{% endif %} </span>
+              {% endif %}
+        </a>
+
+        <a href="#cartOffcanvas" data-bs-toggle="offcanvas" aria-controls="cartOffcanvas"
+          class="text-dark position-relative text-decoration-none p-1">
+          <i class="bi bi-cart icon-xxl"></i>
+          {% if cart_count > 0 %}
+          <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger wishlist-badge">
+            {% if cart_count < 10 %}{{ cart_count }}{% else %}9+{% endif %} </span>
+              {% endif %}
+        </a>
+
+        <a href="{% url 'profile' %}" class="text-dark text-decoration-none p-1">
+          <i class="bi bi-person icon-xl"></i>
+        </a>
+        {% endif %}
+      </div>
+
+      {% if user.is_authenticated %}
+      <form action="{% url 'logout' %}" method="post" class="d-inline">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-dark rounded-pill px-4 py-1 fw-bold text-uppercase ms-2 btn-logout">{% trans "Logout" %}</button>
+      </form>
+      {% else %}
+      <a href="{% url 'login' %}" class="btn btn-outline-dark rounded-pill px-3 py-1 fw-bold text-uppercase btn-login">{% trans "Login" %}</a>
+      <a href="{% url 'register' %}" class="btn btn-dark rounded-pill px-3 py-1 fw-bold text-uppercase ms-2 btn-register-nav">{% trans "Join Us" %}</a>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="collapse navbar-collapse mt-3" id="navbarNav">
+
+    <ul class="navbar-nav gap-2 mb-3 d-lg-none">
+      <li class="nav-item">
+        <a class="nav-link fw-bold text-uppercase" href="{% url 'products:products' %}">{% trans "Shop" %}</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link fw-bold text-uppercase" href="{% url 'about' %}">{% trans "About Us" %}</a>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link fw-bold text-uppercase dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+          aria-expanded="false">
+          {% trans "Categories" %}
+        </a>
+        <ul class="dropdown-menu border-0 shadow-sm">
+          {% for cat in menu_categories %}
+          <li><a class="dropdown-item fw-bold"
+              href="{% url 'products:products' %}?category={{ cat.slug }}">{{ cat.name }}</a></li>
+          {% endfor %}
+          {% if has_more_categories %}
+          <li>
+            <hr class="dropdown-divider">
+          </li>
+          <li><a class="dropdown-item fw-bold text-muted" href="{% url 'products:products' %}">{% trans "All Categories" %}</a></li>
+          {% endif %}
+        </ul>
+      </li>
+    </ul>
+
+    <hr class="d-lg-none">
+
+    <div class="d-lg-none d-flex flex-column gap-3">
+      <div class="d-flex align-items-center justify-content-between">
+        <span class="text-muted small text-uppercase fw-bold">{% trans "Language" %}</span>
+        <div class="d-flex gap-2">
+          <form action="{% url 'set_language' %}" method="post" class="d-inline">
+            {% csrf_token %}
+            <input name="next" type="hidden" value="/">
+            <input name="language" type="hidden" value="en">
+            <button type="submit"
+              class="btn btn-outline-secondary btn-sm rounded-0 {% if request.LANGUAGE_CODE != 'ar' %}active{% endif %}">English</button>
+          </form>
+          <form action="{% url 'set_language' %}" method="post" class="d-inline">
+            {% csrf_token %}
+            <input name="next" type="hidden" value="/">
+            <input name="language" type="hidden" value="ar">
+            <button type="submit"
+              class="btn btn-outline-secondary btn-sm rounded-0 {% if request.LANGUAGE_CODE == 'ar' %}active{% endif %}">العربية</button>
+          </form>
+        </div>
+      </div>
+
+      {% if user.is_authenticated %}
+      <div class="d-flex gap-3">
+        <a class="nav-link fw-bold text-uppercase position-relative" href="{% url 'wishlist' %}">
+          <i class="bi bi-heart" style="font-size: 1.2rem;"></i>
+          {% trans "Wishlist" %}
+          {% if wishlist_count > 0 %}
+          <span class="badge bg-danger rounded-pill ms-1">{{ wishlist_count }}</span>
+          {% endif %}
+        </a>
+        <a class="nav-link fw-bold text-uppercase position-relative" href="#cartOffcanvas" data-bs-toggle="offcanvas"
+          aria-controls="cartOffcanvas">
+          <i class="bi bi-cart" style="font-size: 1.2rem;"></i>
+          {% trans "Cart" %}
+          {% if cart_count > 0 %}
+          <span class="badge bg-danger rounded-pill ms-1">{{ cart_count }}</span>
+          {% endif %}
+        </a>
+      </div>
+      {% endif %}
+
+      <hr>
+
+      {% if user.is_authenticated %}
+      <a class="nav-link fw-bold text-uppercase" href="{% url 'profile' %}">{% trans "Profile" %}</a>
+      <form action="{% url 'logout' %}" method="post" class="d-inline">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-link nav-link fw-bold text-uppercase p-0 border-0">{% trans "Logout" %}</button>
+      </form>
+      {% else %}
+      <div class="d-flex gap-2">
+        <a href="{% url 'login' %}" class="btn btn-outline-dark rounded-pill fw-bold text-uppercase flex-fill py-2"
+          style="font-size: 0.75rem;">{% trans "Login" %}</a>
+        <a href="{% url 'register' %}" class="btn btn-dark rounded-pill fw-bold text-uppercase flex-fill py-2"
+          style="font-size: 0.75rem;">{% trans "Join Us" %}</a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  </div>
+</nav>

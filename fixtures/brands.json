@@ -1,0 +1,22 @@
+[
+  {"model": "products.brand", "pk": 1, "fields": {"name": "Apple", "slug": "apple"}},
+  {"model": "products.brand", "pk": 2, "fields": {"name": "Samsung", "slug": "samsung"}},
+  {"model": "products.brand", "pk": 3, "fields": {"name": "Sony", "slug": "sony"}},
+  {"model": "products.brand", "pk": 4, "fields": {"name": "Nike", "slug": "nike"}},
+  {"model": "products.brand", "pk": 5, "fields": {"name": "Adidas", "slug": "adidas"}},
+  {"model": "products.brand", "pk": 6, "fields": {"name": "Dell", "slug": "dell"}},
+  {"model": "products.brand", "pk": 7, "fields": {"name": "HP", "slug": "hp"}},
+  {"model": "products.brand", "pk": 8, "fields": {"name": "Lenovo", "slug": "lenovo"}},
+  {"model": "products.brand", "pk": 9, "fields": {"name": "LG", "slug": "lg"}},
+  {"model": "products.brand", "pk": 10, "fields": {"name": "Canon", "slug": "canon"}},
+  {"model": "products.brand", "pk": 11, "fields": {"name": "Xiaomi", "slug": "xiaomi"}},
+  {"model": "products.brand", "pk": 12, "fields": {"name": "Huawei", "slug": "huawei"}},
+  {"model": "products.brand", "pk": 13, "fields": {"name": "Asus", "slug": "asus"}},
+  {"model": "products.brand", "pk": 14, "fields": {"name": "Microsoft", "slug": "microsoft"}},
+  {"model": "products.brand", "pk": 15, "fields": {"name": "Amazon", "slug": "amazon"}},
+  {"model": "products.brand", "pk": 16, "fields": {"name": "Google", "slug": "google"}},
+  {"model": "products.brand", "pk": 17, "fields": {"name": "Puma", "slug": "puma"}},
+  {"model": "products.brand", "pk": 18, "fields": {"name": "Reebok", "slug": "reebok"}},
+  {"model": "products.brand", "pk": 19, "fields": {"name": "Under Armour", "slug": "under-armour"}},
+  {"model": "products.brand", "pk": 20, "fields": {"name": "Generic", "slug": "generic"}}
+]

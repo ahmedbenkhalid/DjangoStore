@@ -1,0 +1,163 @@
+{% extends 'pages/shared/base.html' %}
+{% load i18n %}
+{% load bootstrap_icons %}
+
+{% block title %}{% trans "Checkout" %}{% endblock %}
+
+{% block content %}
+<div class="row g-5">
+    <!-- Checkout Form -->
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+            <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+                <h4 class="fw-bold mb-0">{% trans "Shipping Details" %}</h4>
+            </div>
+            <div class="card-body p-4">
+                {% if addresses %}
+                <div class="mb-4">
+                    <label class="form-label fw-bold small text-muted text-uppercase">{% trans "Saved Addresses" %}</label>
+                    <div class="row">
+                        {% for addr in addresses %}
+                        <div class="col-12 mb-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="saved_address" id="address_{{ addr.pk }}" value="{{ addr.pk }}" data-phone="{{ addr.phone }}" data-address="{{ addr.address }}, {% if addr.area %}{{ addr.area }}, {% endif %}{{ addr.city }}" {% if addr.is_default %}checked{% endif %}>
+                                <label class="form-check-label w-100" for="address_{{ addr.pk }}">
+                                    <div class="bg-light rounded-3 p-3">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span class="fw-bold">{{ addr.name }}</span>
+                                            {% if addr.is_default %}
+                                            <span class="badge bg-primary">{% trans "Default" %}</span>
+                                            {% endif %}
+                                        </div>
+                                        <small class="text-muted">{{ addr.phone }}</small><br>
+                                        <small class="text-muted">{{ addr.address }}, {{ addr.city }}{% if addr.area %} - {{ addr.area }}{% endif %}</small>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        <div class="col-12 mb-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="saved_address" id="address_new" value="new" {% if not addresses %}checked{% endif %}>
+                                <label class="form-check-label" for="address_new">
+                                    <span class="fw-bold">{% trans "Enter new address" %}</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <form action="{% url 'orders:create_order' %}" method="post" id="checkout-form">
+                    {% csrf_token %}
+                    <div id="new-address-form" {% if addresses %}style="display:none;"{% endif %}>
+                        <div class="mb-3">
+                            <label for="phone" class="form-label fw-bold small text-muted text-uppercase">{% trans "Phone Number" %}</label>
+                            <input type="text" name="phone" id="phone" class="form-control rounded-pill px-3" placeholder="+20 1XX XXX XXXX" value="{{ default_phone|default:'' }}">
+                        </div>
+                        <div class="mb-3">
+                            <label for="shipping_address" class="form-label fw-bold small text-muted text-uppercase">{% trans "Shipping Address" %}</label>
+                            <textarea name="shipping_address" id="shipping_address" rows="3" class="form-control rounded-4 px-3 py-2" placeholder="{% trans 'Enter your full delivery address' %}">{{ default_address|default:'' }}</textarea>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label for="notes" class="form-label fw-bold small text-muted text-uppercase">{% trans "Order Notes (Optional)" %}</label>
+                        <textarea name="notes" id="notes" rows="2" class="form-control rounded-4 px-3 py-2" placeholder="{% trans 'Special instructions for delivery' %}"></textarea>
+                    </div>
+
+                    <div class="bg-light rounded-4 p-4 mb-4 border-start border-primary border-4">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="text-primary">
+                                {% bs_icon 'truck' size='2em' %}
+                            </div>
+                            <div>
+                                <h6 class="fw-bold mb-1">{% trans "Payment Method" %}</h6>
+                                <p class="mb-0 text-muted small">{% trans "Cash on Delivery" %}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-dark btn-lg rounded-pill fw-bold py-3">
+                            {% trans "Place Order" %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Summary -->
+    <div class="col-lg-5">
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden sticky-top" style="top: 100px;">
+            <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+                <h5 class="fw-bold mb-0">{% trans "Order Summary" %}</h5>
+            </div>
+            <div class="card-body p-4">
+                <div class="mb-4">
+                    {% for item in products %}
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div class="d-flex align-items-center flex-grow-1">
+                            <div class="rounded-3 border overflow-hidden me-3" style="width: 50px; height: 50px; flex-shrink: 0;">
+                                {% if item.product.img %}
+                                    <img src="{{ item.product.img.url }}" class="w-100 h-100" style="object-fit: cover;">
+                                {% elif item.product.img_link %}
+                                    <img src="{{ item.product.img_link }}" class="w-100 h-100" style="object-fit: cover;">
+                                {% endif %}
+                            </div>
+                            <div class="min-w-0">
+                                <h6 class="small fw-bold mb-0 text-truncate">{{ item.product.name }}</h6>
+                                <span class="small text-muted">{{ item.quantity }} x {% if LANGUAGE_CODE == 'ar' %}ج.م{% else %}EGP{% endif %} {{ item.product.price }}</span>
+                            </div>
+                        </div>
+                        <span class="fw-bold ms-3">{% if LANGUAGE_CODE == 'ar' %}ج.م{% else %}EGP{% endif %} {{ item.subtotal }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <hr class="my-4">
+
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">{% trans "Subtotal" %}</span>
+                    <span>{% if LANGUAGE_CODE == 'ar' %}ج.م{% else %}EGP{% endif %} {{ total }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">{% trans "Shipping" %}</span>
+                    <span class="text-success small fw-bold">{% trans "FREE" %}</span>
+                </div>
+                <div class="d-flex justify-content-between mt-4">
+                    <h5 class="fw-bold">{% trans "Total" %}</h5>
+                    <h5 class="fw-bold text-primary">{% if LANGUAGE_CODE == 'ar' %}ج.م{% else %}EGP{% endif %} {{ total }}</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const savedAddresses = document.querySelectorAll('input[name="saved_address"]');
+    const newAddressForm = document.getElementById('new-address-form');
+    const phoneInput = document.getElementById('phone');
+    const addressInput = document.getElementById('shipping_address');
+    
+    if (savedAddresses.length > 0) {
+        savedAddresses.forEach(function(radio) {
+            radio.addEventListener('change', function() {
+                if (this.value === 'new') {
+                    newAddressForm.style.display = 'block';
+                    phoneInput.required = true;
+                    addressInput.required = true;
+                } else {
+                    newAddressForm.style.display = 'none';
+                    phoneInput.required = false;
+                    addressInput.required = false;
+                    phoneInput.value = this.dataset.phone;
+                    addressInput.value = this.dataset.address;
+                }
+            });
+        });
+    }
+});
+</script>
+{% endblock %}

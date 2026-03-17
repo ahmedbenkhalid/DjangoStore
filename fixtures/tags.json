@@ -1,0 +1,22 @@
+[
+  {"model": "products.tag", "pk": 1, "fields": {"name": "New Arrival", "slug": "new-arrival"}},
+  {"model": "products.tag", "pk": 2, "fields": {"name": "Best Seller", "slug": "best-seller"}},
+  {"model": "products.tag", "pk": 3, "fields": {"name": "Sale", "slug": "sale"}},
+  {"model": "products.tag", "pk": 4, "fields": {"name": "Popular", "slug": "popular"}},
+  {"model": "products.tag", "pk": 5, "fields": {"name": "Trending", "slug": "trending"}},
+  {"model": "products.tag", "pk": 6, "fields": {"name": "Limited Edition", "slug": "limited-edition"}},
+  {"model": "products.tag", "pk": 7, "fields": {"name": "Eco Friendly", "slug": "eco-friendly"}},
+  {"model": "products.tag", "pk": 8, "fields": {"name": "Premium", "slug": "premium"}},
+  {"model": "products.tag", "pk": 9, "fields": {"name": "Budget Friendly", "slug": "budget-friendly"}},
+  {"model": "products.tag", "pk": 10, "fields": {"name": "Wireless", "slug": "wireless"}},
+  {"model": "products.tag", "pk": 11, "fields": {"name": "Bluetooth", "slug": "bluetooth"}},
+  {"model": "products.tag", "pk": 12, "fields": {"name": "Smart", "slug": "smart"}},
+  {"model": "products.tag", "pk": 13, "fields": {"name": "Vintage", "slug": "vintage"}},
+  {"model": "products.tag", "pk": 14, "fields": {"name": "Modern", "slug": "modern"}},
+  {"model": "products.tag", "pk": 15, "fields": {"name": "Classic", "slug": "classic"}},
+  {"model": "products.tag", "pk": 16, "fields": {"name": "Kids", "slug": "kids"}},
+  {"model": "products.tag", "pk": 17, "fields": {"name": "Adults", "slug": "adults"}},
+  {"model": "products.tag", "pk": 18, "fields": {"name": "Unisex", "slug": "unisex"}},
+  {"model": "products.tag", "pk": 19, "fields": {"name": "Organic", "slug": "organic"}},
+  {"model": "products.tag", "pk": 20, "fields": {"name": "Import", "slug": "import"}}
+]

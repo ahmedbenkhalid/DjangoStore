@@ -1,0 +1,22 @@
+[
+  {"model": "products.category", "pk": 1, "fields": {"name": "Electronics", "slug": "electronics"}},
+  {"model": "products.category", "pk": 2, "fields": {"name": "Clothing", "slug": "clothing"}},
+  {"model": "products.category", "pk": 3, "fields": {"name": "Home & Garden", "slug": "home-garden"}},
+  {"model": "products.category", "pk": 4, "fields": {"name": "Sports", "slug": "sports"}},
+  {"model": "products.category", "pk": 5, "fields": {"name": "Books", "slug": "books"}},
+  {"model": "products.category", "pk": 6, "fields": {"name": "Toys & Games", "slug": "toys-games"}},
+  {"model": "products.category", "pk": 7, "fields": {"name": "Beauty", "slug": "beauty"}},
+  {"model": "products.category", "pk": 8, "fields": {"name": "Automotive", "slug": "automotive"}},
+  {"model": "products.category", "pk": 9, "fields": {"name": "Health", "slug": "health"}},
+  {"model": "products.category", "pk": 10, "fields": {"name": "Food & Beverages", "slug": "food-beverages"}},
+  {"model": "products.category", "pk": 11, "fields": {"name": "Office Supplies", "slug": "office-supplies"}},
+  {"model": "products.category", "pk": 12, "fields": {"name": "Pet Supplies", "slug": "pet-supplies"}},
+  {"model": "products.category", "pk": 13, "fields": {"name": "Jewelry", "slug": "jewelry"}},
+  {"model": "products.category", "pk": 14, "fields": {"name": "Music", "slug": "music"}},
+  {"model": "products.category", "pk": 15, "fields": {"name": "Videos", "slug": "videos"}},
+  {"model": "products.category", "pk": 16, "fields": {"name": "Tools", "slug": "tools"}},
+  {"model": "products.category", "pk": 17, "fields": {"name": "Baby Products", "slug": "baby-products"}},
+  {"model": "products.category", "pk": 18, "fields": {"name": "Groceries", "slug": "groceries"}},
+  {"model": "products.category", "pk": 19, "fields": {"name": "Digital Products", "slug": "digital-products"}},
+  {"model": "products.category", "pk": 20, "fields": {"name": "Services", "slug": "services"}}
+]

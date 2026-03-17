@@ -1,0 +1,66 @@
+{% extends 'pages/shared/base.html' %}
+{% load i18n %}
+{% load bootstrap_icons %}
+
+{% block title %}{% trans "My Orders" %}{% endblock %}
+
+{% block content %}
+<div class="bg-light py-5 mb-5 rounded-4">
+    <div class="container text-center">
+        <h1 class="fw-bold mb-1">{% trans "My Orders" %}</h1>
+        <p class="text-muted mb-0">{% trans "Track and manage your recent purchases." %}</p>
+    </div>
+</div>
+
+<div class="container container-content mb-5">
+    {% if orders %}
+    <div class="table-responsive">
+        <table class="table table-hover align-middle border-0">
+            <thead class="bg-light">
+                <tr class="text-uppercase small fw-bold text-muted border-0">
+                    <th class="border-0 px-4 py-3">{% trans "Order ID" %}</th>
+                    <th class="border-0 py-3">{% trans "Date" %}</th>
+                    <th class="border-0 py-3">{% trans "Status" %}</th>
+                    <th class="border-0 py-3">{% trans "Total" %}</th>
+                    <th class="border-0 px-4 py-3 text-end">{% trans "Actions" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr class="border-bottom">
+                    <td class="px-4 fw-bold">#{{ order.id }}</td>
+                    <td class="text-muted">{{ order.created_at|date:"d M Y" }}</td>
+                    <td>
+                        <span class="badge rounded-pill 
+                            {% if order.status == 'delivered' %}bg-success
+                            {% elif order.status == 'cancelled' %}bg-danger
+                            {% elif order.status == 'pending' %}bg-warning text-dark
+                            {% else %}bg-primary{% endif %} bg-opacity-10 
+                            {% if order.status == 'delivered' %}text-success
+                            {% elif order.status == 'cancelled' %}text-danger
+                            {% elif order.status == 'pending' %}text-warning
+                            {% else %}text-primary{% endif %} px-3">
+                            {{ order.get_status_display }}
+                        </span>
+                    </td>
+                    <td class="fw-bold text-primary">{% if request.LANGUAGE_CODE == 'ar' %}ج.م{% else %}EGP{% endif %} {{ order.total_amount }}</td>
+                    <td class="px-4 text-end">
+                        <a href="{% url 'orders:order_detail' order.id %}" class="btn btn-light btn-sm rounded-pill px-3 fw-bold">
+                            {% trans "View Details" %}
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <div class="mb-4 opacity-25"><i class="bi bi-bag-x" style="font-size: 4rem;"></i></div>
+        <h4 class="fw-bold">{% trans "No orders found" %}</h4>
+        <p class="text-muted mb-4">{% trans "Looks like you haven't placed any orders yet." %}</p>
+        <a href="{% url 'products:products' %}" class="btn btn-dark rounded-pill px-5 py-2">{% trans "Start Shopping" %}</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

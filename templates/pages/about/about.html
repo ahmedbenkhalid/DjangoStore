@@ -1,0 +1,81 @@
+{% extends 'pages/shared/base.html' %}
+{% load static %}
+{% load i18n %}
+{% load bootstrap_icons %}
+{% block title %}{% trans "About" %} - {{ block.super }}{% endblock %}
+{% block content %}
+
+<!-- Hero Section with Background Image -->
+<div class="position-relative text-white about-hero">
+    <div class="position-absolute top-0 start-0 w-100 h-100 bg-dark opacity-50"></div>
+    <div class="container py-5 position-relative">
+        <div class="row justify-content-center text-center py-5">
+            <div class="col-lg-8">
+                <h1 class="display-4 fw-bold">{% trans "About Our Store" %}</h1>
+                <p class="lead fs-3">{% trans "Welcome to our store" %}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Our Story -->
+<div class="container py-5">
+    <div class="row align-items-center g-5">
+        <div class="col-md-6">
+            <h2 class="fw-bold mb-4">{% trans "Our Story" %}</h2>
+            <p class="fs-5">{% trans "Founded in the heart of the city, our family-owned business started as a small shop with a big dream. Over the years, we've grown into a trusted destination for customers seeking high-quality products and personalized service. Every item we offer is carefully selected to ensure it meets our standards – and your expectations." %}</p>
+            <p class="fs-5">{% trans "We believe in building lasting relationships with our customers, one happy purchase at a time." %}</p>
+        </div>
+        <div class="col-md-6">
+            <div class="bg-light rounded-3 p-5 text-center text-dark border">
+                <i class="bi bi-shop" style="font-size: 4rem;"></i>
+                <p class="mt-2 mb-0 text-muted">{% trans "Our storefront" %}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- What We Stand For - Redesigned Section -->
+<div class="bg-light py-5">
+    <div class="container">
+        <h2 class="text-center fw-bold mb-5">{% trans "What We Stand For" %}</h2>
+        <div class="row g-4">
+            <!-- Card 1: Uncompromising Quality -->
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm bg-white">
+                    <div class="card-body text-center p-4">
+                        <div class="mb-3 text-dark">
+                            <i class="bi bi-gem" style="font-size: 3rem;"></i>
+                        </div>
+                        <h3 class="h5 fw-bold">{% trans "Uncompromising Quality" %}</h3>
+                        <p class="text-muted small">{% trans "We source only the finest materials and products, so you can shop with confidence." %}</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Card 2: Customer First -->
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm bg-white">
+                    <div class="card-body text-center p-4">
+                        <div class="mb-3 text-dark">
+                            <i class="bi bi-heart" style="font-size: 3rem;"></i>
+                        </div>
+                        <h3 class="h5 fw-bold">{% trans "Customer First" %}</h3>
+                        <p class="text-muted small">{% trans "Your satisfaction is our priority. Our team is here to help you find exactly what you need." %}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm bg-white">
+                    <div class="card-body text-center p-4">
+                        <div class="mb-3 text-dark">
+                            <i class="bi bi-tree" style="font-size: 3rem;"></i>
+                        </div>
+                        <h3 class="h5 fw-bold">{% trans "Sustainable Practices" %}</h3>
+                        <p class="text-muted small">{% trans "We care about the planet and choose eco-friendly options whenever possible." %}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,281 @@
+{% extends 'pages/shared/base.html' %}
+{% load i18n %}
+{% load bootstrap_icons %}
+
+{% block title %}E-Shop — {% trans "Home" %}{% endblock %}
+
+{% block content %}
+
+{# ── Hero Banner Carousel ── #}
+{% if banners %}
+<div id="heroCarousel" class="carousel slide carousel-fade mb-5" data-bs-ride="carousel" data-bs-interval="6000">
+  <div class="carousel-indicators">
+    {% for banner in banners %}
+    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="{{ forloop.counter0 }}" 
+            {% if forloop.first %}class="active" aria-current="true"{% endif %}></button>
+    {% endfor %}
+  </div>
+  
+  <div class="carousel-inner rounded-4 overflow-hidden shadow">
+    {% for banner in banners %}
+    <div class="carousel-item {% if forloop.first %}active{% endif %}" data-bs-interval="6000">
+      {% if banner.link %}
+      <a href="{{ banner.link }}">
+      {% endif %}
+        <div class="hero-image-container">
+          {% if banner.image %}
+            <img src="{{ banner.image.url }}" class="d-block w-100 hero-img" alt="{{ banner.get_title }}" 
+                 style="height: 480px; object-fit: cover;">
+          {% else %}
+            <div class="bg-dark d-flex align-items-center justify-content-center text-white" style="height: 480px;">
+              <i class="bi bi-image" style="font-size: 5rem; opacity: 0.2;"></i>
+            </div>
+          {% endif %}
+        </div>
+      {% if banner.link %}
+      </a>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  
+  <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon bg-dark bg-opacity-25 rounded-circle p-3" aria-hidden="true"></span>
+    <span class="visually-hidden">Previous</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+    <span class="carousel-control-next-icon bg-dark bg-opacity-25 rounded-circle p-3" aria-hidden="true"></span>
+    <span class="visually-hidden">Next</span>
+  </button>
+</div>
+{% else %}
+{# Fallback - Just a placeholder image #}
+<div class="rounded-4 overflow-hidden shadow mb-5">
+  <div class="bg-dark d-flex align-items-center justify-content-center text-white" style="height: 400px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);">
+    <div class="text-center">
+      <i class="bi bi-shop text-white opacity-25 mb-3" style="font-size: 6rem;"></i>
+      <h3 class="fw-bold">{% trans "Welcome to SMART S3R" %}</h3>
+      <p class="opacity-75">{% trans "Discover our latest collection" %}</p>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{# ── Categories ── #}
+{% if categories %}
+<div class="mb-5">
+  <div class="d-flex align-items-end justify-content-between mb-4">
+    <div>
+      <p class="text-muted fw-bold text-uppercase mb-1 section-label">{% trans "Browse by" %}</p>
+      <h2 class="fw-bold mb-0 h3">{% trans "Categories" %}</h2>
+    </div>
+    <a href="{% url 'categories:categories' %}" class="btn btn-sm btn-outline-dark rounded-pill px-3 fw-bold">
+      {% trans "All Categories" %} &rarr;
+    </a>
+  </div>
+
+  <div class="row row-cols-2 row-cols-md-4 row-cols-lg-4 g-3">
+    {% for cat in categories %}
+    <div class="col">
+      <a href="{% url 'products:products' %}?category={{ cat.slug }}" class="text-decoration-none d-block h-100">
+        <div class="card border-0 shadow-sm h-100 text-center overflow-hidden category-card">
+          <div class="position-relative overflow-hidden" style="aspect-ratio: 1/1; background: #f8f9fa;">
+            {% if cat.image %}
+              <img src="{{ cat.image.url }}" class="w-100 h-100"
+                   style="object-fit: cover;" alt="{{ cat.name }}">
+            {% else %}
+              <div class="d-flex align-items-center justify-content-center h-100 bg-light text-muted">
+                <i class="bi bi-grid" style="font-size: 2.5rem;"></i>
+              </div>
+            {% endif %}
+          </div>
+          <div class="card-body py-2 px-3">
+            <p class="fw-bold mb-0 text-dark category-name">{{ cat.name }}</p>
+          </div>
+        </div>
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+{# ── Featured Products ── #}
+{% if featured_products %}
+<div class="mb-5">
+  <div class="d-flex align-items-end justify-content-between mb-4">
+    <div>
+      <p class="text-muted fw-bold text-uppercase mb-1 section-label">{% trans "Hand-picked for you" %}</p>
+      <h2 class="fw-bold mb-0 h3">{% trans "Featured Products" %}</h2>
+    </div>
+    <a href="{% url 'products:products' %}" class="btn btn-sm btn-outline-dark rounded-pill px-3 fw-bold">
+      {% trans "View All" %} &rarr;
+    </a>
+  </div>
+
+  <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">
+    {% for product in featured_products %}
+    <div class="col">
+      <a href="{{ product.get_absolute_url }}" class="text-decoration-none d-block h-100">
+        <div class="card border-0 shadow-sm h-100 product-card">
+          <div class="position-relative overflow-hidden" style="aspect-ratio: 1/1;">
+            {% if product.img %}
+              <img src="{{ product.img.url }}"
+                   class="card-img-top h-100 w-100 product-img"
+                   style="object-fit: cover;"
+                   alt="{{ product.name }}">
+            {% elif product.img_link %}
+              <img src="{{ product.img_link }}"
+                   class="card-img-top h-100 w-100 product-img"
+                   style="object-fit: cover;"
+                   alt="{{ product.name }}">
+            {% else %}
+              <div class="bg-light d-flex align-items-center justify-content-center h-100 text-muted">
+                <i class="bi bi-image" style="font-size: 2.5rem;"></i>
+              </div>
+            {% endif %}
+
+            <div class="product-overlay position-absolute bottom-0 start-0 end-0 d-flex align-items-center justify-content-center">
+              {% if user.is_authenticated %}
+                <form action="{% url 'cart:add' product.id %}" method="post" class="js-cart-form">
+                  {% csrf_token %}
+                  <input type="hidden" name="quantity" value="1">
+                  <button type="submit" class="btn btn-light btn-sm rounded-pill fw-bold d-flex align-items-center gap-2 px-4">
+                    <i class="bi bi-cart-plus" style="font-size: .95rem;"></i> {% trans "Add to Cart" %}
+                  </button>
+                </form>
+              {% else %}
+                <button type="button"
+                        class="btn btn-light btn-sm rounded-pill fw-bold d-flex align-items-center gap-2 px-4"
+                        data-bs-toggle="modal" data-bs-target="#authModal">
+                  {% bs_icon 'cart-plus' size='.95em' %} {% trans "Add to Cart" %}
+                </button>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="card-body px-2 pt-2 pb-3 d-flex flex-column">
+            <p class="text-muted mb-0 product-brand">{{ product.brand.name }}</p>
+            <span class="text-dark fw-semibold lh-sm mt-1 mb-auto product-title">{{ product.name }}</span>
+            <p class="fw-bold mb-0 mt-2">{% if request.LANGUAGE_CODE == 'ar' %}ج.م{% else %}EGP{% endif %} {{ product.price }}</p>
+          </div>
+        </div>
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+{# ── Why Choose Us ── #}
+<div class="py-5 mb-5 rounded-4 bg-light px-4">
+  <div class="text-center mb-5">
+    <p class="text-muted fw-bold text-uppercase mb-1 section-label">{% trans "Our Promise" %}</p>
+    <h2 class="fw-bold h3">{% trans "Why Choose Us" %}</h2>
+  </div>
+  <div class="row g-4 text-center">
+    <div class="col-6 col-md-3">
+      <div class="mb-3 text-primary"><i class="bi bi-truck" style="font-size: 2rem;"></i></div>
+      <h6 class="fw-bold">{% trans "Fast Delivery" %}</h6>
+      <p class="text-muted small mb-0">{% trans "Orders shipped within 24 hours" %}</p>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="mb-3 text-success"><i class="bi bi-shield-check" style="font-size: 2rem;"></i></div>
+      <h6 class="fw-bold">{% trans "Secure Payments" %}</h6>
+      <p class="text-muted small mb-0">{% trans "100% secure & encrypted checkout" %}</p>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="mb-3 text-warning"><i class="bi bi-arrow-counterclockwise" style="font-size: 2rem;"></i></div>
+      <h6 class="fw-bold">{% trans "Easy Returns" %}</h6>
+      <p class="text-muted small mb-0">{% trans "14-day hassle-free returns" %}</p>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="mb-3 text-danger"><i class="bi bi-headset" style="font-size: 2rem;"></i></div>
+      <h6 class="fw-bold">{% trans "24/7 Support" %}</h6>
+      <p class="text-muted small mb-0">{% trans "We're here whenever you need us" %}</p>
+    </div>
+  </div>
+</div>
+
+{# ── Newsletter ── #}
+<div class="rounded-4 text-white text-center p-5 mb-4 newsletter-banner">
+  <div class="mb-3"><i class="bi bi-envelope-heart opacity-75" style="font-size: 2.5rem;"></i></div>
+  <h2 class="fw-bold h3 mb-2">{% trans "Stay in the Loop" %}</h2>
+  <p class="text-white-50 mb-4">{% trans "Subscribe for exclusive deals, new arrivals, and more." %}</p>
+  <form class="row g-2 justify-content-center" onsubmit="return false;">
+    <div class="col-12 col-sm-7 col-md-5">
+      <input type="email" class="form-control border-0 rounded-pill py-2 px-4"
+             placeholder="{% trans 'Enter your email address' %}">
+    </div>
+    <div class="col-auto">
+      <button type="submit" class="btn btn-light rounded-pill fw-bold px-4 py-2">
+        {% trans "Subscribe" %} &rarr;
+      </button>
+    </div>
+  </form>
+</div>
+
+{# ── Auth Modal (guests) ── #}
+{% if not user.is_authenticated %}
+<div class="modal fade" id="authModal" tabindex="-1" aria-labelledby="authModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 420px;">
+    <div class="modal-content border-0 shadow-lg rounded-4">
+      <div class="modal-header border-0 pb-0">
+        <div>
+          <h5 class="modal-title fw-bold mb-0" id="authModalLabel">{% trans "Create an account" %}</h5>
+          <p class="text-muted small mb-0">{% trans "Sign up to add items to your cart" %}</p>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body pt-3 pb-1">
+        <form action="{% url 'register' %}" method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="h_username" class="form-label small fw-bold">{% trans "Username" %}</label>
+            <div class="input-group">
+              <span class="input-group-text bg-light border-0"><i class="bi bi-person"></i></span>
+              <input type="text" name="username" id="h_username" class="form-control border-0 bg-light"
+                     placeholder="{% trans 'Choose a username' %}" required>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="h_email" class="form-label small fw-bold">{% trans "Email" %}</label>
+            <div class="input-group">
+              <span class="input-group-text bg-light border-0"><i class="bi bi-envelope"></i></span>
+              <input type="email" name="email" id="h_email" class="form-control border-0 bg-light"
+                     placeholder="{% trans 'your@email.com' %}" required>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="h_pw1" class="form-label small fw-bold">{% trans "Password" %}</label>
+            <div class="input-group">
+              <span class="input-group-text bg-light border-0"><i class="bi bi-lock"></i></span>
+              <input type="password" name="password1" id="h_pw1" class="form-control border-0 bg-light"
+                     placeholder="{% trans 'Create a password' %}" required>
+            </div>
+          </div>
+          <div class="mb-4">
+            <label for="h_pw2" class="form-label small fw-bold">{% trans "Confirm Password" %}</label>
+            <div class="input-group">
+              <span class="input-group-text bg-light border-0"><i class="bi bi-lock-fill"></i></span>
+              <input type="password" name="password2" id="h_pw2" class="form-control border-0 bg-light"
+                     placeholder="{% trans 'Repeat your password' %}" required>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-dark rounded-pill w-100 fw-bold py-2">
+            <i class="bi bi-person-plus"></i> {% trans "Create Account" %}
+          </button>
+        </form>
+      </div>
+      <div class="modal-footer border-0 pt-2 d-flex justify-content-center">
+        <p class="text-muted small mb-0">
+          {% trans "Already have an account?" %}
+          <a href="{% url 'login' %}" class="fw-bold text-dark text-decoration-none">{% trans "Log in" %} &rarr;</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,605 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-10-27 12:00+0000\n"
+"PO-Revision-Date: 2023-10-27 12:00+0000\n"
+"Last-Translator: Auto <auto@example.com>\n"
+"Language-Team: Arabic <ar@example.com>\n"
+"Language: ar\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Home"
+msgstr "الرئيسية"
+
+msgid "Products"
+msgstr "المنتجات"
+
+msgid "Cart"
+msgstr "عربة التسوق"
+
+msgid "Orders"
+msgstr "الطلبات"
+
+msgid "Profile"
+msgstr "الملف الشخصي"
+
+msgid "Admin"
+msgstr "الإدارة"
+
+msgid "Login"
+msgstr "تسجيل الدخول"
+
+msgid "Register"
+msgstr "إنشاء حساب"
+
+msgid "Logout"
+msgstr "تسجيل الخروج"
+
+msgid "Search for products..."
+msgstr "البحث عن منتجات..."
+
+msgid "Search"
+msgstr "بحث"
+
+msgid "Shop"
+msgstr "المتجر"
+
+msgid "About Us"
+msgstr "معلومات عنا"
+
+msgid "Follow Us"
+msgstr "تابعنا"
+
+msgid "Facebook"
+msgstr "فيسبوك"
+
+msgid "Twitter"
+msgstr "تويتر"
+
+msgid "Instagram"
+msgstr "إنستغرام"
+
+msgid "Smart S3r. All rights reserved."
+msgstr "سمارت سير. جميع الحقوق محفوظة."
+
+msgid "About Us - Smart S3r"
+msgstr "معلومات عنا - سمارت سير"
+
+msgid "Tech with Style"
+msgstr "تكنولوجيا بأناقة"
+
+msgid "Discover our latest premium products."
+msgstr "اكتشف أحدث منتجاتنا المتميزة."
+
+msgid "Shop Now /"
+msgstr "تسوق الآن /"
+
+msgid "Featured Products"
+msgstr "منتجات مميزة"
+
+msgid "Our Story"
+msgstr "قصتنا"
+
+msgid "Welcome to Smart S3r, your number one source for premium tech..."
+msgstr "مرحباً بكم في سمارت سير، مصدرك الأول للإلكترونيات..."
+
+msgid "Filters"
+msgstr "تصفية"
+
+msgid "Categories"
+msgstr "الفئات"
+
+msgid "All Categories"
+msgstr "جميع الفئات"
+
+msgid "Brands"
+msgstr "العلامات التجارية"
+
+msgid "All Brands"
+msgstr "جميع العلامات التجارية"
+
+msgid "Brand"
+msgstr "العلامة التجارية"
+
+msgid "Category"
+msgstr "الفئة"
+
+msgid "SKU"
+msgstr "وحدة الاحتفاظ بالمخزون"
+
+msgid "No Image"
+msgstr "بدون صورة"
+
+msgid "In Stock"
+msgstr "في المخزن"
+
+msgid "Sold Out"
+msgstr "نفدت الكمية"
+
+msgid "No description available."
+msgstr "لا يوجد وصف متاح."
+
+msgid "Add to Cart /"
+msgstr "إضافة للسلة /"
+
+msgid "Sold Out /"
+msgstr "نفدت الكمية /"
+
+msgid "Save"
+msgstr "حفظ"
+
+msgid "Description"
+msgstr "الوصف"
+
+msgid "Specifications"
+msgstr "المواصفات"
+
+msgid "Reviews"
+msgstr "المراجعات"
+
+msgid "Product Overview"
+msgstr "نظرة عامة على المنتج"
+
+msgid "No reviews yet."
+msgstr "لا توجد مراجعات حتى الآن."
+
+msgid "You May Also Like"
+msgstr "قد يعجبك أيضاً"
+
+msgid "Related"
+msgstr "المرتبطة"
+
+msgid "Your Selection"
+msgstr "اختياراتك"
+
+msgid "Shopping Cart"
+msgstr "عربة التسوق"
+
+msgid "Qty"
+msgstr "الكمية"
+
+msgid "Remove /"
+msgstr "حذف /"
+
+msgid "Order Summary /"
+msgstr "ملخص الطلب /"
+
+msgid "Subtotal"
+msgstr "المجموع الفرعي"
+
+msgid "Shipping"
+msgstr "الشحن"
+
+msgid "Calculated at checkout"
+msgstr "يتم حسابه عند الدفع"
+
+msgid "Total"
+msgstr "المجموع"
+
+msgid "Checkout /"
+msgstr "الدفع /"
+
+msgid "Tax included. Shipping calculated at checkout."
+msgstr "شامل الضريبة. يتم حساب الشحن عند الدفع."
+
+msgid "Your cart is empty"
+msgstr "عربة التسوق فارغة"
+
+msgid "Add some products to get started!"
+msgstr "أضف بعض المنتجات للبدء!"
+
+msgid "Browse Products /"
+msgstr "تصفح المنتجات /"
+
+msgid "Account Activity"
+msgstr "نشاط الحساب"
+
+msgid "My Orders"
+msgstr "طلباتي"
+
+msgid "Order #"
+msgstr "طلب #"
+
+msgid "Items"
+msgstr "العناصر"
+
+msgid "View Details"
+msgstr "عرض التفاصيل"
+
+msgid "No orders found"
+msgstr "لم يتم العثور على طلبات"
+
+msgid "Your purchase history is currently empty."
+msgstr "سجل مشترياتك فارغ حالياً."
+
+msgid "Start Shopping"
+msgstr "ابدأ التسوق"
+
+msgid "Order Summary"
+msgstr "ملخص الطلب"
+
+msgid "/ BACK TO ORDERS"
+msgstr "/ العودة للطلبات"
+
+msgid "Shipping Address"
+msgstr "عنوان الشحن"
+
+msgid "Payment"
+msgstr "الدفع"
+
+msgid "Order Notes"
+msgstr "ملاحظات الطلب"
+
+msgid "Continue Shopping"
+msgstr "مواصلة التسوق"
+
+msgid "Final Step"
+msgstr "الخطوة الأخيرة"
+
+msgid "Checkout"
+msgstr "إتمام الطلب"
+
+msgid "Shipping Details /"
+msgstr "تفاصيل الشحن /"
+
+msgid "Full Address"
+msgstr "العنوان الكامل"
+
+msgid "STREET, CITY, STATE, ZIP..."
+msgstr "الشارع، المدينة، المنطقة..."
+
+msgid "Phone Number"
+msgstr "رقم الهاتف"
+
+msgid "Order Notes (Optional)"
+msgstr "ملاحظات الطلب (اختياري)"
+
+msgid "SPECIAL INSTRUCTIONS..."
+msgstr "تعليمات خاصة..."
+
+msgid "Payment Method /"
+msgstr "طريقة الدفع /"
+
+msgid "Cash on Delivery"
+msgstr "الدفع عند الاستلام"
+
+msgid "Confirm Order — ${{ total }} /"
+msgstr "تأكيد الطلب — ${{ total }} /"
+
+msgid "Order Confirmed - Smart S3r"
+msgstr "تم تأكيد الطلب - سمارت سير"
+
+msgid "Order Confirmed"
+msgstr "تم تأكيد الطلب"
+
+msgid "Success /"
+msgstr "نجاح /"
+
+msgid "Confirmed."
+msgstr "مؤكد."
+
+msgid ""
+"Thank you for your purchase. Your order #{{ order.id }} is being processed."
+msgstr "شكراً لشرائك. يتم الآن معالجة طلبك رقم {{ order.id }}."
+
+msgid "View All Orders"
+msgstr "عرض جميع الطلبات"
+
+msgid "Account Access"
+msgstr "الوصول للحساب"
+
+msgid "Username"
+msgstr "اسم المستخدم"
+
+msgid "USERNAME"
+msgstr "اسم المستخدم"
+
+msgid "Password"
+msgstr "كلمة المرور"
+
+msgid "Forgot?"
+msgstr "هل نسيتها؟"
+
+msgid "Sign In /"
+msgstr "تسجيل الدخول /"
+
+msgid "New to Smart S3r?"
+msgstr "جديد في سمارت سير؟"
+
+msgid "Create Account /"
+msgstr "إنشاء حساب /"
+
+msgid "Join Us"
+msgstr "انضم إلينا"
+
+msgid "ENTER {{ label }}"
+msgstr "أدخل {{ label }}"
+
+msgid "Already have an account?"
+msgstr "هل لديك حساب بالفعل؟"
+
+msgid "Login Now /"
+msgstr "تسجيل الدخول الآن /"
+
+msgid "By joining, you agree to our"
+msgstr "بانضمامك إلينا، أنت توافق على"
+
+msgid "Terms"
+msgstr "الشروط"
+
+msgid "and"
+msgstr "و"
+
+msgid "Privacy"
+msgstr "الخصوصية"
+
+msgid "My Account"
+msgstr "حسابي"
+
+msgid "'s Profile"
+msgstr "الملف الشخصي لـ"
+
+msgid "Edit"
+msgstr "تعديل"
+
+msgid "Wishlist"
+msgstr "قائمة الرغبات"
+
+msgid "Recent Activity"
+msgstr "النشاط الأخير"
+
+msgid "No activity yet. Start shopping!"
+msgstr "لا يوجد نشاط حتى الآن. ابدأ التسوق!"
+
+msgid "Go to Store"
+msgstr "الذهاب للمتجر"
+
+msgid "Member Since"
+msgstr "عضو منذ"
+
+msgid "Profile Information"
+msgstr "معلومات الملف الشخصي"
+
+msgid "Recent Orders"
+msgstr "آخر الطلبات"
+
+msgid "Go to Wishlist"
+msgstr "الانتقال لقائمة الرغبات"
+
+msgid "Order Date"
+msgstr "تاريخ الطلب"
+
+msgid "Status"
+msgstr "الحالة"
+
+msgid "Profile Picture"
+msgstr "صورة الملف الشخصي"
+
+msgid "Email"
+msgstr "البريد الإلكتروني"
+
+msgid "Full Name"
+msgstr "الاسم الكامل"
+
+msgid "No orders yet."
+msgstr "لا توجد طلبات حتى الآن."
+
+msgid "View Order"
+msgstr "عرض الطلب"
+
+msgid "Address Book"
+msgstr "دفتر العناوين"
+
+msgid "Save your shipping addresses for a faster checkout experience."
+msgstr "احفظ عناوين الشحن الخاصة بك لتجربة دفع أسرع."
+
+msgid "Manage Addresses"
+msgstr "إدارة العناوين"
+
+msgid "Security"
+msgstr "الأمان"
+
+msgid "Manage your password and security settings to keep your account safe."
+msgstr "قم بإدارة كلمة المرور وإعدادات الأمان للحفاظ على أمان حسابك."
+
+msgid "Manage Security"
+msgstr "إدارة الأمان"
+
+msgid "Change Password"
+msgstr "تغيير كلمة المرور"
+
+msgid "Update your password to keep your account secure."
+msgstr "قم بتحديث كلمة المرور الخاصة بك للحفاظ على أمان حسابك."
+
+msgid "Username:"
+msgstr "اسم المستخدم:"
+
+msgid "Member Since:"
+msgstr "عضو منذ:"
+
+msgid "Password Changed"
+msgstr "تم تغيير كلمة المرور"
+
+msgid "Password Updated Successfully!"
+msgstr "تم تحديث كلمة المرور بنجاح!"
+
+msgid ""
+"Your password has been changed. You can now continue using your account."
+msgstr ""
+"تم تغيير كلمة المرور الخاصة بك. يمكنك الآن الاستمرار في استخدام حسابك."
+
+msgid "Back to Profile"
+msgstr "العودة للملف الشخصي"
+
+msgid "Visit Official Site"
+msgstr "زيارة الموقع الرسمي"
+
+msgid "Share Product"
+msgstr "مشاركة المنتج"
+
+msgid "Copy Link"
+msgstr "نسخ الرابط"
+
+msgid "Link Copied!"
+msgstr "تم نسخ الرابط!"
+
+msgid "Only {{ count }} left in stock!"
+msgstr "متبقي {{ count }} فقط في المخزن!"
+
+msgid "Items available"
+msgstr "قطع متوفرة"
+
+msgid "Out of Stock"
+msgstr "نفدت الكمية"
+
+msgid "My Wishlist"
+msgstr "قائمة أمنياتي"
+
+msgid "Products you've saved for later."
+msgstr "المنتجات التي قمت بحفظها لوقت لاحق."
+
+msgid "Your wishlist is empty"
+msgstr "قائمة أمنياتك فارغة"
+
+msgid "Explore our products and tap the heart icon to save items you love!"
+msgstr "استكشف منتجاتنا واضغط على أيقونة القلب لحفظ العناصر التي تحبها!"
+
+msgid "SKU:"
+msgstr "رمز المنتج:"
+
+msgid "Category:"
+msgstr "الفئة:"
+
+msgid "Share:"
+msgstr "مشاركة:"
+
+msgid "Checkout Now"
+msgstr "إتمام الدفع الآن"
+
+msgid "Shipping Details"
+msgstr "تفاصيل الشحن"
+
+msgid "Payment Method"
+msgstr "طريقة الدفع"
+
+msgid "Place Order"
+msgstr "تأكيد الطلب"
+
+msgid "Order Confirmation"
+msgstr "تأكيد الطلب"
+
+msgid "Thank you for your order!"
+msgstr "شكراً لطلبك!"
+
+msgid "Your order has been placed successfully."
+msgstr "تم تنفيذ طلبك بنجاح."
+
+msgid "Order ID:"
+msgstr "رقم الطلب:"
+
+msgid "Total:"
+msgstr "الإجمالي:"
+
+msgid "Pay when you receive your order"
+msgstr "ادفع عند استلام طلبك"
+
+msgid "Order Items"
+msgstr "عناصر الطلب"
+
+msgid "Order Status"
+msgstr "حالة الطلب"
+
+msgid "Date:"
+msgstr "التاريخ:"
+
+msgid "View all results"
+msgstr "عرض جميع النتائج"
+
+msgid "About Our Store"
+msgstr "حول متجرنا"
+
+msgid "Welcome to our store"
+msgstr "مرحباً بكم في متجرنا"
+
+msgid "Write a Review"
+msgstr "كتابة مراجعة"
+
+msgid "Edit Your Review"
+msgstr "تعديل مراجعتك"
+
+msgid "Customer Reviews"
+msgstr "مراجعات العملاء"
+
+msgid "Rating"
+msgstr "التقييم"
+
+msgid "Your Comment"
+msgstr "تعليقك"
+
+msgid "Update Review"
+msgstr "تحديث المراجعة"
+
+msgid "Submit Review"
+msgstr "إرسال المراجعة"
+
+msgid "Login to Review"
+msgstr "سجل الدخول للمراجعة"
+
+msgid "Write your experience here..."
+msgstr "اكتب تجربتك هنا..."
+
+msgid "No reviews yet. Be the first to share your experience!"
+msgstr "لا توجد مراجعات بعد. كن أول من يشارك تجربته!"
+
+msgid "About"
+msgstr "حول"
+
+msgid ""
+"Founded in the heart of the city, our family-owned business started as a "
+"small shop with a big dream. Over the years, we've grown into a trusted "
+"destination for customers seeking high-quality products and personalized "
+"service. Every item we offer is carefully selected to ensure it meets our "
+"standards – and your expectations."
+msgstr ""
+"تأسس عملنا العائلي في قلب المدينة، وقد بدأ كمتجر صغير بحلم كبير. على مر "
+"السنين، كبرنا لنصبح وجهة موثوقة للعملاء الباحثين عن منتجات عالية الجودة "
+"وخدمة شخصية. يتم اختيار كل عنصر نقدمه بعناية لضمان تلبية معاييرنا - "
+"وتوقعاتك."
+
+msgid ""
+"We believe in building lasting relationships with our customers, one happy "
+"purchase at a time."
+msgstr "نؤمن ببناء علاقات دائمة مع عملائنا، من خلال كل عملية شراء سعيدة."
+
+msgid "Our storefront"
+msgstr "واجهة متجرنا"
+
+msgid "What We Stand For"
+msgstr "ما نمثله"
+
+msgid "Uncompromising Quality"
+msgstr "جودة لا تهاون فيها"
+
+msgid ""
+"We source only the finest materials and products, so you can shop with "
+"confidence."
+msgstr "نحن نحصل على أفضل المواد والمنتجات فقط، لذا يمكنك التسوق بثقة."
+
+msgid "Customer First"
+msgstr "العميل أولاً"
+
+msgid ""
+"Your satisfaction is our priority. Our team is here to help you find exactly"
+" what you need."
+msgstr "رضاك هو أولويتنا. فريقنا هنا لمساعدتك في العثور على ما تحتاجه بالضبط."
+
+msgid "Sustainable Practices"
+msgstr "ممارسات مستدامة"
+
+msgid ""
+"We care about the planet and choose eco-friendly options whenever possible."
+msgstr "نحن نهتم بالكوكب ونختار الخيارات الصديقة للبيئة كلما أمكن ذلك."

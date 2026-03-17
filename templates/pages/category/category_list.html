@@ -1,0 +1,40 @@
+{% extends 'pages/shared/base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Categories" %}{% endblock %}
+
+{% block content %}
+<div class="mb-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">{% trans "Home" %}</a></li>
+            <li class="breadcrumb-item active">{% trans "Categories" %}</li>
+        </ol>
+    </nav>
+
+    <h1 class="fw-bold mb-4">{% trans "All Categories" %}</h1>
+
+    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-4">
+        {% for cat in categories %}
+        <div class="col">
+            <a href="{{ cat.get_absolute_url }}" class="text-decoration-none text-dark">
+                <div class="card h-100 border-0 shadow-sm category-card overflow-hidden">
+                    <div class="position-relative" style="aspect-ratio: 1/1;">
+                        {% if cat.image %}
+                        <img src="{{ cat.image.url }}" class="w-100 h-100" style="object-fit: cover;" alt="{{ cat.name }}">
+                        {% else %}
+                        <div class="bg-light d-flex align-items-center justify-content-center h-100 text-muted">
+                            <i class="bi bi-grid" style="font-size: 3rem;"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="card-body text-center p-3">
+                        <h6 class="fw-bold mb-0">{{ cat.name }}</h6>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

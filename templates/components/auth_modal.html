@@ -1,0 +1,77 @@
+{% load i18n %}
+{% load bootstrap_icons %}
+
+{% if not user.is_authenticated %}
+<div class="modal fade" id="authModal" tabindex="-1" aria-labelledby="authModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 420px;">
+    <div class="modal-content border-0 shadow-lg rounded-4">
+
+      <div class="modal-header border-0 pb-0">
+        <div>
+          <h5 class="modal-title fw-bold mb-0" id="authModalLabel">{% trans "Create an account" %}</h5>
+          <p class="text-muted small mb-0">{% trans "Sign up or log in to continue" %}</p>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body pt-3 pb-1">
+        <form action="{% url 'register' %}" method="post">
+          {% csrf_token %}
+
+          <div class="mb-3">
+            <label for="modal_username" class="form-label small fw-bold">{% trans "Username" %}</label>
+            <div class="input-group">
+              <span class="input-group-text bg-light border-0">{% bs_icon 'person' %}</span>
+              <input type="text" name="username" id="modal_username"
+                     class="form-control border-0 bg-light"
+                     placeholder="{% trans 'Choose a username' %}" required>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="modal_email" class="form-label small fw-bold">{% trans "Email" %}</label>
+            <div class="input-group">
+              <span class="input-group-text bg-light border-0">{% bs_icon 'envelope' %}</span>
+              <input type="email" name="email" id="modal_email"
+                     class="form-control border-0 bg-light"
+                     placeholder="{% trans 'your@email.com' %}" required>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="modal_password1" class="form-label small fw-bold">{% trans "Password" %}</label>
+            <div class="input-group">
+              <span class="input-group-text bg-light border-0">{% bs_icon 'lock' %}</span>
+              <input type="password" name="password1" id="modal_password1"
+                     class="form-control border-0 bg-light"
+                     placeholder="{% trans 'Create a password' %}" required>
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label for="modal_password2" class="form-label small fw-bold">{% trans "Confirm Password" %}</label>
+            <div class="input-group">
+              <span class="input-group-text bg-light border-0">{% bs_icon 'lock-fill' %}</span>
+              <input type="password" name="password2" id="modal_password2"
+                     class="form-control border-0 bg-light"
+                     placeholder="{% trans 'Repeat your password' %}" required>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-dark rounded-pill w-100 fw-bold py-2">
+            {% bs_icon 'person-plus' %} {% trans "Create Account" %}
+          </button>
+        </form>
+      </div>
+
+      <div class="modal-footer border-0 pt-2 d-flex justify-content-center">
+        <p class="text-muted small mb-0">
+          {% trans "Already have an account?" %}
+          <a href="{% url 'login' %}" class="fw-bold text-dark text-decoration-none">{% trans "Log in" %} &rarr;</a>
+        </p>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endif %}

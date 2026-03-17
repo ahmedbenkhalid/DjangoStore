@@ -1,0 +1,80 @@
+{% load i18n %}
+{% load bootstrap_icons %}
+
+{% if cart_items %}
+  {% for item in cart_items %}
+  <div class="d-flex align-items-center gap-3 py-3 border-bottom">
+
+    {# Product image #}
+    <div class="flex-shrink-0 rounded-2 overflow-hidden bg-light"
+         style="width: 64px; height: 64px;">
+      {% if item.product.img %}
+        <img src="{{ item.product.img.url }}" class="w-100 h-100" style="object-fit: cover;" alt="{{ item.product.name }}">
+      {% elif item.product.img_link %}
+        <img src="{{ item.product.img_link }}" class="w-100 h-100" style="object-fit: cover;" alt="{{ item.product.name }}">
+      {% else %}
+        <div class="d-flex align-items-center justify-content-center h-100 text-muted">
+          <i class="bi bi-image" style="font-size: 1.5rem;"></i>
+        </div>
+      {% endif %}
+    </div>
+
+    {# Name + controls #}
+    <div class="flex-grow-1 min-w-0">
+      <a href="{{ item.product.get_absolute_url }}"
+         class="text-decoration-none text-dark fw-semibold lh-sm d-block text-truncate"
+         style="font-size: .82rem;">{{ item.product.name }}</a>
+
+      {# Quantity controls #}
+      <div class="d-flex align-items-center gap-2 mt-2">
+        <form action="{% url 'cart:add' item.product.id %}" method="post"
+              class="js-cart-form d-inline" data-action="decrease">
+          {% csrf_token %}
+          <input type="hidden" name="quantity" value="-1">
+          <button type="submit"
+                  class="btn btn-outline-secondary btn-sm d-flex align-items-center justify-content-center rounded-circle p-0"
+                  style="width: 26px; height: 26px; font-size: .85rem;">
+            <i class="bi bi-dash" style="font-size: .85rem;"></i>
+          </button>
+        </form>
+
+        <span class="fw-bold" style="font-size: .85rem; min-width: 18px; text-align: center;">
+          {{ item.quantity }}
+        </span>
+
+        <form action="{% url 'cart:add' item.product.id %}" method="post"
+              class="js-cart-form d-inline" data-action="increase">
+          {% csrf_token %}
+          <input type="hidden" name="quantity" value="1">
+          <button type="submit"
+                  class="btn btn-outline-secondary btn-sm d-flex align-items-center justify-content-center rounded-circle p-0"
+                  style="width: 26px; height: 26px; font-size: .85rem;">
+            <i class="bi bi-plus" style="font-size: .85rem;"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    {# Price + remove #}
+    <div class="flex-shrink-0 text-end">
+      <p class="fw-bold mb-1" style="font-size: .85rem;">{% if request.LANGUAGE_CODE == 'ar' %}ج.م{% else %}EGP{% endif %} {{ item.subtotal }}</p>
+      <form action="{% url 'cart:remove' item.product.id %}" method="post"
+            class="js-cart-form d-inline">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-link text-muted p-0" style="font-size: .7rem;">
+          <i class="bi bi-x-lg" style="font-size: .75rem;"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+  {% endfor %}
+
+{% else %}
+  <div class="d-flex flex-column align-items-center justify-content-center h-100 py-5 text-muted">
+    <i class="bi bi-cart-x mb-3 opacity-40" style="font-size: 3rem;"></i>
+    <p class="fw-bold mb-0" style="font-size: .9rem;">{% trans "Your cart is empty" %}</p>
+    <a href="{% url 'products:products' %}" class="btn btn-dark btn-sm rounded-pill px-4 mt-3">
+      {% trans "Start Shopping" %}
+    </a>
+  </div>
+{% endif %}

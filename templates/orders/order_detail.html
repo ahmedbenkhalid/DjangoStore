@@ -1,0 +1,114 @@
+{% extends 'pages/shared/base.html' %}
+{% load i18n %}
+{% load bootstrap_icons %}
+
+{% block title %}{% trans "Order Details" %} #{{ order.id }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <a href="{% url 'orders:order_list' %}" class="btn btn-light rounded-circle shadow-sm">
+            <i class="bi bi-arrow-left"></i>
+        </a>
+        <h1 class="h3 fw-bold mb-0">{% trans "Order Details" %} #{{ order.id }}</h1>
+    </div>
+
+    <div class="row g-4">
+        <!-- Order Info -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-4">{% trans "Order Items" %}</h5>
+                    {% for item in items %}
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="flex-shrink-0 rounded-3 border overflow-hidden" style="width: 64px; height: 64px;">
+                            {% if item.product.img %}
+                                <img src="{{ item.product.img.url }}" class="w-100 h-100" style="object-fit: cover;">
+                            {% elif item.product.img_link %}
+                                <img src="{{ item.product.img_link }}" class="w-100 h-100" style="object-fit: cover;">
+                            {% endif %}
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="fw-bold mb-1">{{ item.product.name }}</h6>
+                            <p class="text-muted small mb-0">{{ item.quantity }} x {% if request.LANGUAGE_CODE == 'ar' %}ج.م{% else %}EGP{% endif %} {{ item.price }}</p>
+                        </div>
+                        <div class="text-end">
+                            <span class="fw-bold">{% if request.LANGUAGE_CODE == 'ar' %}ج.م{% else %}EGP{% endif %} {{ item.subtotal }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    
+                    <hr class="my-4">
+                    
+                    <div class="row">
+                        <div class="col-md-6 ms-auto">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">{% trans "Subtotal" %}</span>
+                                <span>{% if request.LANGUAGE_CODE == 'ar' %}ج.م{% else %}EGP{% endif %} {{ order.total_amount }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">{% trans "Shipping" %}</span>
+                                <span class="text-success small fw-bold">{% trans "FREE" %}</span>
+                            </div>
+                            <div class="d-flex justify-content-between mt-3 pt-3 border-top">
+                                <h5 class="fw-bold">{% trans "Total" %}</h5>
+                                <h5 class="fw-bold text-primary">{% if request.LANGUAGE_CODE == 'ar' %}ج.م{% else %}EGP{% endif %} {{ order.total_amount }}</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body p-4 text-center py-5">
+                    <h6 class="text-muted text-uppercase small fw-bold mb-3">{% trans "Order Status" %}</h6>
+                    <div class="d-flex justify-content-center align-items-center gap-2 h4 fw-bold">
+                        <span class="badge rounded-pill 
+                            {% if order.status == 'delivered' %}bg-success
+                            {% elif order.status == 'cancelled' %}bg-danger
+                            {% elif order.status == 'pending' %}bg-warning text-dark
+                            {% else %}bg-primary{% endif %} bg-opacity-10 
+                            {% if order.status == 'delivered' %}text-success
+                            {% elif order.status == 'cancelled' %}text-danger
+                            {% elif order.status == 'pending' %}text-warning
+                            {% else %}text-primary{% endif %} px-4 py-2">
+                            {{ order.get_status_display }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar Info -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-body p-4">
+                    <h6 class="fw-bold text-uppercase small text-muted mb-3">{% trans "Shipping Details" %}</h6>
+                    <p class="fw-bold mb-1">{{ order.user.get_full_name|default:order.user.username }}</p>
+                    <p class="text-muted mb-2"><i class="bi bi-telephone me-1"></i> {{ order.phone }}</p>
+                    <p class="text-muted mb-0 small"><i class="bi bi-geo-alt me-1"></i> {{ order.shipping_address }}</p>
+                    
+                    {% if order.notes %}
+                    <hr class="my-3">
+                    <h6 class="fw-bold text-uppercase small text-muted mb-2">{% trans "Order Notes" %}</h6>
+                    <p class="text-muted small mb-0">{{ order.notes }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body p-4">
+                    <h6 class="fw-bold text-uppercase small text-muted mb-3">{% trans "Payment" %}</h6>
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="text-primary h2 mb-0"><i class="bi bi-cash"></i></div>
+                        <div>
+                            <p class="fw-bold mb-0">{% trans "Cash on Delivery" %}</p>
+                            <p class="text-muted small mb-0">{% if order.payment_status == 'paid' %}{% trans "Paid" %}{% else %}{% trans "Pay when you receive your order" %}{% endif %}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

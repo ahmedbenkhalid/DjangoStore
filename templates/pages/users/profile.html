@@ -1,0 +1,187 @@
+{% extends 'pages/shared/base.html' %}
+{% load i18n %}
+{% load bootstrap_icons %}
+
+{% block title %}{% trans "Profile" %} — {{ user.username }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Profile Sidebar -->
+    <div class="col-lg-4 mb-4">
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+            <div class="card-body text-center p-5">
+                <div class="mb-4 position-relative d-inline-block">
+                    {% if profile_obj.avatar %}
+                        <img src="{{ profile_obj.avatar.url }}" alt="{% trans 'Profile Picture' %}" 
+                             class="rounded-circle shadow-sm" style="width: 120px; height: 120px; object-fit: cover; border: 4px solid #fff;">
+                    {% else %}
+                        <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto shadow-sm" 
+                             style="width: 120px; height: 120px; border: 4px solid #fff;">
+                            {% bs_icon 'person' size='4em' extra_classes='text-muted' %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <h4 class="fw-bold mb-1">
+                    {% if profile_obj.first_name or profile_obj.last_name %}
+                        {{ profile_obj.first_name }} {{ profile_obj.last_name }}
+                    {% else %}
+                        {{ user.username }}
+                    {% endif %}
+                </h4>
+                <p class="text-muted mb-4">{{ user.email }}</p>
+                
+                <div class="d-grid gap-2">
+                    <a href="{% url 'wishlist' %}" class="btn btn-outline-dark rounded-pill fw-bold">
+                        {% bs_icon 'heart' %} {% trans "Go to Wishlist" %}
+                    </a>
+                </div>
+                
+                <hr class="my-4 opacity-50">
+                
+                <div class="text-start">
+                    <p class="small text-muted text-uppercase fw-bold mb-2">{% trans "Profile Information" %}</p>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">{% trans "Username:" %}</span>
+                        <span class="fw-semibold text-break ms-2">{{ user.username }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">{% trans "Member Since:" %}</span>
+                        <span class="fw-semibold ms-2">{{ user.date_joined|date:"M Y" }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity / Orders -->
+    <div class="col-lg-8">
+        <!-- Profile Edit Form -->
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+            <div class="card-header bg-white border-0 pt-4 px-4 pb-0 d-flex align-items-center justify-content-between">
+                <h5 class="fw-bold mb-0">{% trans "Profile Information" %}</h5>
+            </div>
+            <div class="card-body p-4">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="id_first_name" class="form-label fw-bold small text-muted text-uppercase">{% trans "First Name" %}</label>
+                            <input type="text" name="first_name" id="id_first_name" class="form-control rounded-pill px-3" value="{{ form.first_name.value|default:user.first_name }}" placeholder="{% trans 'First Name' %}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="id_last_name" class="form-label fw-bold small text-muted text-uppercase">{% trans "Last Name" %}</label>
+                            <input type="text" name="last_name" id="id_last_name" class="form-control rounded-pill px-3" value="{{ form.last_name.value|default:user.last_name }}" placeholder="{% trans 'Last Name' %}">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_phone" class="form-label fw-bold small text-muted text-uppercase">{% trans "Phone Number" %}</label>
+                        <input type="text" name="phone" id="id_phone" class="form-control rounded-pill px-3" value="{{ form.phone.value|default:'' }}" placeholder="{% trans 'Phone Number' %}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_address" class="form-label fw-bold small text-muted text-uppercase">{% trans "Shipping Address" %}</label>
+                        <textarea name="address" id="id_address" rows="3" class="form-control rounded-4 px-3 py-2" placeholder="{% trans 'Enter your shipping address' %}">{{ form.address.value|default:'' }}</textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_avatar" class="form-label fw-bold small text-muted text-uppercase">{% trans "Profile Picture" %}</label>
+                        <input type="file" name="avatar" id="id_avatar" class="form-control rounded-pill px-3" accept="image/*">
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-dark rounded-pill fw-bold">
+                            {% trans "Update Profile" %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Recent Orders -->
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-header bg-white border-0 pt-4 px-4 pb-0 d-flex align-items-center justify-content-between">
+                <h5 class="fw-bold mb-0">{% trans "Recent Orders" %}</h5>
+                <a href="{% url 'orders:order_list' %}" class="btn btn-link text-dark fw-bold text-decoration-none p-0 small">
+                    {% trans "View All Orders" %} &rarr;
+                </a>
+            </div>
+            <div class="card-body p-4">
+                {% if recent_orders %}
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light">
+                                <tr class="small text-uppercase text-muted fw-bold">
+                                    <th class="border-0">{% trans "Order #" %}</th>
+                                    <th class="border-0">{% trans "Order Date" %}</th>
+                                    <th class="border-0">{% trans "Status" %}</th>
+                                    <th class="border-0 text-end">{% trans "Total" %}</th>
+                                    <th class="border-0"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in recent_orders %}
+                                    <tr>
+                                        <td class="fw-bold">#{{ order.id }}</td>
+                                        <td class="text-muted">{{ order.created_at|date:"d M Y" }}</td>
+                                        <td>
+                                            <span class="badge rounded-pill 
+                                                {% if order.status == 'delivered' %}bg-success
+                                                {% elif order.status == 'cancelled' or order.status == 'refunded' %}bg-danger
+                                                {% elif order.status == 'pending' %}bg-warning text-dark
+                                                {% else %}bg-primary{% endif %} bg-opacity-10 
+                                                {% if order.status == 'delivered' %}text-success
+                                                {% elif order.status == 'cancelled' or order.status == 'refunded' %}text-danger
+                                                {% elif order.status == 'pending' %}text-warning
+                                                {% else %}text-primary{% endif %} px-3">
+                                                {{ order.get_status_display }}
+                                            </span>
+                                        </td>
+                                        <td class="fw-bold text-end">{% if request.LANGUAGE_CODE == 'ar' %}ج.م{% else %}EGP{% endif %} {{ order.total }}</td>
+                                        <td class="text-end">
+                                            <a href="{% url 'orders:order_detail' order.id %}" class="btn btn-light btn-sm rounded-pill px-3 fw-bold">
+                                                {% trans "View Order" %}
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <div class="text-muted mb-3">
+                            {% bs_icon 'bag-x' size='3em' %}
+                        </div>
+                        <p class="text-muted mb-4">{% trans "No orders yet." %}</p>
+                        <a href="{% url 'products:products' %}" class="btn btn-dark rounded-pill px-4 fw-bold">
+                            {% trans "Start Shopping" %}
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Quick Links / Info Section -->
+        <div class="row mt-4">
+            <div class="col-md-6 mb-4 order-lg-1">
+                <div class="card border-0 shadow-sm rounded-4 h-100 bg-dark text-white p-2">
+                    <div class="card-body">
+                        <div class="mb-3 text-white-50">{% bs_icon 'shield-lock' size='2em' %}</div>
+                        <h6 class="fw-bold mb-2">{% trans "Security" %}</h6>
+                        <p class="small text-white-50 mb-3">{% trans "Manage your password and security settings to keep your account safe." %}</p>
+                        <a href="{% url 'users:password_change' %}" class="btn btn-outline-light btn-sm rounded-pill fw-bold">{% trans "Manage Security" %}</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4 order-lg-2">
+                <div class="card border-0 shadow-sm rounded-4 h-100 p-2">
+                    <div class="card-body">
+                        <div class="mb-3 text-primary">{% bs_icon 'geo-alt' size='2em' %}</div>
+                        <h6 class="fw-bold mb-2">{% trans "Address Book" %}</h6>
+                        <p class="small text-muted mb-3">{% trans "Save your shipping addresses for a faster checkout experience." %}</p>
+                        <a href="{% url 'users:address_list' %}" class="btn btn-outline-dark btn-sm rounded-pill fw-bold">{% trans "Manage Addresses" %}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
