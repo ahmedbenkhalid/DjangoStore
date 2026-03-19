@@ -4,25 +4,38 @@ Load seeding data into MariaDB database.
 Run: python load_data.py
 """
 
+import os
 import pymysql
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
 
 
+def load_env():
+    env_path = BASE_DIR / ".env"
+    if env_path.exists():
+        with open(env_path, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith("#"):
+                    if "=" in line:
+                        key, val = line.split("=", 1)
+                        os.environ[key.strip()] = val.strip()
+
+
 def load_data():
+    load_env()
     # Connect to MariaDB
     conn = pymysql.connect(
-        host="127.0.0.1",
-        port=3306,
-        user="root",
-        password="",
+        host=os.environ.get("MYSQL_HOST", "127.0.0.1"),
+        port=int(os.environ.get("MYSQL_PORT", 3306)),
+        user=os.environ.get("MYSQL_USER", "root"),
+        password=os.environ.get("MYSQL_PASSWORD", ""),
         charset="utf8mb4",
         autocommit=True,
     )
 
     sql_files = [
-        ("Schema", BASE_DIR / "database.sql"),
         ("Seeding Data", BASE_DIR / "data_seeding.sql"),
     ]
 

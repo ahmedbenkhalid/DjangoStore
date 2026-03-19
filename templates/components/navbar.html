@@ -2,293 +2,581 @@
 {% load bootstrap_icons %}
 {% load i18n %}
 
-<nav class="navbar navbar-expand-lg sticky-top s3r-nav">
-  <div class="container-fluid px-lg-5">
-    
-    <!-- 1. Logo -->
-    <a class="navbar-brand fw-black tracking-tighter me-lg-4" href="{% url 'home' %}">
+{# ============================================================
+   SmartS3R — Redesigned Navbar
+   ✅ Desktop: clean layout with grouped icons + separators
+   ✅ Mobile: persistent search bar + full bottom nav (no hamburger)
+   ✅ RTL-safe with logical CSS properties
+   ============================================================ #}
+
+<nav class="navbar s3r-nav sticky-top">
+  <div class="container-fluid px-3 px-lg-5">
+
+    {# ── Brand ── #}
+    <a class="navbar-brand fw-black" href="{% url 'home' %}">
       <span class="brand-box">S</span> MART<span class="text-accent">S3R</span>
     </a>
 
-    <!-- 2. End Actions (Flex-End in Desktop) -->
-    <div class="d-flex align-items-center order-lg-3 gap-2 gap-md-3 ms-auto ms-lg-0">
-
-        <!-- Mobile Search Bar (Visible below lg) -->
-        <div class="flex-grow-1 me-2 d-lg-none">
-            <form action="{% url 'search' %}" class="nav-search-form-mobile">
-                <input type="text" name="q" placeholder="{% trans 'Search products...' %}" class="nav-search-input-mobile">
-                <button type="submit"><i class="bi bi-search"></i></button>
-            </form>
-        </div>
-
-        <!-- Desktop Search Bar -->
-        <div class="d-none d-lg-block">
-            <form action="{% url 'search' %}" class="nav-search-form">
-                <input type="text" name="q" placeholder="{% trans 'Search...' %}" class="nav-search-input">
-                <button type="submit"><i class="bi bi-search"></i></button>
-            </form>
-        </div>
-
-        <!-- Language Dropdown -->
-        <div class="dropdown ms-lg-2">
-            <a href="#" class="nav-icon-link d-flex align-items-center" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="bi bi-translate"></i>
-                <span class="d-none d-md-inline ms-1 small fw-bold text-uppercase">{{ request.LANGUAGE_CODE|slice:":2" }}</span>
-            </a>
-            <ul class="dropdown-menu dropdown-menu-end border-0 shadow-xl dark-dropdown mt-2 p-1">
-                <li>
-                    <form action="{% url 'set_language' %}" method="post" class="m-0 p-0">
-                        {% csrf_token %}
-                        <input name="next" type="hidden" value="{{ request.get_full_path }}">
-                        <button type="submit" name="language" value="ar" class="dropdown-item rounded-3 py-2 text-white px-3 w-100 text-start {% if request.LANGUAGE_CODE|slice:':2' == 'ar' %}active-lang{% endif %}">
-                            <span class="small font-mono">العربية (AR)</span>
-                        </button>
-                    </form>
-                </li>
-                <li>
-                    <form action="{% url 'set_language' %}" method="post" class="m-0 p-0">
-                        {% csrf_token %}
-                        <input name="next" type="hidden" value="{{ request.get_full_path }}">
-                        <button type="submit" name="language" value="en" class="dropdown-item rounded-3 py-2 text-white px-3 w-100 text-start {% if request.LANGUAGE_CODE|slice:':2' == 'en' %}active-lang{% endif %}">
-                            <span class="small font-mono">English (EN)</span>
-                        </button>
-                    </form>
-                </li>
-            </ul>
-        </div>
-
-        <!-- Wishlist (Desktop) -->
-        <a href="{% url 'wishlist' %}" class="nav-icon-link d-none d-lg-flex position-relative ms-lg-1">
-            <i class="bi bi-heart"></i>
-            {% if wishlist_count > 0 %}<span class="badge-mini">{{ wishlist_count }}</span>{% endif %}
+    {# ── Desktop: Central Links ── #}
+    <ul class="navbar-nav desk-links d-none d-lg-flex">
+      <li class="nav-item">
+        <a class="nav-link-cyber {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'home' %}">
+          <span class="nav-num">00</span> {% trans "Home" %}
         </a>
-
-        <!-- Cart (Desktop) -->
-        <a href="#cartOffcanvas" data-bs-toggle="offcanvas" class="nav-icon-link d-none d-lg-flex position-relative">
-            <i class="bi bi-bag"></i>
-            {% if cart_count > 0 %}<span class="badge-mini">{{ cart_count }}</span>{% endif %}
+      </li>
+      <li class="nav-item">
+        <a class="nav-link-cyber {% if 'products' in request.path %}active{% endif %}" href="{% url 'products:products' %}">
+          <span class="nav-num">01</span> {% trans "Shop" %}
         </a>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link-cyber dropdown-toggle {% if 'category' in request.path %}active{% endif %}" href="#" data-bs-toggle="dropdown" data-bs-display="static">
+          <span class="nav-num">02</span> {% trans "Categories" %}
+        </a>
+        <ul class="dropdown-menu border-0 shadow-xl dark-dropdown mt-lg-2">
+          <li><a class="dropdown-item py-2 fw-semibold text-white rounded-3 mb-1" href="{% url 'categories:categories' %}">{% trans "All Categories" %}</a></li>
+          <li><hr class="dropdown-divider opacity-25 my-2"></li>
+          {% for cat in menu_categories %}
+            <li><a class="dropdown-item py-2 fw-semibold text-white rounded-3" href="{{ cat.get_absolute_url }}">{{ cat.name }}</a></li>
+          {% endfor %}
+        </ul>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link-cyber {% if request.resolver_match.url_name == 'about' %}active{% endif %}" href="{% url 'about' %}">
+          <span class="nav-num">03</span> {% trans "About Us" %}
+        </a>
+      </li>
+    </ul>
 
-        <!-- Profile Dropdown -->
-        {% if user.is_authenticated %}
-            <div class="dropdown position-relative ms-1">
-                <a href="#" class="nav-user-trigger" data-bs-toggle="dropdown">
-                    <div class="avatar-hex">
-                        {% if user.profile.avatar %}
-                            <img src="{{ user.profile.avatar.url }}" alt="U">
-                        {% else %}
-                            <div class="avatar-init">{{ user.username|first|upper }}</div>
-                        {% endif %}
-                    </div>
-                </a>
-                <!-- تم تعديل القائمة: إضافة كلاسات Bootstrap المناسبة وإزالة الاعتماد على الاتجاه الثابت -->
-                <ul class="dropdown-menu dropdown-menu-end border-0 shadow-xl dark-dropdown mt-2 rounded-4 p-2">
-                    <li class="px-3 py-2 mb-1 border-bottom border-secondary border-opacity-25 d-lg-none">
-                        <span class="text-accent small fw-bold text-uppercase">{{ user.username }}</span>
-                    </li>
-                    <li><a class="dropdown-item rounded-3 py-2 text-white" href="{% url 'profile' %}">{% trans "Profile" %}</a></li>
-                    <li><a class="dropdown-item rounded-3 py-2 text-white" href="{% url 'orders:order_list' %}">{% trans "My Orders" %}</a></li>
-                    <li><hr class="dropdown-divider opacity-25"></li>
-                    <li>
-                        <form action="{% url 'logout' %}" method="post">
-                            {% csrf_token %}
-                            <button class="dropdown-item rounded-3 py-2 text-danger fw-bold w-100 text-start border-0 bg-transparent">{% trans "Logout" %}</button>
-                        </form>
-                    </li>
-                </ul>
+    {# ── Desktop: Right-side Actions ── #}
+    <div class="desk-right d-none d-lg-flex align-items-center gap-2">
+
+      {# Search #}
+      <form action="{% url 'search' %}" class="nav-search-form">
+        <i class="bi bi-search search-icon"></i>
+        <input type="text" name="q" placeholder="{% trans 'Search products…' %}" class="nav-search-input">
+      </form>
+
+      <div class="nav-sep"></div>
+
+      {# Language #}
+      <div class="dropdown">
+        <a href="#" class="nav-icon-btn" data-bs-toggle="dropdown" aria-expanded="false" title="{% trans 'Language' %}">
+          <i class="bi bi-translate"></i>
+          <span class="lang-code">{{ request.LANGUAGE_CODE|slice:":2"|upper }}</span>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end border-0 shadow-xl dark-dropdown mt-2 p-1">
+          <li>
+            <form action="{% url 'set_language' %}" method="post" class="m-0">
+              {% csrf_token %}
+              <input name="next" type="hidden" value="{{ request.get_full_path }}">
+              <button type="submit" name="language" value="ar" class="dropdown-item rounded-3 py-2 text-white px-3 w-100 text-start {% if request.LANGUAGE_CODE|slice:':2' == 'ar' %}active-lang{% endif %}">
+                <span class="font-mono small">العربية (AR)</span>
+              </button>
+            </form>
+          </li>
+          <li>
+            <form action="{% url 'set_language' %}" method="post" class="m-0">
+              {% csrf_token %}
+              <input name="next" type="hidden" value="{{ request.get_full_path }}">
+              <button type="submit" name="language" value="en" class="dropdown-item rounded-3 py-2 text-white px-3 w-100 text-start {% if request.LANGUAGE_CODE|slice:':2' == 'en' %}active-lang{% endif %}">
+                <span class="font-mono small">English (EN)</span>
+              </button>
+            </form>
+          </li>
+        </ul>
+      </div>
+
+      {# Wishlist #}
+      <a href="{% url 'wishlist' %}" class="nav-icon-btn position-relative" title="{% trans 'Wishlist' %}">
+        <i class="bi bi-heart"></i>
+        {% if wishlist_count > 0 %}<span class="badge-mini">{{ wishlist_count }}</span>{% endif %}
+      </a>
+
+      {# Cart #}
+      <a href="#cartOffcanvas" data-bs-toggle="offcanvas" class="nav-icon-btn position-relative" title="{% trans 'Cart' %}">
+        <i class="bi bi-bag"></i>
+        {% if cart_count > 0 %}<span class="badge-mini">{{ cart_count }}</span>{% endif %}
+      </a>
+
+      <div class="nav-sep"></div>
+
+      {# Profile #}
+      {% if user.is_authenticated %}
+        <div class="dropdown">
+          <a href="#" class="nav-user-trigger" data-bs-toggle="dropdown">
+            <div class="avatar-hex">
+              {% if user.profile.avatar %}
+                <img src="{{ user.profile.avatar.url }}" alt="{{ user.username|first|upper }}">
+              {% else %}
+                <div class="avatar-init">{{ user.username|first|upper }}</div>
+              {% endif %}
             </div>
-        {% else %}
-            <a href="{% url 'login' %}" class="btn-nav-outline ms-2 d-none d-md-inline-block">{% trans "Login" %}</a>
-            <a href="{% url 'login' %}" class="nav-icon-link d-md-none"><i class="bi bi-person"></i></a>
-        {% endif %}
-
-        <!-- Navbar Toggler -->
-        <button class="navbar-toggler border-0 p-0 ms-1 shadow-none d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <div class="menu-icon">
-                <span></span>
-                <span class="short"></span>
-            </div>
-        </button>
-    </div>
-
-    <!-- 3. Central Links (Always Visible on Desktop) -->
-    <div class="d-none d-lg-flex justify-content-center order-lg-2 flex-grow-1 mx-lg-4">
-      <ul class="navbar-nav gap-lg-1 mx-auto">
-        <li class="nav-item">
-          <a class="nav-link-cyber {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'home' %}">
-            <span class="nav-num">00</span> {% trans "Home" %}
           </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link-cyber {% if 'products' in request.path %}active{% endif %}" href="{% url 'products:products' %}">
-            <span class="nav-num">01</span> {% trans "Shop" %}
-          </a>
-        </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link-cyber dropdown-toggle {% if 'category' in request.path %}active{% endif %}" href="#" data-bs-toggle="dropdown" data-bs-display="static">
-            <span class="nav-num">02</span> {% trans "Categories" %}
-          </a>
-          <ul class="dropdown-menu border-0 shadow-xl dark-dropdown mt-lg-2">
-            <li><a class="dropdown-item py-2 fw-semibold text-white rounded-3 mb-1" href="{% url 'categories:categories' %}">{% trans "All Categories" %}</a></li>
-            <li><hr class="dropdown-divider opacity-25 my-2"></li>
-            {% for cat in menu_categories %}
-              <li><a class="dropdown-item py-2 fw-semibold text-white rounded-3" href="{{ cat.get_absolute_url }}">{{ cat.name }}</a></li>
-            {% endfor %}
+          <ul class="dropdown-menu dropdown-menu-end border-0 shadow-xl dark-dropdown mt-2 rounded-4 p-2">
+            <li class="px-3 py-2 mb-1 border-bottom border-secondary border-opacity-25">
+              <span class="text-accent small fw-bold font-mono">{{ user.username }}</span>
+            </li>
+            <li><a class="dropdown-item rounded-3 py-2 text-white" href="{% url 'profile' %}">{% trans "Profile" %}</a></li>
+            <li><a class="dropdown-item rounded-3 py-2 text-white" href="{% url 'orders:order_list' %}">{% trans "My Orders" %}</a></li>
+            <li><hr class="dropdown-divider opacity-25"></li>
+            <li>
+              <form action="{% url 'logout' %}" method="post">
+                {% csrf_token %}
+                <button class="dropdown-item rounded-3 py-2 text-danger fw-bold w-100 text-start border-0 bg-transparent">{% trans "Logout" %}</button>
+              </form>
+            </li>
           </ul>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link-cyber {% if request.resolver_match.url_name == 'about' %}active{% endif %}" href="{% url 'about' %}">
-            <span class="nav-num">03</span> {% trans "About Us" %}
-          </a>
-        </li>
-      </ul>
+        </div>
+      {% else %}
+        <a href="{% url 'login' %}" class="btn-nav-outline">{% trans "Login" %}</a>
+      {% endif %}
     </div>
 
-    <!-- Mobile Nav Links (Collapsible on Mobile) -->
-    <div class="collapse navbar-collapse d-lg-none" id="navbarNav">
-      <ul class="navbar-nav gap-1 mt-3 pb-3">
-        <li class="nav-item">
-          <a class="nav-link-cyber" href="{% url 'home' %}">
-            <span class="nav-num">00</span> {% trans "Home" %}
+    {# ── Mobile: Top-bar Right ── #}
+    <div class="mob-top-right d-flex d-lg-none align-items-center gap-2">
+
+      {# Language #}
+      <div class="dropdown">
+        <a href="#" class="nav-icon-btn" data-bs-toggle="dropdown" aria-expanded="false">
+          <i class="bi bi-translate"></i>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end border-0 shadow-xl dark-dropdown mt-2 p-1">
+          <li>
+            <form action="{% url 'set_language' %}" method="post" class="m-0">
+              {% csrf_token %}
+              <input name="next" type="hidden" value="{{ request.get_full_path }}">
+              <button type="submit" name="language" value="ar" class="dropdown-item rounded-3 py-2 text-white px-3 w-100 text-start {% if request.LANGUAGE_CODE|slice:':2' == 'ar' %}active-lang{% endif %}">
+                <span class="font-mono small">العربية (AR)</span>
+              </button>
+            </form>
+          </li>
+          <li>
+            <form action="{% url 'set_language' %}" method="post" class="m-0">
+              {% csrf_token %}
+              <input name="next" type="hidden" value="{{ request.get_full_path }}">
+              <button type="submit" name="language" value="en" class="dropdown-item rounded-3 py-2 text-white px-3 w-100 text-start {% if request.LANGUAGE_CODE|slice:':2' == 'en' %}active-lang{% endif %}">
+                <span class="font-mono small">English (EN)</span>
+              </button>
+            </form>
+          </li>
+        </ul>
+      </div>
+
+      {# Profile / Login #}
+      {% if user.is_authenticated %}
+        <div class="dropdown">
+          <a href="#" class="nav-user-trigger" data-bs-toggle="dropdown">
+            <div class="avatar-hex">
+              {% if user.profile.avatar %}
+                <img src="{{ user.profile.avatar.url }}" alt="{{ user.username|first|upper }}">
+              {% else %}
+                <div class="avatar-init">{{ user.username|first|upper }}</div>
+              {% endif %}
+            </div>
           </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link-cyber" href="{% url 'products:products' %}">
-            <span class="nav-num">01</span> {% trans "Shop" %}
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link-cyber" href="{% url 'categories:categories' %}">
-            <span class="nav-num">02</span> {% trans "Categories" %}
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link-cyber" href="{% url 'about' %}">
-            <span class="nav-num">03</span> {% trans "About Us" %}
-          </a>
-        </li>
-      </ul>
+          <ul class="dropdown-menu dropdown-menu-end border-0 shadow-xl dark-dropdown mt-2 rounded-4 p-2">
+            <li class="px-3 py-2 mb-1 border-bottom border-secondary border-opacity-25">
+              <span class="text-accent small fw-bold font-mono">{{ user.username }}</span>
+            </li>
+            <li><a class="dropdown-item rounded-3 py-2 text-white" href="{% url 'profile' %}">{% trans "Profile" %}</a></li>
+            <li><a class="dropdown-item rounded-3 py-2 text-white" href="{% url 'orders:order_list' %}">{% trans "My Orders" %}</a></li>
+            <li><hr class="dropdown-divider opacity-25"></li>
+            <li>
+              <form action="{% url 'logout' %}" method="post">
+                {% csrf_token %}
+                <button class="dropdown-item rounded-3 py-2 text-danger fw-bold w-100 text-start border-0 bg-transparent">{% trans "Logout" %}</button>
+              </form>
+            </li>
+          </ul>
+        </div>
+      {% else %}
+        <a href="{% url 'login' %}" class="nav-icon-btn"><i class="bi bi-person"></i></a>
+      {% endif %}
+    </div>
+
+  </div>{# /container-fluid #}
+
+  {# ── Mobile: Persistent Search Bar ── #}
+  <div class="mob-search-bar d-lg-none">
+    <form action="{% url 'search' %}" class="mob-search-form">
+      <i class="bi bi-search mob-search-icon"></i>
+      <input type="text" name="q" placeholder="{% trans 'Search products…' %}" class="mob-search-input">
+      <button type="submit" class="mob-search-btn"><i class="bi bi-chevron-right"></i></button>
+    </form>
   </div>
+
 </nav>
 
-<!-- Mobile Bottom Navigation -->
+{# ── Mobile: Bottom Navigation Bar ── #}
 <div class="bottom-nav d-lg-none">
-    <div class="row g-0 h-100 align-items-center text-center">
-        <div class="col"><a href="{% url 'home' %}" class="nav-item-bottom {% if request.resolver_match.url_name == 'home' %}active{% endif %}"><i class="bi bi-house-door"></i><span>{% trans "Home" %}</span></a></div>
-        <div class="col"><a href="{% url 'products:products' %}" class="nav-item-bottom {% if 'products' in request.path %}active{% endif %}"><i class="bi bi-grid-3x3-gap"></i><span>{% trans "Shop" %}</span></a></div>
-        <div class="col"><a href="{% url 'categories:categories' %}" class="nav-item-bottom {% if 'category' in request.path %}active{% endif %}"><i class="bi bi-tags"></i><span>{% trans "Categories" %}</span></a></div>
-        <div class="col"><a href="{% url 'wishlist' %}" class="nav-item-bottom position-relative {% if request.resolver_match.url_name == 'wishlist' %}active{% endif %}"><i class="bi bi-heart"></i>{% if wishlist_count > 0 %}<span class="badge-mini">{{ wishlist_count }}</span>{% endif %}<span>{% trans "Wishlist" %}</span></a></div>
-        <div class="col"><a href="#cartOffcanvas" data-bs-toggle="offcanvas" class="nav-item-bottom position-relative"><i class="bi bi-bag"></i>{% if cart_count > 0 %}<span class="badge-mini">{{ cart_count }}</span>{% endif %}<span>{% trans "Cart" %}</span></a></div>
-    </div>
-</div>
+  <div class="row g-0 h-100 align-items-center text-center">
 
-<!-- Mobile Search Offcanvas -->
-<div class="offcanvas offcanvas-top text-bg-dark border-0 shadow-lg" tabindex="-1" id="mobileSearchOffcanvas" style="height: auto; border-bottom: 2px solid var(--accent) !important; z-index: 9999;">
-  <div class="offcanvas-header pb-0">
-      <h6 class="offcanvas-title fw-bold text-accent font-mono"><i class="bi bi-search me-2"></i>{% trans "Search" %}</h6>
-      <button type="button" class="btn-close btn-close-white shadow-none" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-  </div>
-  <div class="offcanvas-body pt-3 pb-4">
-    <form action="{% url 'search' %}" class="d-flex gap-2">
-      <input type="text" name="q" class="form-control bg-dark text-white border-secondary shadow-none p-3" placeholder="{% trans 'Search for products, brands...' %}" autofocus style="border-radius: 12px;">
-      <button type="submit" class="btn btn-accent px-4" style="border-radius: 12px;"><i class="bi bi-chevron-right fs-5"></i></button>
-    </form>
+    <div class="col">
+      <a href="{% url 'home' %}" class="nav-tab {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+        <i class="bi bi-house-door"></i>
+        <div class="tab-dot"></div>
+        <span>{% trans "Home" %}</span>
+      </a>
+    </div>
+
+    <div class="col">
+      <a href="{% url 'products:products' %}" class="nav-tab {% if 'products' in request.path %}active{% endif %}">
+        <i class="bi bi-grid-3x3-gap"></i>
+        <div class="tab-dot"></div>
+        <span>{% trans "Shop" %}</span>
+      </a>
+    </div>
+
+    <div class="col">
+      <a href="{% url 'categories:categories' %}" class="nav-tab {% if 'category' in request.path %}active{% endif %}">
+        <i class="bi bi-tags"></i>
+        <div class="tab-dot"></div>
+        <span>{% trans "Categories" %}</span>
+      </a>
+    </div>
+
+    <div class="col">
+      <a href="{% url 'wishlist' %}" class="nav-tab position-relative {% if request.resolver_match.url_name == 'wishlist' %}active{% endif %}">
+        <i class="bi bi-heart"></i>
+        {% if wishlist_count > 0 %}<span class="badge-mini">{{ wishlist_count }}</span>{% endif %}
+        <div class="tab-dot"></div>
+        <span>{% trans "Wishlist" %}</span>
+      </a>
+    </div>
+
+    <div class="col">
+      <a href="#cartOffcanvas" data-bs-toggle="offcanvas" class="nav-tab position-relative">
+        <i class="bi bi-bag"></i>
+        {% if cart_count > 0 %}<span class="badge-mini">{{ cart_count }}</span>{% endif %}
+        <div class="tab-dot"></div>
+        <span>{% trans "Cart" %}</span>
+      </a>
+    </div>
+
   </div>
 </div>
 
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Sora:wght@800&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Sora:wght@800;900&display=swap');
 
-  :root { --accent: #10b981; --nav-bg: #0f172a; --font-mono: 'JetBrains Mono', monospace; }
-
-  /* Main Nav Styles */
-  .s3r-nav { background: #0f172a !important; border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding: 10px 0; z-index: 1060; }
-  .brand-box { background: var(--accent); color: var(--nav-bg); padding: 2px 8px; border-radius: 6px; font-family: 'Sora', sans-serif; }
-  .navbar-brand { color: #fff !important; font-size: 1.25rem; font-weight: 900; }
-
-  /* Icon Actions */
-  .nav-icon-link { color: rgba(255,255,255,0.7) !important; font-size: 1.2rem; padding: 6px; text-decoration: none; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
-  .nav-icon-link:hover { color: var(--accent) !important; transform: translateY(-2px); }
-
-  /* Desktop Search */
-  .nav-search-form { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 100px; padding: 4px 14px; display: flex; align-items: center; transition: 0.3s; }
-  .nav-search-form:focus-within { border-color: var(--accent); box-shadow: 0 0 15px rgba(16,185,129,0.15); }
-  .nav-search-input { background: transparent; border: none; color: #fff; font-size: 0.75rem; outline: none; width: 110px; transition: 0.3s; }
-  .nav-search-input:focus { width: 160px; }
-  .nav-search-form button { background: transparent; border: none; color: var(--accent); font-size: 0.9rem; padding-inline-start: 8px; }
-
-  /* Mobile Search */
-  .nav-search-form-mobile { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; padding: 6px 12px; display: flex; align-items: center; transition: 0.3s; }
-  .nav-search-form-mobile:focus-within { border-color: var(--accent); box-shadow: 0 0 15px rgba(16,185,129,0.15); }
-  .nav-search-input-mobile { background: transparent; border: none; color: #fff; font-size: 0.8rem; outline: none; width: 100%; }
-  .nav-search-input-mobile::placeholder { color: rgba(255,255,255,0.5); }
-  .nav-search-form-mobile button { background: transparent; border: none; color: var(--accent); font-size: 1rem; padding-inline-start: 8px; }
-
-  @media (min-width: 992px) {
-    .nav-search-form-mobile { display: none; }
+  /* ── Variables ── */
+  :root {
+    --accent:   #10b981;
+    --nav-bg:   #0f172a;
+    --nav-bg2:  #1e293b;
+    --font-mono: 'JetBrains Mono', monospace;
   }
 
-  /* User Avatar */
-  .avatar-hex { width: 32px; height: 32px; border-radius: 10px; overflow: hidden; border: 2px solid var(--accent); background: #1e293b; transition: 0.2s; }
+  /* ── Base Nav ── */
+  .s3r-nav {
+    background: var(--nav-bg) !important;
+    border-bottom: 1px solid rgba(255,255,255,.05);
+    padding: 0;
+    z-index: 1060;
+    flex-wrap: wrap;         /* allow search bar to wrap below */
+  }
+
+  .s3r-nav .container-fluid {
+    height: 58px;
+    display: flex;
+    align-items: center;
+  }
+
+  /* ── Brand ── */
+  .navbar-brand {
+    color: #fff !important;
+    font-size: 1.1rem;
+    font-weight: 900;
+    letter-spacing: -.02em;
+    flex-shrink: 0;
+  }
+  .brand-box {
+    background: var(--accent);
+    color: var(--nav-bg);
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-family: 'Sora', sans-serif;
+    font-weight: 900;
+  }
+  .text-accent { color: var(--accent); }
+
+  /* ── Desktop: Central Links ── */
+  .desk-links {
+    flex-direction: row;
+    gap: 2px;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .nav-link-cyber {
+    font-family: var(--font-mono);
+    font-size: .72rem;
+    color: rgba(255,255,255,.55) !important;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 6px 10px;
+    border-radius: 8px;
+    transition: .2s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+  }
+  .nav-link-cyber:hover,
+  .nav-link-cyber.active {
+    color: #fff !important;
+    background: rgba(255,255,255,.07);
+  }
+  .nav-link-cyber.active .nav-num { opacity: 1; }
+  .nav-num {
+    color: var(--accent);
+    font-size: .6rem;
+    font-weight: 700;
+    opacity: .4;
+  }
+
+  /* ── Desktop: Right ── */
+  .desk-right { margin-inline-start: auto; }
+
+  .nav-search-form {
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 100px;
+    padding: 5px 14px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    transition: .3s;
+  }
+  .nav-search-form:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(16,185,129,.12);
+  }
+  .search-icon {
+    color: var(--accent);
+    font-size: .85rem;
+    flex-shrink: 0;
+  }
+  .nav-search-input {
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: .72rem;
+    font-family: var(--font-mono);
+    outline: none;
+    width: 110px;
+    transition: .3s;
+  }
+  .nav-search-input:focus { width: 160px; }
+  .nav-search-input::placeholder { color: rgba(255,255,255,.3); }
+
+  .nav-sep {
+    width: 1px;
+    height: 20px;
+    background: rgba(255,255,255,.1);
+    flex-shrink: 0;
+  }
+
+  .nav-icon-btn {
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255,255,255,.6) !important;
+    border-radius: 9px;
+    text-decoration: none;
+    transition: .2s;
+    position: relative;
+    font-size: 1.05rem;
+    gap: 3px;
+  }
+  .nav-icon-btn:hover {
+    color: #fff !important;
+    background: rgba(255,255,255,.08);
+  }
+  .lang-code {
+    font-size: .6rem;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .avatar-hex {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2px solid var(--accent);
+    background: var(--nav-bg2);
+    transition: .2s;
+    cursor: pointer;
+  }
   .avatar-hex img { width: 100%; height: 100%; object-fit: cover; }
-  .avatar-init { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: var(--accent); font-weight: bold; font-size: 0.8rem; }
+  .avatar-init {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
+    font-weight: bold;
+    font-size: .78rem;
+  }
+  .nav-user-trigger { text-decoration: none; display: flex; }
 
-  /* Hamburger Icon */
-  .menu-icon { width: 22px; height: 16px; position: relative; display: flex; flex-direction: column; justify-content: space-between; }
-  .menu-icon span { height: 2px; width: 100%; background: #fff; border-radius: 2px; transition: 0.3s; }
-  .menu-icon .short { width: 60%; align-self: flex-end; }
-  [dir="rtl"] .menu-icon .short { align-self: flex-start; } /* تحسين RTL للهامبرغر */
+  .btn-nav-outline {
+    font-size: .72rem;
+    padding: 6px 14px;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    font-family: var(--font-mono);
+    transition: .2s;
+    white-space: nowrap;
+  }
+  .btn-nav-outline:hover { background: var(--accent); color: var(--nav-bg); }
 
-  /* Navbar Links */
-  .nav-link-cyber { font-family: var(--font-mono); font-size: 0.78rem; color: rgba(255,255,255,0.7) !important; text-transform: uppercase; text-decoration: none; padding: 5px 12px; transition: 0.3s; display: flex; align-items: center; gap: 6px; }
-  .nav-link-cyber:hover { color: var(--accent) !important; }
-  .nav-num { color: var(--accent); font-weight: 700; font-size: 0.65rem; opacity: 0.5; }
+  /* ── Dropdowns ── */
+  .dark-dropdown {
+    background: var(--nav-bg2) !important;
+    border: 1px solid rgba(255,255,255,.1) !important;
+    box-shadow: 0 12px 40px rgba(0,0,0,.45) !important;
+    min-width: 180px;
+  }
+  .dark-dropdown .dropdown-item:hover {
+    background: rgba(16,185,129,.1);
+    color: var(--accent) !important;
+  }
+  .active-lang {
+    background: var(--accent) !important;
+    color: var(--nav-bg) !important;
+    font-weight: bold;
+  }
 
-  /* Dropdown Styles */
-  .dark-dropdown { background: #1e293b !important; border: 1px solid rgba(255,255,255,0.1) !important; box-shadow: 0 10px 40px rgba(0,0,0,0.4) !important; }
-  .dark-dropdown .dropdown-item:hover { background: rgba(16, 185, 129, 0.1); color: var(--accent) !important; }
-  .active-lang { background: var(--accent) !important; color: #0f172a !important; font-weight: bold; }
+  /* ── Badges ── */
+  .badge-mini {
+    position: absolute;
+    top: 2px;
+    inset-inline-end: 2px;
+    background: var(--accent);
+    color: var(--nav-bg);
+    font-size: .5rem;
+    font-weight: bold;
+    width: 15px;
+    height: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: 2px solid var(--nav-bg);
+    font-family: var(--font-mono);
+  }
+
+  /* ── Mobile: Persistent Search Bar ── */
+  .mob-search-bar {
+    width: 100%;
+    padding: .55rem 1rem;
+    background: rgba(255,255,255,.03);
+    border-top: 1px solid rgba(255,255,255,.05);
+  }
+  .mob-search-form {
+    background: rgba(255,255,255,.07);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 11px;
+    padding: 7px 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: .3s;
+  }
+  .mob-search-form:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(16,185,129,.1);
+  }
+  .mob-search-icon { color: var(--accent); font-size: .9rem; flex-shrink: 0; }
+  .mob-search-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: .78rem;
+    font-family: var(--font-mono);
+    outline: none;
+  }
+  .mob-search-input::placeholder { color: rgba(255,255,255,.35); }
+  .mob-search-btn {
+    background: transparent;
+    border: none;
+    color: var(--accent);
+    font-size: .9rem;
+    padding: 0;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  /* ── Bottom Nav ── */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: var(--nav-bg);
+    border-top: 1px solid rgba(16,185,129,.18);
+    z-index: 1050;
+  }
+
+  .nav-tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: rgba(255,255,255,.35);
+    height: 100%;
+    width: 100%;
+    padding: 6px 0 4px;
+    transition: color .2s;
+    gap: 1px;
+  }
+  .nav-tab i { font-size: 1.2rem; }
+  .nav-tab > span {
+    font-size: .5rem;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: .04em;
+  }
+  .nav-tab .tab-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--accent);
+    margin: 1px auto 0;
+    opacity: 0;
+    transition: opacity .2s;
+  }
+  .nav-tab.active {
+    color: var(--accent);
+  }
+  .nav-tab.active .tab-dot { opacity: 1; }
+
+  /* ── Misc ── */
   .font-mono { font-family: var(--font-mono); }
 
-  /* Badges */
-  .badge-mini { position: absolute; top: 0; inset-inline-end: -2px; background: var(--accent); color: #0f172a; font-size: 0.55rem; font-weight: bold; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; border-radius: 50%; border: 2px solid #0f172a; }
-
-  .btn-nav-outline { font-size: 0.75rem; padding: 6px 16px; border: 1px solid var(--accent); color: var(--accent); border-radius: 8px; text-decoration: none; font-weight: bold; transition: 0.3s; }
-  .btn-nav-outline:hover { background: var(--accent); color: #0f172a; }
-
-  .bottom-nav { position: fixed !important; bottom: 0 !important; left: 0; right: 0; height: 60px; background: #0f172a; border-top: 1px solid rgba(16, 185, 129, 0.2); z-index: 1050; }
-  .nav-item-bottom { display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; color: rgba(255, 255, 255, 0.4); height: 100%; width: 100%; }
-  .nav-item-bottom i { font-size: 1.2rem; }
-  .nav-item-bottom span { font-size: 0.55rem; font-family: var(--font-mono); text-transform: uppercase; margin-top: 2px; }
-  .nav-item-bottom.active { color: var(--accent); }
-  .search-btn-flat-v2 { width: 38px; height: 38px; background: var(--accent); color: #0f172a; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
-
-
-  /* ضمان عرض مناسب للقائمة في الشاشات الصغيرة */
-  .dark-dropdown {
-      min-width: 180px;
-      max-width: 90vw;
+  /* ── Desktop: Hover-open dropdown ── */
+  @media (min-width: 992px) {
+    .nav-item.dropdown:hover > .dropdown-menu {
+      display: block;
+    }
+    body { padding-bottom: 0 !important; }
   }
 
+  /* ── Mobile body padding (bottom nav clearance) ── */
   @media (max-width: 991px) {
     body { padding-bottom: 60px !important; }
-    .navbar-collapse { background: #0f172a; border-bottom: 2px solid var(--accent); padding: 20px; position: absolute; top: 100%; left: 0; width: 100%; }
-    .nav-num { display: none; }
-    .navbar-collapse.show { max-height: 70vh; overflow-y: auto; }
-  }
-
-  /* Dropdown hover for desktop */
-  @media (min-width: 992px) {
-    .nav-item.dropdown:hover .dropdown-menu {
-      display: block;
-      opacity: 1;
-      visibility: visible;
-    }
-    .dropdown-menu {
-      display: none;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.2s ease;
-    }
   }
 </style>

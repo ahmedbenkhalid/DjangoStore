@@ -92,8 +92,10 @@ services:
       - static_volume:/app/staticfiles
       - media_volume:/app/www/media
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
 
 volumes:
   mysql_data:

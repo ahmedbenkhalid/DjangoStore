@@ -1,6 +1,7 @@
 from asgiref.sync import sync_to_async
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
+from django.urls import reverse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
 from django.core.cache import cache
@@ -193,15 +194,15 @@ def add_review(request, product_id):
     return redirect(product.get_absolute_url())
 
 
-@sync_to_async
 @login_required
+@require_POST
 def delete_review(request, review_id):
     """Delete a product review."""
     review = get_object_or_404(Review, id=review_id, user=request.user.profile)
     product_slug = review.product.slug
     review.delete()
     cache.delete(f"product_detail_{product_slug}")
-    return redirect(f"/products/{product_slug}/")
+    return redirect(reverse("products:detail", kwargs={"slug": product_slug}))
 
 
 async def category_list(request):
