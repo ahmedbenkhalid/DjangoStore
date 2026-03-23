@@ -164,11 +164,11 @@
           <div class="item-info">
             <div class="item-name">{{ item.product.name }}</div>
             <div class="item-qty">
-              {{ item.quantity }} × {% if LANGUAGE_CODE == 'ar' %}ج.م{% else %}EGP{% endif %} {{ item.product.price|floatformat:2|intcomma }}
+              {{ item.quantity }} × {% if request.LANGUAGE_CODE == 'ar' %}ج.م{% else %}EGP{% endif %} {{ item.product.price|floatformat:2|intcomma }}
             </div>
           </div>
           <div class="item-price">
-            {% if LANGUAGE_CODE == 'ar' %}ج.م{% else %}EGP{% endif %} {{ item.subtotal|floatformat:2|intcomma }}
+            {% if request.LANGUAGE_CODE == 'ar' %}ج.م{% else %}EGP{% endif %} {{ item.subtotal|floatformat:2|intcomma }}
           </div>
         </div>
         {% endfor %}
@@ -177,7 +177,7 @@
 
         <div class="summary-row">
           <span class="summary-key">{% trans "Subtotal" %}</span>
-          <span class="summary-val">{% if LANGUAGE_CODE == 'ar' %}ج.م{% else %}EGP{% endif %} {{ total|floatformat:2|intcomma }}</span>
+          <span class="summary-val">{% if request.LANGUAGE_CODE == 'ar' %}ج.م{% else %}EGP{% endif %} {{ total|floatformat:2|intcomma }}</span>
         </div>
         <div class="summary-row">
           <span class="summary-key">{% trans "Shipping" %}</span>
@@ -186,7 +186,7 @@
 
         <div class="summary-total-row">
           <span class="summary-total-key">{% trans "Total" %}</span>
-          <span class="summary-total-val">{% if LANGUAGE_CODE == 'ar' %}ج.م{% else %}EGP{% endif %} {{ total|floatformat:2|intcomma }}</span>
+          <span class="summary-total-val">{% if request.LANGUAGE_CODE == 'ar' %}ج.م{% else %}EGP{% endif %} {{ total|floatformat:2|intcomma }}</span>
         </div>
 
         <div class="secure-note">

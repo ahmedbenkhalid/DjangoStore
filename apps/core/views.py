@@ -7,7 +7,6 @@ from .models import Banner
 
 
 def home(request):
-    # Categories - limit to 4
     categories = cache.get("home_categories")
     if categories is None:
         categories = list(Category.objects.all()[:4])
@@ -32,7 +31,6 @@ def home(request):
         )
         cache.set("featured_products", featured_products, 3600)
 
-    # Most Liked Products (by wishlist count)
     most_liked = cache.get("most_liked_products")
     if most_liked is None:
         most_liked = list(

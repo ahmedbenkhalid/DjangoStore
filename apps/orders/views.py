@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.utils.translation import gettext as _
 
 from products.models import Product
 from orders.models import Order, OrderItem, OrderStatus, PaymentMethod, PaymentStatus
@@ -56,7 +57,7 @@ def checkout(request):
     products, total = get_cart_products(request)
 
     if not products:
-        messages.error(request, "Your cart is empty.")
+        messages.error(request, _("Your cart is empty."))
         return redirect("cart:detail")
 
     from users.models import Address
@@ -105,7 +106,7 @@ def create_order(request):
     products, total = get_cart_products(request)
 
     if not products:
-        messages.error(request, "Your cart is empty.")
+        messages.error(request, _("Your cart is empty."))
         return redirect("cart:detail")
 
     shipping_address = request.POST.get("shipping_address", "").strip()
@@ -119,7 +120,7 @@ def create_order(request):
     }
 
     if not shipping_address or not phone:
-        messages.error(request, "Please provide shipping address and phone number.")
+        messages.error(request, _("Please provide shipping address and phone number."))
         return redirect("orders:checkout")
 
     try:
@@ -135,7 +136,10 @@ def create_order(request):
                 if p.stock < requested_qty:
                     messages.error(
                         request,
-                        f"Sorry, {p.name} is out of stock or does not have enough quantity (Available: {p.stock}).",
+                        _(
+                            "Sorry, %(name)s is out of stock or does not have enough quantity (Available: %(stock)s)."
+                        )
+                        % {"name": p.name, "stock": p.stock},
                     )
                     return redirect("orders:checkout")
 
@@ -175,7 +179,7 @@ def create_order(request):
             if "checkout_data" in request.session:
                 del request.session["checkout_data"]
 
-            messages.success(request, "Your order has been placed successfully!")
+            messages.success(request, _("Your order has been placed successfully!"))
 
             from .tasks import send_order_confirmation_task
 
@@ -188,9 +192,8 @@ def create_order(request):
             return redirect("orders:confirmation", order_id=order.id)
 
     except Exception as e:
-        # If anything fails (like a database error), the transaction rolls back
         messages.error(
-            request, f"An error occurred while processing your order: {str(e)}"
+            request, _("An error occurred while processing your order: %s") % str(e)
         )
         return redirect("orders:checkout")
 
@@ -259,7 +262,8 @@ def cancel_order(request, order_id):
     ]:
         messages.error(
             request,
-            f"Order cannot be cancelled in its current status: {order.get_status_display()}.",
+            _("Order cannot be cancelled in its current status: %(status)s.")
+            % {"status": order.get_status_display()},
         )
         return redirect("orders:order_detail", order_id=order.id)
 
@@ -273,7 +277,7 @@ def cancel_order(request, order_id):
     order.save(update_fields=["status"])
 
     messages.success(
-        request, f"Order #{order.id} has been cancelled and stock restored."
+        request, _("Order #%d has been cancelled and stock restored.") % order.id
     )
 
     from .tasks import send_order_cancelled_task

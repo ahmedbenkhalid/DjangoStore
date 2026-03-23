@@ -1,0 +1,79 @@
+{% load i18n %}
+
+<div class="d-flex d-lg-none align-items-center gap-2">
+  {# Mobile Search Toggle #}
+  <button class="nav-icon-btn text-decoration-none d-flex align-items-center justify-content-center rounded" 
+          type="button" data-bs-toggle="collapse" data-bs-target="#mobileSearch" 
+          aria-expanded="false" aria-controls="mobileSearch"
+          style="width: 34px; height: 34px;">
+    <i class="bi bi-search"></i>
+  </button>
+
+  {# Language Switcher #}
+  <div class="dropdown lang-switcher">
+    <a href="#" class="nav-icon-btn text-decoration-none d-flex align-items-center justify-content-center px-2 py-1 rounded gap-1" data-bs-toggle="dropdown" title="{% trans 'Language' %}">
+      <i class="bi bi-globe2"></i>
+      <span class="lang-code">{% if request.LANGUAGE_CODE == 'ar' %}عربي{% else %}EN{% endif %}</span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg dark-dropdown mt-2 p-2 rounded-4" style="min-width: 140px;">
+      <li>
+        <form id="lang-form-en" action="{% url 'set_language' %}" method="post">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <input type="hidden" name="language" value="en">
+          <button type="button"
+            onclick="document.getElementById('lang-form-en').submit()"
+            class="dropdown-item text-center w-100 bg-transparent border-0 rounded-3 py-2 text-white {% if request.LANGUAGE_CODE == 'en' %}active-lang{% endif %}">
+            English
+          </button>
+        </form>
+      </li>
+      <li>
+        <form id="lang-form-ar" action="{% url 'set_language' %}" method="post">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <input type="hidden" name="language" value="ar">
+          <button type="button"
+            onclick="document.getElementById('lang-form-ar').submit()"
+            class="dropdown-item text-center w-100 bg-transparent border-0 rounded-3 py-2 text-white {% if request.LANGUAGE_CODE == 'ar' %}active-lang{% endif %}">
+            العربية
+          </button>
+        </form>
+      </li>
+    </ul>
+  </div>
+
+  {# Auth Section #}
+  {% if user.is_authenticated %}
+    <div class="dropdown">
+      <a href="#" class="nav-user-trigger text-decoration-none d-flex" data-bs-toggle="dropdown">
+        <div class="avatar-hex rounded overflow-hidden" style="width: 32px; height: 32px;">
+          {% if user.profile.avatar %}
+            <img src="{{ user.profile.avatar.url }}" alt="{{ user.username|first|upper }}" class="w-100 h-100 object-fit-cover">
+          {% else %}
+            <div class="avatar-init w-100 h-100 d-flex align-items-center justify-content-center">{{ user.username|first|upper }}</div>
+          {% endif %}
+        </div>
+      </a>
+      <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg dark-dropdown mt-2 rounded-4 p-2" style="min-width: 180px;">
+        <li class="px-3 py-2 mb-1 border-bottom border-secondary border-opacity-25">
+          <span class="text-accent small fw-bold font-mono">{{ user.username }}</span>
+        </li>
+        <li><a class="dropdown-item rounded-3 py-2 text-white bg-transparent border-0 text-center w-100" href="{% url 'profile' %}">{% trans "Profile" %}</a></li>
+        <li><a class="dropdown-item rounded-3 py-2 text-white bg-transparent border-0 text-center w-100" href="{% url 'orders:order_list' %}">{% trans "My Orders" %}</a></li>
+        <li><hr class="dropdown-divider opacity-25"></li>
+        <li>
+          <form action="{% url 'logout' %}" method="post">
+            {% csrf_token %}
+            <button class="dropdown-item rounded-3 py-2 text-danger fw-bold w-100 border-0 bg-transparent text-center">{% trans "Logout" %}</button>
+          </form>
+        </li>
+      </ul>
+    </div>
+  {% else %}
+    <div class="d-flex align-items-center gap-1">
+      <a href="{% url 'login' %}" class="nav-auth-link login text-decoration-none">{% trans "Login" %}</a>
+      <a href="{% url 'register' %}" class="nav-auth-link register text-decoration-none">{% trans "Register" %}</a>
+    </div>
+  {% endif %}
+</div>

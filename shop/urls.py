@@ -22,11 +22,8 @@ from django.conf.urls.static import static
 from django.views.generic.base import RedirectView
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
-    path("i18n/", include("django.conf.urls.i18n")),
     path("robots.txt", RedirectView.as_view(url="/static/robots.txt", permanent=True)),
     path("", include("core.urls")),
-    path("/about", include("core.urls")),
 ]
 
 if settings.DEBUG:

@@ -24,6 +24,9 @@ function fixRTLDropdowns() {
 
   // Fix all dropdowns
   document.querySelectorAll('.dropdown-menu').forEach(function(menu) {
+    // Skip language switcher — it should stay anchored to its trigger
+    if (menu.closest('.lang-switcher')) return;
+
     // Remove Bootstrap's end alignment in RTL
     if (menu.classList.contains('dropdown-menu-end')) {
       menu.classList.remove('dropdown-menu-end');

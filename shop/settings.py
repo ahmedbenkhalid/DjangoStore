@@ -178,7 +178,10 @@ LOGIN_URL = "/login/"
 LANGUAGE_CODE = "en-us"
 LANGUAGES = [
     ("en", _("English")),
+    ("ar", _("Arabic")),
 ]
+LANGUAGE_COOKIE_NAME = "django_language"
+LANGUAGE_COOKIE_AGE = 60 * 60 * 24 * 365  # 1 year
 TIME_ZONE = "EET"
 
 LOCALE_PATHS = [

@@ -1,8 +1,10 @@
 from django.db import models
+from django.utils import translation
 
 
 class Category(models.Model):
     name = models.CharField(max_length=255)
+    name_ar = models.CharField(max_length=255, blank=True, verbose_name="Name (Arabic)")
     slug = models.SlugField(max_length=255, unique=True)
     image = models.ImageField(upload_to="products/", blank=True, null=True)
 
@@ -15,6 +17,11 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+    def get_name(self):
+        if translation.get_language() == "ar" and self.name_ar:
+            return self.name_ar
+        return self.name
+
     def get_absolute_url(self):
         from django.urls import reverse
 
@@ -23,6 +30,7 @@ class Category(models.Model):
 
 class Brand(models.Model):
     name = models.CharField(max_length=255)
+    name_ar = models.CharField(max_length=255, blank=True, verbose_name="Name (Arabic)")
     slug = models.SlugField(max_length=255, unique=True)
 
     class Meta:
@@ -31,9 +39,15 @@ class Brand(models.Model):
     def __str__(self):
         return self.name
 
+    def get_name(self):
+        if translation.get_language() == "ar" and self.name_ar:
+            return self.name_ar
+        return self.name
+
 
 class Tag(models.Model):
     name = models.CharField(max_length=100)
+    name_ar = models.CharField(max_length=100, blank=True, verbose_name="Name (Arabic)")
     slug = models.SlugField(max_length=100, unique=True)
 
     class Meta:
@@ -42,9 +56,15 @@ class Tag(models.Model):
     def __str__(self):
         return self.name
 
+    def get_name(self):
+        if translation.get_language() == "ar" and self.name_ar:
+            return self.name_ar
+        return self.name
+
 
 class Product(models.Model):
     name = models.CharField(max_length=255)
+    name_ar = models.CharField(max_length=255, blank=True, verbose_name="Name (Arabic)")
     slug = models.SlugField(max_length=255, unique=True)
     sku = models.CharField(max_length=100, unique=True, blank=True, null=True)
     img = models.ImageField(upload_to="products/", blank=True, null=True)
@@ -55,6 +75,7 @@ class Product(models.Model):
     stock = models.PositiveIntegerField(default=0)
     type = models.CharField(max_length=100, blank=True)
     description = models.TextField(blank=True)
+    description_ar = models.TextField(blank=True, verbose_name="Description (Arabic)")
     external_link = models.URLField(blank=True, null=True)
     category = models.ForeignKey(
         Category, on_delete=models.CASCADE, related_name="products"
@@ -78,6 +99,16 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_name(self):
+        if translation.get_language() == "ar" and self.name_ar:
+            return self.name_ar
+        return self.name
+
+    def get_description(self):
+        if translation.get_language() == "ar" and self.description_ar:
+            return self.description_ar
+        return self.description
 
     def get_absolute_url(self):
         from django.urls import reverse

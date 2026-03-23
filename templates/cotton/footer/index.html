@@ -1,0 +1,67 @@
+{% load i18n %}
+
+<footer class="s3r-footer mt-5 pt-5 pb-4 small">
+  <div class="container">
+    <div class="row g-4 pb-4 border-bottom border-secondary border-opacity-10">
+      <c-footer.brand_col />
+      
+      <div class="col-lg-2 col-md-6 col-6">
+        <h6 class="footer-heading fw-bold small mb-3">{% trans "Shop" %}</h6>
+        <ul class="list-unstyled mb-0 d-flex flex-column gap-2 footer-links">
+          <li><a href="{% url 'products:products' %}" class="text-decoration-none small">{% trans "All Products" %}</a></li>
+          <li><a href="{% url 'products:products' %}?category=smartphones" class="text-decoration-none small">{% trans "Smartphones" %}</a></li>
+          <li><a href="{% url 'products:products' %}?category=laptops" class="text-decoration-none small">{% trans "Laptops" %}</a></li>
+          <li><a href="{% url 'products:products' %}?category=audio" class="text-decoration-none small">{% trans "Audio" %}</a></li>
+          <li><a href="{% url 'products:products' %}?category=accessories" class="text-decoration-none small">{% trans "Accessories" %}</a></li>
+        </ul>
+      </div>
+
+      <div class="col-lg-2 col-md-6 col-6">
+        <h6 class="footer-heading fw-bold small mb-3">{% trans "Account" %}</h6>
+        <ul class="list-unstyled mb-0 d-flex flex-column gap-2 footer-links">
+          <li><a href="{% url 'profile' %}" class="text-decoration-none small">{% trans "My Profile" %}</a></li>
+          <li><a href="{% url 'orders:order_list' %}" class="text-decoration-none small">{% trans "My Orders" %}</a></li>
+          <li><a href="{% url 'products:wishlist_list' %}" class="text-decoration-none small">{% trans "Wishlist" %}</a></li>
+          <li><a href="{% url 'users:address_list' %}" class="text-decoration-none small">{% trans "Addresses" %}</a></li>
+          <li><a href="{% url 'users:password_change' %}" class="text-decoration-none small">{% trans "Change Password" %}</a></li>
+        </ul>
+      </div>
+
+      <div class="col-lg-2 col-md-6 col-6">
+        <h6 class="footer-heading fw-bold small mb-3">{% trans "Support" %}</h6>
+        <ul class="list-unstyled mb-0 d-flex flex-column gap-2 footer-links">
+          <li><a href="#" class="text-decoration-none small">{% trans "Contact Us" %}</a></li>
+          <li><a href="#" class="text-decoration-none small">{% trans "FAQ" %}</a></li>
+          <li><a href="#" class="text-decoration-none small">{% trans "Shipping Info" %}</a></li>
+          <li><a href="#" class="text-decoration-none small">{% trans "Returns" %}</a></li>
+          <li><a href="#" class="text-decoration-none small">{% trans "Track Order" %}</a></li>
+        </ul>
+      </div>
+
+      <div class="col-lg-2 col-md-6">
+        <h6 class="footer-heading fw-bold small mb-3">{% trans "Contact" %}</h6>
+        <ul class="list-unstyled mb-0 d-flex flex-column gap-3 footer-contact">
+          <li class="d-flex align-items-start gap-2 small">
+            <i class="bi bi-telephone mt-1"></i>
+            <span>+20 1XX XXX XXXX</span>
+          </li>
+          <li class="d-flex align-items-start gap-2 small">
+            <i class="bi bi-envelope mt-1"></i>
+            <span>support@smarts3r.com</span>
+          </li>
+          <li class="d-flex align-items-start gap-2 small">
+            <i class="bi bi-geo-alt mt-1"></i>
+            <span>Cairo, Egypt</span>
+          </li>
+          <li class="d-flex align-items-start gap-2 small">
+            <i class="bi bi-clock mt-1"></i>
+            <span>{% trans "Sat-Thu: 9AM - 10PM" %}</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <c-footer.badges />
+    <c-footer.bottom />
+  </div>
+</footer>

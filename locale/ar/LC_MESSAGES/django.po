@@ -603,3 +603,91 @@ msgstr "ممارسات مستدامة"
 msgid ""
 "We care about the planet and choose eco-friendly options whenever possible."
 msgstr "نحن نهتم بالكوكب ونختار الخيارات الصديقة للبيئة كلما أمكن ذلك."
+
+# ── Settings ──────────────────────────────────
+
+msgid "English"
+msgstr "الإنجليزية"
+
+msgid "Arabic"
+msgstr "العربية"
+
+# ── Cart Messages ─────────────────────────────
+
+msgid "Cart updated."
+msgstr "تم تحديث العربة."
+
+msgid "Item removed from cart."
+msgstr "تمت إزالة العنصر من العربة."
+
+msgid "Only %(stock)s items left in stock."
+msgstr "متبقي %(stock)s قطع فقط في المخزن."
+
+msgid "Sorry, only %(stock)s items are available for %(name)s."
+msgstr "عذراً، %(stock)s قطع فقط متوفرة لـ %(name)s."
+
+# ── Orders Messages ───────────────────────────
+
+msgid "Your cart is empty."
+msgstr "عربة التسوق فارغة."
+
+msgid "Please provide shipping address and phone number."
+msgstr "يرجى تقديم عنوان الشحن ورقم الهاتف."
+
+msgid ""
+"Sorry, %(name)s is out of stock or does not have enough quantity (Available: "
+"%(stock)s)."
+msgstr ""
+"عذراً، %(name)s نفد من المخزون أو لا يحتوي على كمية كافية (المتوفر: "
+"%(stock)s)."
+
+msgid "Your order has been placed successfully!"
+msgstr "تم تنفيذ طلبك بنجاح!"
+
+msgid "An error occurred while processing your order: %s"
+msgstr "حدث خطأ أثناء معالجة طلبك: %s"
+
+msgid "Order cannot be cancelled in its current status: %(status)s."
+msgstr "لا يمكن إلغاء الطلب في حالته الحالية: %(status)s."
+
+msgid "Order #%d has been cancelled and stock restored."
+msgstr "تم إلغاء الطلب #%d واستعادة المخزون."
+
+msgid "Place Order"
+msgstr "تأكيد الطلب"
+
+msgid "FREE"
+msgstr "مجاني"
+
+msgid "Saved Addresses"
+msgstr "العناوين المحفوظة"
+
+msgid "Default"
+msgstr "افتراضي"
+
+msgid "Enter new address"
+msgstr "أدخل عنوان جديد"
+
+msgid "Enter your full delivery address"
+msgstr "أدخل عنوان التسليم الكامل"
+
+msgid "Optional"
+msgstr "اختياري"
+
+msgid "Special instructions for delivery"
+msgstr "تعليمات خاصة للتسليم"
+
+msgid "Pay when your order arrives"
+msgstr "ادفع عند وصول طلبك"
+
+msgid "Almost there"
+msgstr "تقريباً انتهيت"
+
+msgid "Shipping"
+msgstr "الشحن"
+
+msgid "Confirm"
+msgstr "التأكيد"
+
+msgid "Your order is protected by 256-bit SSL encryption."
+msgstr "طلبك محمي بتشفير 256 بت SSL."
