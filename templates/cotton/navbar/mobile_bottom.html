@@ -1,49 +1,34 @@
 {% load i18n %}
 
-<div class="bottom-nav d-lg-none position-fixed bottom-0 start-0 w-100 border-top border-success border-opacity-25" style="height: 60px;">
+<div class="bottom-nav-app d-lg-none position-fixed bottom-0 start-0 w-100 bg-white border-top" style="height: 60px;">
   <div class="d-flex flex-row h-100 align-items-center justify-content-around text-center w-100">
 
-    <a href="{% url 'home' %}" class="nav-tab text-decoration-none d-flex flex-column align-items-center justify-content-center py-1 w-100 h-100 gap-1 {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+    <a href="{% url 'home' %}" class="nav-tab-app text-decoration-none d-flex flex-column align-items-center justify-content-center py-1 w-100 h-100 gap-1 {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
       <i class="bi bi-house-door" style="font-size: 1.2rem;"></i>
-      <div class="tab-dot rounded-circle" style="width: 4px; height: 4px;"></div>
-      <span class="text-uppercase" style="font-size: 0.5rem; letter-spacing: 0.04em;">{% trans "Home" %}</span>
+      <span class="text-uppercase" style="font-size: 0.55rem; letter-spacing: 0.04em;">{% trans "Home" %}</span>
     </a>
 
-    <a href="{% url 'products:products' %}" class="nav-tab text-decoration-none d-flex flex-column align-items-center justify-content-center py-1 w-100 h-100 gap-1 {% if 'products' in request.path %}active{% endif %}">
+    <a href="{% url 'products:products' %}" class="nav-tab-app text-decoration-none d-flex flex-column align-items-center justify-content-center py-1 w-100 h-100 gap-1 {% if 'products' in request.path %}active{% endif %}">
       <i class="bi bi-grid-3x3-gap" style="font-size: 1.2rem;"></i>
-      <div class="tab-dot rounded-circle" style="width: 4px; height: 4px;"></div>
-      <span class="text-uppercase" style="font-size: 0.5rem; letter-spacing: 0.04em;">{% trans "Shop" %}</span>
+      <span class="text-uppercase" style="font-size: 0.55rem; letter-spacing: 0.04em;">{% trans "Shop" %}</span>
     </a>
 
-    <a href="{% url 'categories:categories' %}" class="nav-tab text-decoration-none d-flex flex-column align-items-center justify-content-center py-1 w-100 h-100 gap-1 {% if 'category' in request.path %}active{% endif %}">
+    <a href="{% url 'categories:categories' %}" class="nav-tab-app text-decoration-none d-flex flex-column align-items-center justify-content-center py-1 w-100 h-100 gap-1 {% if 'category' in request.path %}active{% endif %}">
       <i class="bi bi-tags" style="font-size: 1.2rem;"></i>
-      <div class="tab-dot rounded-circle" style="width: 4px; height: 4px;"></div>
-      <span class="text-uppercase" style="font-size: 0.5rem; letter-spacing: 0.04em;">{% trans "Categories" %}</span>
+      <span class="text-uppercase" style="font-size: 0.55rem; letter-spacing: 0.04em;">{% trans "Categories" %}</span>
     </a>
 
-    <a href="{% url 'wishlist' %}" class="nav-tab position-relative text-decoration-none d-flex flex-column align-items-center justify-content-center py-1 w-100 h-100 gap-1 {% if request.resolver_match.url_name == 'wishlist' %}active{% endif %}">
+    <a href="{% url 'wishlist' %}" class="nav-tab-app position-relative text-decoration-none d-flex flex-column align-items-center justify-content-center py-1 w-100 h-100 gap-1 {% if request.resolver_match.url_name == 'wishlist' %}active{% endif %}">
       <i class="bi bi-heart" style="font-size: 1.2rem;"></i>
-      {% if wishlist_count > 0 %}<span class="badge-mini position-absolute translate-middle rounded-circle d-flex align-items-center justify-content-center" style="width: 15px; height: 15px; top: 8px; right: calc(50% - 20px);">{{ wishlist_count }}</span>{% endif %}
-      <div class="tab-dot rounded-circle" style="width: 4px; height: 4px;"></div>
-      <span class="text-uppercase" style="font-size: 0.5rem; letter-spacing: 0.04em;">{% trans "Wishlist" %}</span>
+      {% if wishlist_count > 0 %}<span class="badge-count-app position-absolute translate-middle rounded-circle d-flex align-items-center justify-content-center" style="width: 16px; height: 16px; top: 6px; right: calc(50% - 20px);">{{ wishlist_count }}</span>{% endif %}
+      <span class="text-uppercase" style="font-size: 0.55rem; letter-spacing: 0.04em;">{% trans "Wishlist" %}</span>
     </a>
 
-    <a href="#cartOffcanvas" data-bs-toggle="offcanvas" class="nav-tab position-relative text-decoration-none d-flex flex-column align-items-center justify-content-center py-1 w-100 h-100 gap-1">
+    <a href="#cartOffcanvas" data-bs-toggle="offcanvas" class="nav-tab-app position-relative text-decoration-none d-flex flex-column align-items-center justify-content-center py-1 w-100 h-100 gap-1">
       <i class="bi bi-bag" style="font-size: 1.2rem;"></i>
-      {% if cart_count > 0 %}<span class="badge-mini position-absolute translate-middle rounded-circle d-flex align-items-center justify-content-center" style="width: 15px; height: 15px; top: 8px; right: calc(50% - 20px);">{{ cart_count }}</span>{% endif %}
-      <div class="tab-dot rounded-circle" style="width: 4px; height: 4px;"></div>
-      <span class="text-uppercase" style="font-size: 0.5rem; letter-spacing: 0.04em;">{% trans "Cart" %}</span>
+      {% if cart_count > 0 %}<span class="badge-count-app position-absolute translate-middle rounded-circle d-flex align-items-center justify-content-center" style="width: 16px; height: 16px; top: 6px; right: calc(50% - 20px);">{{ cart_count }}</span>{% endif %}
+      <span class="text-uppercase" style="font-size: 0.55rem; letter-spacing: 0.04em;">{% trans "Cart" %}</span>
     </a>
-
-    <form action="{% url 'set_language' %}" method="post" class="nav-tab-form w-100 h-100">
-      {% csrf_token %}
-      <input type="hidden" name="next" value="{{ request.get_full_path }}">
-      <button type="submit" name="language" value="{% if request.LANGUAGE_CODE == 'ar' %}en{% else %}ar{% endif %}" class="nav-tab text-decoration-none d-flex flex-column align-items-center justify-content-center py-1 w-100 h-100 gap-1 border-0 bg-transparent">
-        <i class="bi bi-globe2" style="font-size: 1.2rem;"></i>
-        <div class="tab-dot rounded-circle" style="width: 4px; height: 4px;"></div>
-        <span class="text-uppercase" style="font-size: 0.5rem; letter-spacing: 0.04em;">{% if request.LANGUAGE_CODE == 'ar' %}EN{% else %}عربي{% endif %}</span>
-      </button>
-    </form>
 
   </div>
 </div>

@@ -9,7 +9,7 @@
     <div class="col-12">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h4 class="fw-bold mb-0">{% trans "Address Book" %}</h4>
-            <a href="{% url 'users:address_add' %}" class="btn btn-dark rounded-pill fw-bold">
+            <a href="{% url 'users:address_add' %}" class="btn btn-dark-custom rounded-pill fw-bold">
                 {% bs_icon 'plus-circle' %} {% trans "Add New Address" %}
             </a>
         </div>
@@ -20,7 +20,7 @@
     {% if addresses %}
         {% for addr in addresses %}
         <div class="col-md-6 mb-4">
-            <div class="card border-0 shadow-sm rounded-4 h-100 {% if addr.is_default %}border-primary{% endif %}">
+            <div class="card card-shadcn border-0 h-100 {% if addr.is_default %}border-primary{% endif %}">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-start mb-3">
                         <div>
@@ -30,7 +30,7 @@
                             {% endif %}
                         </div>
                         <div class="btn-group">
-                            <a href="{% url 'users:address_edit' addr.pk %}" class="btn btn-outline-dark btn-sm rounded-pill">
+                            <a href="{% url 'users:address_edit' addr.pk %}" class="btn btn-outline-secondary btn-sm rounded-pill">
                                 {% bs_icon 'pencil' %}
                             </a>
                             <a href="{% url 'users:address_set_default' addr.pk %}" class="btn btn-outline-primary btn-sm rounded-pill" {% if addr.is_default %}disabled{% endif %}>
@@ -52,13 +52,13 @@
         {% endfor %}
     {% else %}
         <div class="col-12">
-            <div class="card border-0 shadow-sm rounded-4">
+            <div class="card card-shadcn border-0">
                 <div class="card-body text-center py-5">
                     <div class="text-muted mb-3">
                         {% bs_icon 'geo-alt' size='3em' %}
                     </div>
                     <p class="text-muted mb-4">{% trans "You haven't added any addresses yet." %}</p>
-                    <a href="{% url 'users:address_add' %}" class="btn btn-dark rounded-pill px-4 fw-bold">
+                    <a href="{% url 'users:address_add' %}" class="btn btn-dark-custom rounded-pill px-4 fw-bold">
                         {% trans "Add Your First Address" %}
                     </a>
                 </div>
@@ -69,7 +69,7 @@
 
 <div class="row mt-3">
     <div class="col-12">
-        <a href="{% url 'profile' %}" class="btn btn-outline-dark rounded-pill">
+        <a href="{% url 'profile' %}" class="btn btn-outline-secondary rounded-pill">
             {% bs_icon 'arrow-left' %} {% trans "Back to Profile" %}
         </a>
     </div>

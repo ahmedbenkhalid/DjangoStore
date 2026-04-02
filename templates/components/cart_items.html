@@ -5,18 +5,17 @@
 {% if cart_items %}
   <div class="cart-items-container px-3">
     {% for item in cart_items %}
-    <div class="cart-item d-flex align-items-center gap-3 py-4 border-bottom border-secondary position-relative transition-all">
+    <div class="d-flex align-items-center gap-3 py-3 border-bottom">
       
       {# Product Image #}
-      <div class="flex-shrink-0 rounded-3 overflow-hidden border border-secondary bg-dark shadow-sm"
-           style="width: 80px; height: 80px;">
+      <div class="flex-shrink-0 rounded-3 overflow-hidden bg-light" style="width: 72px; height: 72px;">
         <a href="{{ item.product.get_absolute_url }}">
           {% if item.product.img %}
-            <img src="{{ item.product.img.url }}" class="w-100 h-100 img-fluid" style="object-fit: cover;" alt="{{ item.product.name }}" loading="lazy">
+            <img src="{{ item.product.img.url }}" class="w-100 h-100" style="object-fit: cover;" alt="{{ item.product.name }}" loading="lazy">
           {% elif item.product.img_link %}
-            <img src="{{ item.product.img_link }}" class="w-100 h-100 img-fluid" style="object-fit: cover;" alt="{{ item.product.name }}" loading="lazy">
+            <img src="{{ item.product.img_link }}" class="w-100 h-100" style="object-fit: cover;" alt="{{ item.product.name }}" loading="lazy">
           {% else %}
-            <div class="d-flex align-items-center justify-content-center h-100 bg-dark text-muted">
+            <div class="d-flex align-items-center justify-content-center h-100 text-muted">
               <i class="bi bi-image fs-4"></i>
             </div>
           {% endif %}
@@ -27,43 +26,44 @@
       <div class="flex-grow-1 min-w-0">
         <div class="d-flex justify-content-between align-items-start mb-1">
           <a href="{{ item.product.get_absolute_url }}"
-             class="text-decoration-none text-white fw-bold lh-sm d-block text-truncate pe-3"
-             style="font-size: 0.9rem; letter-spacing: -0.01em;">
+             class="text-decoration-none text-body fw-bold lh-sm d-block text-truncate pe-3"
+             style="font-size: 0.85rem;">
             {{ item.product.name }}
           </a>
           
           {# Remove Button #}
           <form action="{% url 'cart:remove' item.product.id %}" method="post" class="js-cart-form">
             {% csrf_token %}
-            <button type="submit" class="btn btn-link text-white-50 p-0 border-0 btn-remove-item shadow-none">
-              <i class="bi bi-x-circle-fill" style="font-size: 1rem;"></i>
+            <button type="submit" class="btn btn-link text-muted p-0 border-0 shadow-none">
+              <i class="bi bi-x-circle" style="font-size: 1rem;"></i>
             </button>
           </form>
         </div>
 
-        {# Price Tag #}
+        {# Price #}
         <div class="mb-2">
-            <span class="fw-black text-accent" style="font-size: 0.85rem;">
-                {{ item.subtotal|floatformat:2|intcomma }} <small class="text-white-50 fw-bold" style="font-size: 0.7rem;">{% if request.LANGUAGE_CODE == 'ar' %}ج.م{% else %}EGP{% endif %}</small>
+            <span class="fw-bold text-accent" style="font-size: 0.85rem;">
+                {% if request.LANGUAGE_CODE == 'ar' %}ج.م{% else %}EGP{% endif %} {{ item.subtotal|floatformat:2|intcomma }}
             </span>
+            <span class="text-muted small ms-1">x{{ item.quantity }}</span>
         </div>
 
-        {# Quantity Control Bar #}
-        <div class="quantity-bar d-inline-flex align-items-center bg-secondary bg-opacity-10 rounded-3 p-1 border border-secondary">
-          <form action="{% url 'cart:add' item.product.id %}" method="post" class="js-cart-form" data-action="decrease">
+        {# Quantity Control #}
+        <div class="d-inline-flex align-items-center border rounded-3 p-1">
+          <form action="{% url 'cart:add' item.product.id %}" method="post" class="js-cart-form">
             {% csrf_token %}
             <input type="hidden" name="quantity" value="-1">
-            <button type="submit" class="btn btn-quantity rounded-3 p-0 d-flex align-items-center justify-content-center text-white">
+            <button type="submit" class="btn btn-sm p-0 d-flex align-items-center justify-content-center text-muted" style="width: 24px; height: 24px;">
               <i class="bi bi-dash"></i>
             </button>
           </form>
-          <span class="px-3 fw-bold text-white" style="font-size: 0.8rem; min-width: 35px; text-align: center;">
+          <span class="px-2 fw-bold" style="font-size: 0.8rem; min-width: 30px; text-align: center;">
             {{ item.quantity }}
           </span>
-          <form action="{% url 'cart:add' item.product.id %}" method="post" class="js-cart-form" data-action="increase">
+          <form action="{% url 'cart:add' item.product.id %}" method="post" class="js-cart-form">
             {% csrf_token %}
             <input type="hidden" name="quantity" value="1">
-            <button type="submit" class="btn btn-quantity rounded-3 p-0 d-flex align-items-center justify-content-center text-white">
+            <button type="submit" class="btn btn-sm p-0 d-flex align-items-center justify-content-center text-muted" style="width: 24px; height: 24px;">
               <i class="bi bi-plus"></i>
             </button>
           </form>
@@ -76,20 +76,14 @@
 {% else %}
   <div class="text-center py-5 px-4 h-100 d-flex flex-column justify-content-center">
     <div class="mb-4">
-        <div class="empty-cart-icon mx-auto mb-3 d-flex align-items-center justify-content-center bg-dark rounded-circle border border-secondary" style="width: 100px; height: 100px;">
-            <i class="bi bi-terminal-x text-accent opacity-50" style="font-size: 3rem;"></i>
+        <div class="mx-auto mb-3 d-flex align-items-center justify-content-center bg-light rounded-circle" style="width: 80px; height: 80px;">
+            <i class="bi bi-cart-x text-muted" style="font-size: 2rem;"></i>
         </div>
-        <h5 class="fw-black text-white">{% trans "Your cart is feeling light" %}</h5>
-        <p class="text-white-50 small">{% trans "Looks like you haven't added anything yet." %}</p>
+        <h5 class="fw-bold">{% trans "Your cart is empty" %}</h5>
+        <p class="text-muted small">{% trans "Looks like you haven't added anything yet." %}</p>
     </div>
-    <a href="{% url 'products:products' %}" class="btn btn-accent rounded-pill px-5 py-2 fw-bold text-uppercase tracking-wider" style="font-size: 0.8rem;">
-      {% trans "Explore Shop" %}
+    <a href="{% url 'products:products' %}" class="btn btn-accent rounded-pill px-4 py-2 fw-bold">
+      {% trans "Start Shopping" %}
     </a>
   </div>
 {% endif %}
-
-<style>
-  .btn-quantity { width: 24px; height: 24px; transition: 0.2s; border: none; background: transparent; }
-  .btn-quantity:hover { background: rgba(16, 185, 129, 0.2); color: var(--accent) !important; }
-  .btn-remove-item:hover { color: #ef4444 !important; }
-</style>

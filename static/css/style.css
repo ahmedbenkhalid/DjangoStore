@@ -1,241 +1,411 @@
-/* ── 1. Reset & Base ── */
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+/* ═══════════════════════════════════════════════════
+   SMART S3R — Light Mode Design Tokens
+   Bootstrap 5.3 + shadcn-django inspired
+   ═══════════════════════════════════════════════════ */
+
+:root {
+  /* ── Brand Colors ── */
+  --brand-accent: #10b981;
+  --brand-accent-rgb: 16, 185, 129;
+  --brand-accent-hover: #059669;
+  --brand-accent-light: #d1fae5;
+  --brand-accent-dim: rgba(16, 185, 129, 0.08);
+  --brand-accent-mid: rgba(16, 185, 129, 0.12);
+
+  /* ── Backgrounds ── */
+  --bg-body: #f8fafc;
+  --bg-surface: #ffffff;
+  --bg-muted: #f1f5f9;
+
+  /* ── Text ── */
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+
+  /* ── Borders ── */
+  --border-default: #e2e8f0;
+  --border-strong: #cbd5e1;
+  --border-accent: rgba(16, 185, 129, 0.3);
+
+  /* ── Typography ── */
+  --font-heading: 'Sora', sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-arabic: 'Cairo', 'Inter', sans-serif;
+
+  /* ── Radius ── */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-pill: 100px;
+
+  /* ── Shadows ── */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 10px 32px rgba(0, 0, 0, 0.1);
+  --shadow-accent: 0 0 20px rgba(16, 185, 129, 0.25);
 }
+
+/* ── RTL Font Override ── */
+[dir="rtl"] {
+  font-family: var(--font-arabic);
+}
+
+/* ═══════════════════════════════════════════════════
+   Base Styles
+   ═══════════════════════════════════════════════════ */
 
 body {
+  font-family: var(--font-body);
+  color: var(--text-primary);
+  background: var(--bg-body);
   scroll-behavior: smooth;
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  color: #1d1c1e;
-  background: #fefefbf2;
-  overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  padding-bottom: env(safe-area-inset-bottom);
 }
 
-/* ── 2. Header & Navbar Fix (المسافات والمنع من التداخل) ── */
-.navbar {
-  padding: 0.75rem 1rem;
-  background: #fff;
-  border-bottom: 1px solid #eee;
+/* ═══════════════════════════════════════════════════
+   Navbar (light mode)
+   ═══════════════════════════════════════════════════ */
+
+.nav-app {
+  z-index: 1060;
+  box-shadow: var(--shadow-sm);
+}
+
+.brand-box {
+  background: var(--brand-accent);
+  color: #fff;
+  font-family: var(--font-heading);
+  font-weight: 900;
+  font-size: 0.9rem;
 }
 
 .navbar-brand {
   font-weight: 800;
-  letter-spacing: -0.05em;
-  font-size: clamp(1.1rem, 4vw, 1.4rem);
-  flex-shrink: 0;
+  letter-spacing: -0.03em;
+  font-size: 1.1rem;
 }
 
-.nav-link-uppercase {
-  font-size: 0.75rem;
+.nav-link-app {
+  font-family: var(--font-heading);
+  font-size: 0.82rem;
   font-weight: 600;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  white-space: nowrap;
-  /* يمنع نزول النص لسطر جديد */
-  padding: 0.5rem 0.8rem !important;
+  color: var(--text-secondary) !important;
+  transition: all 0.2s;
 }
 
-/* ضبط شريط البحث */
-.search-wrapper {
-  max-width: 450px;
-  flex-grow: 1;
-  margin: 0 1.5rem;
+.nav-link-app:hover,
+.nav-link-app.active {
+  color: var(--text-primary) !important;
+  background: var(--bg-muted);
 }
 
-.search-input {
-  border: 1px solid #e0e0e0;
-  border-radius: 6px 0 0 6px !important;
-  height: 40px;
-  font-size: 0.9rem;
+.nav-search-form-app {
+  background: var(--bg-muted);
+  border: 1.5px solid var(--border-default);
+  transition: border-color 0.3s, box-shadow 0.3s;
 }
 
-.search-btn {
-  border-radius: 0 6px 6px 0 !important;
-  height: 40px;
-  min-width: 50px;
-  background: #212529;
-  color: #fff;
+.nav-search-form-app:focus-within {
+  border-color: var(--brand-accent);
+  box-shadow: 0 0 0 3px var(--brand-accent-mid);
+  background: var(--bg-surface);
+}
+
+.nav-search-input-app {
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  font-family: var(--font-body);
+  outline: none;
+  width: 130px;
+  transition: 0.3s;
+}
+
+.nav-search-input-app:focus { width: 180px; }
+.nav-search-input-app::placeholder { color: var(--text-muted); }
+
+.nav-icon-btn-app {
+  color: var(--text-secondary) !important;
+  transition: all 0.2s;
+  font-size: 1.05rem;
+  background: transparent;
   border: none;
 }
 
-/* أزرار الحساب والسلة */
-.btn-login,
-.btn-register-nav,
-.btn-language {
-  font-size: 0.75rem;
+.nav-icon-btn-app:hover,
+.nav-icon-btn-app:focus {
+  color: var(--text-primary) !important;
+  background: var(--bg-muted) !important;
+  outline: none;
+}
+
+.lang-code-app {
+  font-size: 0.6rem;
+  font-family: var(--font-mono);
   font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  white-space: nowrap;
+  line-height: 1;
 }
 
-/* ── 3. Hero Banner (Responsive UX) ── */
-.hero-image-container {
-  overflow: hidden;
-  background: #f0f0f0;
-  width: 100%;
-  border-radius: 1rem;
+.badge-count-app {
+  background: var(--brand-accent);
+  color: #fff;
+  font-size: 0.55rem;
+  font-weight: bold;
+  border: 2px solid #fff;
+  font-family: var(--font-mono);
 }
 
-.hero-img {
-  width: 100%;
-  height: clamp(280px, 50vh, 480px);
-  /* يتكيف مع الموبايل والشاشة الكبيرة */
-  object-fit: cover;
-  object-position: center;
+.avatar-app {
+  background: var(--bg-muted);
+  border: 2px solid var(--brand-accent-light);
+  transition: 0.2s;
 }
 
-/* ── 4. Categories & Product Cards ── */
-.category-card {
-  transition: transform .25s ease, box-shadow .25s ease;
-  border: none !important;
+.avatar-app:hover { border-color: var(--brand-accent); }
+
+/* Mobile Bottom Nav */
+.bottom-nav-app {
+  z-index: 1050;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.06);
 }
 
-.category-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, .08) !important;
+.nav-tab-app {
+  color: var(--text-muted);
+  transition: color 0.2s;
 }
 
-.product-card {
-  transition: transform 0.3s ease;
-  border: none !important;
+.nav-tab-app:hover,
+.nav-tab-app.active {
+  color: var(--brand-accent);
 }
 
-.product-image-wrapper {
-  aspect-ratio: 1/1;
-  overflow: hidden;
-  position: relative;
-  background: #f8f9fa;
+/* RTL Fixes */
+[dir="rtl"] .dropdown-menu-end { right: auto !important; left: 0 !important; }
+[dir="rtl"] .nav-search-form-app { flex-direction: row-reverse; }
+
+@media (min-width: 992px) {
+  .nav-item.dropdown:hover > .dropdown-menu { display: block; }
+  body { padding-bottom: 0 !important; }
 }
 
-.product-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform .4s ease;
+@media (max-width: 991px) {
+  body { padding-bottom: 60px !important; }
 }
 
-.product-card:hover .product-img {
-  transform: scale(1.06);
+/* ═══════════════════════════════════════════════════
+   Footer (light mode)
+   ═══════════════════════════════════════════════════ */
+
+.footer-links-app a {
+  color: var(--text-muted);
+  transition: color 0.2s;
 }
 
-/* توحيد ارتفاع العناوين لشكل متناسق Grid */
-.product-title {
-  font-size: .85rem;
+.footer-links-app a:hover { color: var(--brand-accent); }
+
+.social-link-app {
+  background: var(--bg-muted);
+  color: var(--text-secondary);
+  transition: all 0.2s;
+}
+
+.social-link-app:hover {
+  background: var(--brand-accent);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+/* ═══════════════════════════════════════════════════
+   Alerts (light mode)
+   ═══════════════════════════════════════════════════ */
+
+.alert-app {
+  border: 1px solid var(--border-default);
+  box-shadow: var(--shadow-md);
+}
+
+.alert-icon-app { font-size: 1.2rem; }
+
+/* ═══════════════════════════════════════════════════
+   Component Overrides (Bootstrap + shadcn-django)
+   ═══════════════════════════════════════════════════ */
+
+/* ── Buttons ── */
+.btn-accent {
+  background: var(--brand-accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  transition: all 0.2s;
+}
+
+.btn-accent:hover {
+  background: var(--brand-accent-hover);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-accent);
+}
+
+.btn-dark-custom {
+  background: var(--text-primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s;
+}
+
+.btn-dark-custom:hover {
+  background: #1e293b;
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-outline-accent {
+  border: 1.5px solid var(--brand-accent);
+  color: var(--brand-accent);
+  background: transparent;
+  border-radius: var(--radius-sm);
   font-weight: 600;
-  min-height: 2.6em;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  line-height: 1.3;
+  transition: all 0.2s;
 }
 
-/* ── 5. Overlays (Hover vs Mobile) ── */
-.product-overlay {
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0) 100%);
-  padding: 1rem;
-  transform: translateY(100%);
-  transition: transform .3s ease;
+.btn-outline-accent:hover {
+  background: var(--brand-accent);
+  color: #fff;
 }
 
-.product-card:hover .product-overlay {
-  transform: translateY(0);
+/* ── Cards ── */
+.card-shadcn {
+  border: 1px solid var(--border-default) !important;
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
 }
+
+.card-shadcn:hover {
+  border-color: var(--brand-accent) !important;
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* ── Forms ── */
+.form-control-shadcn {
+  border: 1.5px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  padding: 0.65rem 0.9rem;
+  font-size: 0.88rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background: var(--bg-surface);
+}
+
+.form-control-shadcn:focus {
+  border-color: var(--brand-accent);
+  box-shadow: 0 0 0 3px var(--brand-accent-mid);
+  outline: none;
+}
+
+.input-icon-shell {
+  display: flex;
+  align-items: center;
+  background: var(--bg-surface);
+  border: 1.5px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.input-icon-shell:focus-within {
+  border-color: var(--brand-accent);
+  box-shadow: 0 0 0 3px var(--brand-accent-mid);
+}
+
+.input-icon-shell.has-error {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.input-icon-shell .input-icon {
+  padding: 0 11px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  flex-shrink: 0;
+  transition: color 0.2s;
+}
+
+.input-icon-shell:focus-within .input-icon { color: var(--brand-accent); }
+
+.input-icon-shell .form-control {
+  border: none;
+  box-shadow: none;
+  background: transparent;
+  padding-left: 0;
+}
+
+.input-icon-shell .form-control:focus { box-shadow: none; }
+
+/* ── Badges ── */
+.badge-accent {
+  background: var(--brand-accent-dim);
+  color: var(--brand-accent);
+  border: 1px solid var(--border-accent);
+  font-family: var(--font-heading);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 4px 13px;
+  border-radius: var(--radius-pill);
+}
+
+.badge-dark {
+  background: var(--text-primary);
+  color: #fff;
+  font-family: var(--font-heading);
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 5px 14px;
+  border-radius: var(--radius-pill);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ═══════════════════════════════════════════════════
+   Custom Scrollbar
+   ═══════════════════════════════════════════════════ */
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+
+/* ═══════════════════════════════════════════════════
+   Utility Classes
+   ═══════════════════════════════════════════════════ */
+
+.text-accent { color: var(--brand-accent) !important; }
+.bg-accent { background: var(--brand-accent) !important; }
+.border-accent { border-color: var(--brand-accent) !important; }
+
+.fw-black { font-weight: 900; }
+.font-heading { font-family: var(--font-heading); }
+.font-mono { font-family: var(--font-mono); }
+
+.hover-lift { transition: transform 0.2s, box-shadow 0.2s; }
+.hover-lift:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+
+/* ═══════════════════════════════════════════════════
+   Responsive
+   ═══════════════════════════════════════════════════ */
 
 @media (max-width: 768px) {
-  .product-overlay {
-    transform: translateY(0);
-    background: transparent;
-    padding: 0.5rem 0;
-    position: relative;
-  }
-
-  .product-overlay .btn {
-    width: 100%;
-    font-size: 0.8rem;
-  }
-
-  .search-wrapper {
-    margin: 0.5rem 0;
-    order: 3;
-    /* ينزل تحت في الموبايل لو احتجت */
-  }
-}
-
-/* ── 6. Newsletter & Sections ── */
-.newsletter-banner {
-  background: linear-gradient(135deg, #1a1a2e 0%, #0f3460 100%);
-  border-radius: 1rem;
-}
-
-.section-label {
-  font-size: .7rem;
-  font-weight: 700;
-  letter-spacing: .1em;
-  color: #6c757d;
-  text-transform: uppercase;
-}
-
-/* ── 7. Global Utils ── */
-.hover-lift:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
-}
-
-.backdrop-blur {
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-}
-
-/* تحسين السكرول بار */
-::-webkit-scrollbar {
-  width: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #ccc;
-  border-radius: 10px;
-}
-
-/* تحسين شكل الـ Tabs لتكون أنعم */
-.nav-tabs-custom .nav-link {
-  color: #6c757d;
-  transition: all 0.3s ease;
-  border-bottom: 2px solid transparent !important;
-}
-
-.nav-tabs-custom .nav-link.active {
-  color: #000 !important;
-  border-bottom: 2px solid #000 !important;
-}
-
-/* تحسين شكل جدول المواصفات */
-.specs-table {
-  background-color: #f8f9fa;
-  width: 30%;
-}
-
-/* تحسين شكل زر الـ Wishlist الدائري */
-.btn-wishlist {
-  width: 45px;
-  height: 45px;
-  transition: all 0.3s ease;
-}
-
-.btn-wishlist:hover {
-  background-color: #f8d7da;
-  border-color: #f5c2c7;
-  color: #842029;
+  .search-wrapper { margin: 0.5rem 0; }
 }

@@ -8,14 +8,14 @@
 {% block content %}
 <div class="row">
   <div class="col-lg-8">
-    <div class="card border-0 shadow-sm rounded-4">
+    <div class="card card-shadcn border-0">
       <div class="card-body p-4">
-        <h4 class="fw-bold mb-4">{% trans "Shopping Cart" %}</h4>
-        
+        <h4 class="fw-bold font-heading mb-4">{% trans "Shopping Cart" %}</h4>
+
         {% if cart_items %}
           {% for item in cart_items %}
           <div class="d-flex align-items-center gap-3 py-3 border-bottom">
-            <div class="flex-shrink-0 rounded-2 overflow-hidden bg-light" style="width: 80px; height: 80px;">
+            <div class="flex-shrink-0 rounded-3 overflow-hidden bg-light" style="width: 80px; height: 80px;">
               {% if item.product.img %}
                 <img src="{{ item.product.img.url }}" class="w-100 h-100" style="object-fit: cover;" alt="{{ item.product.name }}">
               {% elif item.product.img_link %}
@@ -32,16 +32,16 @@
                 {{ item.product.name }}
               </a>
               <p class="text-muted mb-0" style="font-size: .85rem;">{{ item.product.brand.name }}</p>
-              
+
               <div class="d-flex align-items-center gap-2 mt-2">
                 <form action="{% url 'cart:add' item.product.id %}" method="post" class="js-cart-form d-inline">
                   {% csrf_token %}
                   <input type="hidden" name="quantity" value="-1">
                   <button type="submit" class="btn btn-outline-secondary btn-sm">{% bs_icon 'dash' %}</button>
                 </form>
-                
+
                 <span class="fw-bold">{{ item.quantity }}</span>
-                
+
                 <form action="{% url 'cart:add' item.product.id %}" method="post" class="js-cart-form d-inline">
                   {% csrf_token %}
                   <input type="hidden" name="quantity" value="1">
@@ -65,7 +65,7 @@
           <div class="text-center py-5">
             {% bs_icon 'cart-x' size='3em' extra_classes='mb-3 opacity-40' %}
             <p class="fw-bold">{% trans "Your cart is empty" %}</p>
-            <a href="{% url 'products:products' %}" class="btn btn-dark rounded-pill px-4">
+            <a href="{% url 'products:products' %}" class="btn btn-dark-custom rounded-pill px-4">
               {% trans "Start Shopping" %}
             </a>
           </div>
@@ -75,9 +75,9 @@
   </div>
 
   <div class="col-lg-4 mt-3 mt-lg-0">
-    <div class="card border-0 shadow-sm rounded-4">
+    <div class="card card-shadcn border-0">
       <div class="card-body p-4">
-        <h5 class="fw-bold mb-3">{% trans "Order Summary" %}</h5>
+        <h5 class="fw-bold font-heading mb-3">{% trans "Order Summary" %}</h5>
         <div class="d-flex justify-content-between mb-2">
           <span class="text-muted">{% trans "Subtotal" %}</span>
           <span class="fw-semibold">{% if request.LANGUAGE_CODE == 'ar' %}ج.م{% else %}EGP{% endif %} {{ cart_total|floatformat:2|intcomma }}</span>
@@ -93,9 +93,9 @@
         </div>
         {% if cart_items %}
           {% if user.is_authenticated %}
-          <a href="{% url 'orders:checkout' %}" class="btn btn-dark w-100 rounded-pill py-2 fw-bold">{% trans "Proceed to Checkout" %}</a>
+          <a href="{% url 'orders:checkout' %}" class="btn btn-dark-custom w-100 rounded-pill py-2 fw-bold">{% trans "Proceed to Checkout" %}</a>
           {% else %}
-          <button type="button" class="btn btn-dark w-100 rounded-pill py-2 fw-bold" 
+          <button type="button" class="btn btn-dark-custom w-100 rounded-pill py-2 fw-bold"
             data-bs-toggle="modal" data-bs-target="#authModal">
             {% trans "Proceed to Checkout" %}
           </button>

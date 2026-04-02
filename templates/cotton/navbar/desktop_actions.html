@@ -2,27 +2,27 @@
 
 <div class="ms-auto d-none d-lg-flex align-items-center gap-2">
   {# Search #}
-  <form action="{% url 'search' %}" class="nav-search-form rounded-pill px-3 py-1 d-flex align-items-center gap-2">
-    <i class="bi bi-search search-icon flex-shrink-0"></i>
-    <input type="text" name="q" placeholder="{% trans 'Search products…' %}" class="nav-search-input">
+  <form action="{% url 'search' %}" class="nav-search-form-app d-flex align-items-center gap-2 rounded-pill px-3 py-1">
+    <i class="bi bi-search text-muted flex-shrink-0"></i>
+    <input type="text" name="q" placeholder="{% trans 'Search products…' %}" class="nav-search-input-app">
   </form>
 
   {# Language #}
-  <div class="dropdown lang-switcher">
-    <a href="#" class="nav-icon-btn text-decoration-none d-flex align-items-center justify-content-center px-2 py-1 rounded gap-1" data-bs-toggle="dropdown" title="{% trans 'Language' %}">
+  <div class="dropdown">
+    <a href="#" class="nav-icon-btn-app text-decoration-none d-flex align-items-center justify-content-center px-2 py-1 rounded-2 gap-1" data-bs-toggle="dropdown" title="{% trans 'Language' %}">
       <i class="bi bi-globe2"></i>
-      <span class="lang-code">{% if request.LANGUAGE_CODE == 'ar' %}عربي{% else %}EN{% endif %}</span>
+      <span class="lang-code-app">{% if request.LANGUAGE_CODE == 'ar' %}عربي{% else %}EN{% endif %}</span>
     </a>
-    <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg dark-dropdown mt-2 p-2 rounded-4" style="min-width: 140px;">
+    <ul class="dropdown-menu dropdown-menu-end border shadow-sm mt-2 p-1 rounded-3" style="min-width: 140px;">
       <li>
         <a href="{% url 'set_language_custom' %}?language=en&next={{ request.get_full_path }}"
-           class="dropdown-item text-center w-100 bg-transparent border-0 rounded-3 py-2 text-white {% if request.LANGUAGE_CODE == 'en' %}active-lang{% endif %}">
+           class="dropdown-item rounded-2 text-center py-2 {% if request.LANGUAGE_CODE == 'en' %}active{% endif %}">
           English
         </a>
       </li>
       <li>
         <a href="{% url 'set_language_custom' %}?language=ar&next={{ request.get_full_path }}"
-           class="dropdown-item text-center w-100 bg-transparent border-0 rounded-3 py-2 text-white {% if request.LANGUAGE_CODE == 'ar' %}active-lang{% endif %}">
+           class="dropdown-item rounded-2 text-center py-2 {% if request.LANGUAGE_CODE == 'ar' %}active{% endif %}">
           عربي
         </a>
       </li>
@@ -30,46 +30,46 @@
   </div>
 
   {# Wishlist & Cart #}
-  <a href="{% url 'wishlist' %}" class="nav-icon-btn text-decoration-none d-flex align-items-center justify-content-center rounded position-relative" style="width: 34px; height: 34px;" title="{% trans 'Wishlist' %}">
+  <a href="{% url 'wishlist' %}" class="nav-icon-btn-app text-decoration-none d-flex align-items-center justify-content-center rounded-2 position-relative" style="width: 36px; height: 36px;" title="{% trans 'Wishlist' %}">
     <i class="bi bi-heart"></i>
-    {% if wishlist_count > 0 %}<span class="badge-mini position-absolute top-0 start-100 translate-middle rounded-circle d-flex align-items-center justify-content-center" style="width: 15px; height: 15px;">{{ wishlist_count }}</span>{% endif %}
+    {% if wishlist_count > 0 %}<span class="badge-count-app position-absolute top-0 start-100 translate-middle rounded-circle d-flex align-items-center justify-content-center" style="width: 16px; height: 16px;">{{ wishlist_count }}</span>{% endif %}
   </a>
 
-  <a href="#cartOffcanvas" data-bs-toggle="offcanvas" class="nav-icon-btn text-decoration-none d-flex align-items-center justify-content-center rounded position-relative" style="width: 34px; height: 34px;" title="{% trans 'Cart' %}">
+  <a href="#cartOffcanvas" data-bs-toggle="offcanvas" class="nav-icon-btn-app text-decoration-none d-flex align-items-center justify-content-center rounded-2 position-relative" style="width: 36px; height: 36px;" title="{% trans 'Cart' %}">
     <i class="bi bi-bag"></i>
-    {% if cart_count > 0 %}<span class="badge-mini position-absolute top-0 start-100 translate-middle rounded-circle d-flex align-items-center justify-content-center" style="width: 15px; height: 15px;">{{ cart_count }}</span>{% endif %}
+    {% if cart_count > 0 %}<span class="badge-count-app position-absolute top-0 start-100 translate-middle rounded-circle d-flex align-items-center justify-content-center" style="width: 16px; height: 16px;">{{ cart_count }}</span>{% endif %}
   </a>
 
-  <div class="nav-sep" style="width: 1px; height: 20px;"></div>
+  <div style="width: 1px; height: 24px; background: var(--border-default);"></div>
 
   {# Auth Section #}
   {% if user.is_authenticated %}
     <div class="dropdown">
-      <a href="#" class="nav-user-trigger text-decoration-none d-flex" data-bs-toggle="dropdown">
-        <div class="avatar-hex rounded overflow-hidden" style="width: 32px; height: 32px;">
+      <a href="#" class="text-decoration-none d-flex" data-bs-toggle="dropdown">
+        <div class="avatar-app rounded-circle overflow-hidden d-flex align-items-center justify-content-center" style="width: 34px; height: 34px;">
           {% if user.profile.avatar %}
             <img src="{{ user.profile.avatar.url }}" alt="{{ user.username|first|upper }}" class="w-100 h-100 object-fit-cover">
           {% else %}
-            <div class="avatar-init w-100 h-100 d-flex align-items-center justify-content-center">{{ user.username|first|upper }}</div>
+            <div class="w-100 h-100 d-flex align-items-center justify-content-center fw-bold small text-accent">{{ user.username|first|upper }}</div>
           {% endif %}
         </div>
       </a>
-      <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg dark-dropdown mt-2 rounded-4 p-2" style="min-width: 180px;">
-        <li class="px-3 py-2 mb-1 border-bottom border-secondary border-opacity-25">
+      <ul class="dropdown-menu dropdown-menu-end border shadow-sm mt-2 rounded-3 p-1" style="min-width: 180px;">
+        <li class="px-3 py-2 mb-1">
           <span class="text-accent small fw-bold font-mono">{{ user.username }}</span>
         </li>
-        <li><a class="dropdown-item rounded-3 py-2 text-white bg-transparent border-0 text-center w-100" href="{% url 'profile' %}">{% trans "Profile" %}</a></li>
-        <li><a class="dropdown-item rounded-3 py-2 text-white bg-transparent border-0 text-center w-100" href="{% url 'orders:order_list' %}">{% trans "My Orders" %}</a></li>
-        <li><hr class="dropdown-divider opacity-25"></li>
+        <li><a class="dropdown-item rounded-2 py-2" href="{% url 'profile' %}">{% trans "Profile" %}</a></li>
+        <li><a class="dropdown-item rounded-2 py-2" href="{% url 'orders:order_list' %}">{% trans "My Orders" %}</a></li>
+        <li><hr class="dropdown-divider"></li>
         <li>
           <form action="{% url 'logout' %}" method="post">
             {% csrf_token %}
-            <button class="dropdown-item rounded-3 py-2 text-danger fw-bold w-100 border-0 bg-transparent text-center">{% trans "Logout" %}</button>
+            <button class="dropdown-item rounded-2 py-2 text-danger">{% trans "Logout" %}</button>
           </form>
         </li>
       </ul>
     </div>
   {% else %}
-    <a href="{% url 'login' %}" class="btn-nav-outline text-decoration-none rounded px-3 py-1 fw-bold text-nowrap">{% trans "Login" %}</a>
+    <a href="{% url 'login' %}" class="btn btn-outline-dark btn-sm rounded-pill px-3 fw-bold text-decoration-none text-nowrap">{% trans "Login" %}</a>
   {% endif %}
 </div>

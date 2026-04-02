@@ -7,7 +7,7 @@
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-lg-8">
-        <div class="card border-0 shadow-sm rounded-4">
+        <div class="card card-shadcn border-0">
             <div class="card-header bg-white border-0 pt-4 px-4">
                 <h4 class="fw-bold mb-0">
                     {% if action == 'add' %}{% trans "Add New Address" %}{% else %}{% trans "Edit Address" %}{% endif %}
@@ -45,10 +45,10 @@
                         </div>
                     </div>
                     <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-dark rounded-pill fw-bold">
+                        <button type="submit" class="btn btn-dark-custom rounded-pill fw-bold">
                             {% if action == 'add' %}{% trans "Add Address" %}{% else %}{% trans "Update Address" %}{% endif %}
                         </button>
-                        <a href="{% url 'users:address_list' %}" class="btn btn-outline-dark rounded-pill">
+                        <a href="{% url 'users:address_list' %}" class="btn btn-outline-secondary rounded-pill">
                             {% trans "Cancel" %}
                         </a>
                     </div>

@@ -2,11 +2,6 @@
 {% load i18n %}
 {% load humanize %}
 {% load bootstrap_icons %}
-{% load static %}
-
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/orders.css' %}" />
-{% endblock %}
 
 {% block title %}{% trans "Order Confirmed" %} — SMART S3R{% endblock %}
 
@@ -15,39 +10,43 @@
 <div class="py-5 text-center">
 
   {# ── Success icon ── #}
-  <div class="success-ring"><i class="bi bi-check-lg"></i></div>
+  <div class="mx-auto mb-4 rounded-circle d-flex align-items-center justify-content-center"
+       style="width: 80px; height: 80px; background: var(--brand-accent-dim); border: 2px solid var(--brand-accent);">
+    <i class="bi bi-check-lg" style="font-size: 2rem; color: var(--brand-accent);"></i>
+  </div>
 
   {# ── Title ── #}
-  <h1 class="confirm-title">{% trans "Order Confirmed!" %}</h1>
-  <p class="confirm-sub">{% trans "Thank you! Your order has been placed successfully." %}</p>
+  <h1 class="fw-bold font-heading mb-2">{% trans "Order Confirmed!" %}</h1>
+  <p class="text-muted mb-5">{% trans "Thank you! Your order has been placed successfully." %}</p>
 
   {# ── Order details card ── #}
-  <div class="order-card">
-    <div class="order-card-head">
-      <div>
-        <div class="order-id-label">{% trans "Order ID" %}</div>
-        <div class="order-id-val">#{{ order.id }}</div>
+  <div class="card card-shadcn border-0 mx-auto mb-5" style="max-width: 500px;">
+    <div class="card-header bg-transparent border-0 p-4 pb-0 d-flex align-items-center justify-content-between">
+      <div class="text-start">
+        <div class="small text-muted text-uppercase fw-bold" style="font-size: 0.73rem; letter-spacing: 0.05em;">{% trans "Order ID" %}</div>
+        <div class="fw-bold font-heading fs-5">#{{ order.id }}</div>
       </div>
-      <div class="order-status">
-        <span class="status-dot"></span>
+      <c-badge variant="default">
+        <span class="rounded-circle me-1" style="width: 8px; height: 8px; display: inline-block; background: var(--brand-accent);"></span>
         {% trans "Processing" %}
-      </div>
+      </c-badge>
     </div>
-    <div class="order-body">
-      <div class="order-row">
-        <span class="order-key">{% trans "Date" %}</span>
-        <span class="order-val">{{ order.created_at|date:"d M Y, h:i A" }}</span>
+    <div class="card-body p-4">
+      <div class="d-flex justify-content-between mb-3">
+        <span class="text-muted small">{% trans "Date" %}</span>
+        <span class="fw-semibold small">{{ order.created_at|date:"d M Y, h:i A" }}</span>
       </div>
-      <div class="order-row">
-        <span class="order-key">{% trans "Payment" %}</span>
-        <span class="order-val">
-          <i class="bi bi-truck me-1" style="color:var(--accent);"></i>
+      <div class="d-flex justify-content-between mb-3">
+        <span class="text-muted small">{% trans "Payment" %}</span>
+        <span class="fw-semibold small">
+          <i class="bi bi-truck me-1 text-accent"></i>
           {% trans "Cash on Delivery" %}
         </span>
       </div>
-      <div class="order-row">
-        <span class="order-key">{% trans "Total" %}</span>
-        <span class="order-total">
+      <hr>
+      <div class="d-flex justify-content-between pt-2">
+        <span class="fw-bold">{% trans "Total" %}</span>
+        <span class="fw-bold font-heading fs-5">
           {% if request.LANGUAGE_CODE == 'ar' %}ج.م{% else %}EGP{% endif %} {{ order.total_amount|floatformat:2|intcomma }}
         </span>
       </div>
@@ -55,38 +54,49 @@
   </div>
 
   {# ── What happens next ── #}
-  <div class="next-steps">
-    <div class="next-title">{% trans "What happens next?" %}</div>
-    <div class="next-item">
-      <div class="next-icon ni-green"><i class="bi bi-bell-fill"></i></div>
-      <div>
-        <div class="next-text-title">{% trans "Order Confirmation" %}</div>
-        <div class="next-text-sub">{% trans "You'll receive a confirmation notification shortly." %}</div>
+  <div class="mx-auto mb-5" style="max-width: 500px;">
+    <h5 class="fw-bold font-heading mb-4">{% trans "What happens next?" %}</h5>
+    <div class="d-flex flex-column gap-3">
+      <div class="d-flex align-items-start gap-3 text-start">
+        <div class="bg-success bg-opacity-10 rounded-3 d-flex align-items-center justify-content-center flex-shrink-0"
+             style="width: 40px; height: 40px;">
+          <i class="bi bi-bell-fill text-success"></i>
+        </div>
+        <div>
+          <div class="fw-bold small">{% trans "Order Confirmation" %}</div>
+          <div class="text-muted small">{% trans "You'll receive a confirmation notification shortly." %}</div>
+        </div>
       </div>
-    </div>
-    <div class="next-item">
-      <div class="next-icon ni-blue"><i class="bi bi-box-seam-fill"></i></div>
-      <div>
-        <div class="next-text-title">{% trans "Preparing Your Order" %}</div>
-        <div class="next-text-sub">{% trans "We'll pack your items and get them ready for shipping." %}</div>
+      <div class="d-flex align-items-start gap-3 text-start">
+        <div class="bg-primary bg-opacity-10 rounded-3 d-flex align-items-center justify-content-center flex-shrink-0"
+             style="width: 40px; height: 40px;">
+          <i class="bi bi-box-seam-fill text-primary"></i>
+        </div>
+        <div>
+          <div class="fw-bold small">{% trans "Preparing Your Order" %}</div>
+          <div class="text-muted small">{% trans "We'll pack your items and get them ready for shipping." %}</div>
+        </div>
       </div>
-    </div>
-    <div class="next-item">
-      <div class="next-icon ni-amber"><i class="bi bi-truck"></i></div>
-      <div>
-        <div class="next-text-title">{% trans "Out for Delivery" %}</div>
-        <div class="next-text-sub">{% trans "Our courier will deliver your order. Pay cash on arrival." %}</div>
+      <div class="d-flex align-items-start gap-3 text-start">
+        <div class="bg-warning bg-opacity-10 rounded-3 d-flex align-items-center justify-content-center flex-shrink-0"
+             style="width: 40px; height: 40px;">
+          <i class="bi bi-truck text-warning"></i>
+        </div>
+        <div>
+          <div class="fw-bold small">{% trans "Out for Delivery" %}</div>
+          <div class="text-muted small">{% trans "Our courier will deliver your order. Pay cash on arrival." %}</div>
+        </div>
       </div>
     </div>
   </div>
 
   {# ── Action buttons ── #}
-  <div class="action-btns">
-    <a href="{% url 'profile' %}" class="btn-outline-orders">
-      <i class="bi bi-bag-check"></i> {% trans "View My Orders" %}
+  <div class="d-flex gap-3 justify-content-center flex-wrap">
+    <a href="{% url 'orders:order_list' %}" class="btn btn-outline-secondary rounded-pill px-4">
+      <i class="bi bi-bag-check me-2"></i>{% trans "View My Orders" %}
     </a>
-    <a href="{% url 'products:products' %}" class="btn-shop">
-      <i class="bi bi-bag-heart-fill"></i> {% trans "Continue Shopping" %}
+    <a href="{% url 'products:products' %}" class="btn btn-accent rounded-pill px-4">
+      <i class="bi bi-bag-heart-fill me-2"></i>{% trans "Continue Shopping" %}
     </a>
   </div>
 
