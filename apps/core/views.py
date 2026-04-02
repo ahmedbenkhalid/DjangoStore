@@ -57,7 +57,11 @@ def set_language_custom(request):
 def home(request):
     categories = cache.get("home_categories")
     if categories is None:
-        categories = list(Category.objects.all()[:4])
+        # Get top 4 categories by product count for better homepage relevancy
+        categories = list(
+            Category.objects.annotate(product_count=Count("products"))
+            .order_by("-product_count")[:4]
+        )
         cache.set("home_categories", categories, 3600)
 
     # Featured Products (newest)

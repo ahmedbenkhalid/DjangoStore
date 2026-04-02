@@ -3,6 +3,7 @@
 {% load humanize %}
 {% load bootstrap_icons %}
 {% load static %}
+{% load cache %}
 
 {% block title %}SMART S3R — {% trans "Home" %}{% endblock %}
 
@@ -11,20 +12,26 @@
 {% endblock %}
 
 {% block content %}
+{% cache 3600 home_hero request.LANGUAGE_CODE banners.0.id %}
 {% if banners %}
-<div class="hero-wrap mb-5" id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
+<div id="heroCarousel" class="carousel slide hero-wrap mb-5" data-bs-ride="carousel">
+  <!-- Indicators -->
   <div class="carousel-indicators">
     {% for banner in banners %}
-      <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="{{ forloop.counter0 }}"
-              {% if forloop.first %}class="active"{% endif %}></button>
+      <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="{{ forloop.counter0 }}" 
+              {% if forloop.first %}class="active" aria-current="true"{% endif %} 
+              aria-label="Slide {{ forloop.counter }}"></button>
     {% endfor %}
   </div>
+
   <div class="carousel-inner">
     {% for banner in banners %}
     <div class="carousel-item {% if forloop.first %}active{% endif %}" data-bs-interval="6000">
       {% if banner.link %}<a href="{{ banner.link }}">{% endif %}
         {% if banner.image %}
-          <img src="{{ banner.image.url }}" class="hero-img" alt="{{ banner.get_title }}" loading="eager">
+          <img src="{{ banner.image.url }}" class="hero-img d-block w-100" alt="{{ banner.get_title }}" {% if forloop.first %}loading="eager"{% else %}loading="lazy"{% endif %}>
+        {% elif banner.image_link %}
+          <img src="{{ banner.image_link }}" class="hero-img d-block w-100" alt="{{ banner.get_title }}" {% if forloop.first %}loading="eager"{% else %}loading="lazy"{% endif %}>
         {% else %}
           <div class="hero-fallback">
             <div class="hero-fallback-orb hfo1"></div>
@@ -38,54 +45,40 @@
           </div>
         {% endif %}
       {% if banner.link %}</a>{% endif %}
+      
+      {% if banner.get_title or banner.get_subtitle %}
+      <div class="carousel-caption d-none d-md-block">
+        <h2 class="fw-bold">{{ banner.get_title }}</h2>
+        <p>{{ banner.get_subtitle }}</p>
+        {% if banner.link and banner.get_link_text %}
+        <a href="{{ banner.link }}" class="btn btn-accent rounded-pill px-4 py-2 mt-2">
+          {{ banner.get_link_text }} <i class="bi bi-arrow-right ms-2"></i>
+        </a>
+        {% endif %}
+      </div>
+      {% endif %}
     </div>
     {% endfor %}
   </div>
+
+  <!-- Controls -->
   <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
-    <span class="carousel-control-prev-icon"></span>
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">{% trans "Previous" %}</span>
   </button>
   <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
-    <span class="carousel-control-next-icon"></span>
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">{% trans "Next" %}</span>
   </button>
 </div>
-
-{% else %}
-<div class="hero-wrap mb-5">
-  <div class="hero-fallback">
-    <div class="hero-fallback-orb hfo1"></div>
-    <div class="hero-fallback-orb hfo2"></div>
-    <div class="hero-fallback-grid"></div>
-    <div class="hero-fallback-inner">
-      <div class="hero-fallback-badge"><span class="hf-dot"></span>{% trans "Electronics Store" %}</div>
-      <h1 class="hero-fallback-title">{% trans "Discover" %} <span>{% trans "Next-Gen" %}</span><br>{% trans "Electronics" %}</h1>
-      <p class="hero-fallback-sub">{% trans "Smartphones, Laptops, Wearables & More — All in One Place." %}</p>
-      <div class="hero-fallback-btns">
-        <a href="{% url 'products:products' %}" class="hfb-primary">
-          <i class="bi bi-bag-heart-fill"></i> {% trans "Shop Now" %}
-        </a>
-        <a href="{% url 'categories:categories' %}" class="hfb-secondary">
-          <i class="bi bi-grid-fill"></i> {% trans "Browse Categories" %}
-        </a>
-      </div>
-    </div>
-  </div>
-</div>
 {% endif %}
+{% endcache %}
 
 
 {# ── Categories ────────────────────────────────── #}
+{% cache 3600 home_categories request.LANGUAGE_CODE categories.0.id %}
 {% if categories %}
 <div class="categories-section">
-  <div class="d-flex align-items-end justify-content-between mb-4">
-    <div>
-      <div class="sec-badge"><i class="bi bi-grid-fill"></i> {% trans "Browse by" %}</div>
-      <h2 class="sec-title">{% trans "Categories" %}</h2>
-    </div>
-    <a href="{% url 'categories:categories' %}" class="sec-link">
-      {% trans "All Categories" %} <i class="bi bi-arrow-right"></i>
-    </a>
-  </div>
-
   <div class="row row-cols-2 row-cols-md-4 row-cols-lg-4 g-3">
     {% for cat in categories %}
     <div class="col">
@@ -93,17 +86,20 @@
         <div class="cat-img-wrap">
           {% if cat.image %}
             <img src="{{ cat.image.url }}" alt="{{ cat.name }}" loading="lazy">
+          {% elif cat.image_link %}
+            <img src="{{ cat.image_link }}" alt="{{ cat.name }}" loading="lazy">
           {% else %}
             <div class="cat-placeholder"><i class="bi bi-cpu-fill"></i></div>
           {% endif %}
         </div>
-        <div class="cat-name">{{ cat.name }}</div>
+        <div class="cat-name">{{ cat.get_name }}</div>
       </a>
     </div>
     {% endfor %}
   </div>
 </div>
 {% endif %}
+{% endcache %}
 
 
 {# ── Featured Products ─────────────────────────── #}
@@ -152,9 +148,9 @@
         </a>
 
         <div class="prod-body">
-          <div class="prod-brand">{{ product.brand.name }}</div>
+          <div class="prod-brand">{{ product.brand.get_name }}</div>
           <a href="{{ product.get_absolute_url }}" class="text-decoration-none">
-            <div class="prod-name">{{ product.name }}</div>
+            <div class="prod-name">{{ product.get_name }}</div>
           </a>
           <div class="prod-price">
             <span>{% if request.LANGUAGE_CODE == 'ar' %}ج.م{% else %}EGP{% endif %}</span> {{ product.price|floatformat:2|intcomma }}
@@ -214,9 +210,9 @@
         </a>
 
         <div class="prod-body">
-          <div class="prod-brand">{{ product.brand.name }}</div>
+          <div class="prod-brand">{{ product.brand.get_name }}</div>
           <a href="{{ product.get_absolute_url }}" class="text-decoration-none">
-            <div class="prod-name">{{ product.name }}</div>
+            <div class="prod-name">{{ product.get_name }}</div>
           </a>
           <div class="prod-price">
             <span>{% if request.LANGUAGE_CODE == 'ar' %}ج.م{% else %}EGP{% endif %}</span> {{ product.price|floatformat:2|intcomma }}
@@ -231,44 +227,11 @@
 
 
 {# ── Why Choose Us ─────────────────────────────── #}
+{% cache 86400 home_why_choose_us request.LANGUAGE_CODE %}
 <div class="why-section mb-5">
-  <div class="text-center mb-4">
-    <div class="sec-badge" style="margin:0 auto 0.5rem;">
-      <i class="bi bi-patch-check-fill"></i> {% trans "Our Promise" %}
-    </div>
-    <h2 class="sec-title">{% trans "Why Choose SMART S3R" %}</h2>
-  </div>
-  <div class="row g-4 text-center">
-    <div class="col-6 col-md-3">
-      <div class="why-item">
-        <div class="why-icon wi-blue"><i class="bi bi-truck"></i></div>
-        <h6>{% trans "Fast Delivery" %}</h6>
-        <p>{% trans "Orders shipped within 24 hours" %}</p>
-      </div>
-    </div>
-    <div class="col-6 col-md-3">
-      <div class="why-item">
-        <div class="why-icon wi-green"><i class="bi bi-shield-check"></i></div>
-        <h6>{% trans "Secure Payments" %}</h6>
-        <p>{% trans "100% secure & encrypted checkout" %}</p>
-      </div>
-    </div>
-    <div class="col-6 col-md-3">
-      <div class="why-item">
-        <div class="why-icon wi-amber"><i class="bi bi-arrow-counterclockwise"></i></div>
-        <h6>{% trans "Easy Returns" %}</h6>
-        <p>{% trans "14-day hassle-free returns" %}</p>
-      </div>
-    </div>
-    <div class="col-6 col-md-3">
-      <div class="why-item">
-        <div class="why-icon wi-red"><i class="bi bi-headset"></i></div>
-        <h6>{% trans "24/7 Support" %}</h6>
-        <p>{% trans "We're here whenever you need us" %}</p>
-      </div>
-    </div>
-  </div>
+...
 </div>
+{% endcache %}
 
 
 {# ── Newsletter ────────────────────────────────── #}
