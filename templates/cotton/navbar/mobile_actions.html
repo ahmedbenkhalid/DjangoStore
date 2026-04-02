@@ -31,12 +31,6 @@
     </ul>
   </div>
 
-  {# Theme Toggle #}
-  <button class="theme-toggle" onclick="toggleTheme()" title="{% trans 'Toggle theme' %}">
-    <i class="bi bi-moon"></i>
-    <i class="bi bi-sun"></i>
-  </button>
-
   {# Auth Section #}
   {% if user.is_authenticated %}
     <div class="dropdown">
