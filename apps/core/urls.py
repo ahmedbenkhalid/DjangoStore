@@ -4,12 +4,12 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.views.generic import TemplateView
 
-from apps.core import views
-from apps.products import urls as products_urls
-from apps.products import views as products_views
-from apps.products.views import wishlist_list
-from apps.orders import urls as orders_urls
-from apps.users import views as users_views
+from core import views
+from products import urls as products_urls
+from products import views as products_views
+from products.views import wishlist_list
+from orders import urls as orders_urls
+from users import views as users_views
 from django.contrib.auth import views as auth_views
 
 from django.conf.urls.i18n import i18n_patterns
@@ -38,13 +38,13 @@ urlpatterns += i18n_patterns(
         include((products_urls.categories_urls, "categories"), namespace="categories"),
     ),
     path("wishlist/", wishlist_list, name="wishlist"),
-    path("cart/", include("apps.cart.urls", namespace="cart")),
+    path("cart/", include("cart.urls", namespace="cart")),
     path("orders/", include((orders_urls.urlpatterns, "orders"), namespace="orders")),
     path("register/", users_views.register, name="register"),
     path("login/", users_views.login_view, name="login"),
     path("logout/", auth_views.LogoutView.as_view(next_page="/"), name="logout"),
     path("profile/", users_views.profile, name="profile"),
-    path("users/", include("apps.users.urls", namespace="users")),
+    path("users/", include("users.urls", namespace="users")),
     prefix_default_language=True,
 )
 

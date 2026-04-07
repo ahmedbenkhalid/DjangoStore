@@ -6,7 +6,7 @@ from django.views.generic.base import RedirectView
 
 urlpatterns = [
     path("robots.txt", RedirectView.as_view(url="/static/robots.txt", permanent=True)),
-    path("", include("apps.core.urls")),
+    path("", include("core.urls")),
 ]
 
 # Serve media files in development

@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import Sum, F, ExpressionWrapper, DecimalField
-from apps.products.models import Product
+from products.models import Product
 
 
 class Cart(models.Model):

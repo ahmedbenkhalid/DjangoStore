@@ -6,7 +6,7 @@ from django.utils.translation import gettext as _
 from django.core.cache import cache
 from asgiref.sync import sync_to_async
 
-from apps.products.models import Product
+from products.models import Product
 
 
 def get_cart(request):

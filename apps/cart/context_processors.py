@@ -1,6 +1,6 @@
 from django.core.cache import cache
 
-from apps.products.models import Product
+from products.models import Product
 
 
 def cart(request):

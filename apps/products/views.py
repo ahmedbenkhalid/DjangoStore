@@ -8,8 +8,8 @@ from django.core.cache import cache
 from django.core.paginator import Paginator
 from django.db.models import Prefetch
 
-from apps.products.models import Product, Category, Wishlist, Review
-from apps.products.forms import ReviewForm
+from products.models import Product, Category, Wishlist, Review
+from products.forms import ReviewForm
 
 
 # ── helpers ───────────────────────────────────────────────────────────────────
@@ -51,6 +51,8 @@ async def product_list(request):
         "category__slug",
         "brand__id",
         "brand__name",
+        "stock",
+        "discount_price",
     )
 
     # Filters
@@ -60,6 +62,30 @@ async def product_list(request):
 
     if query:
         products = products.filter(name__icontains=query)
+
+    # Brand filter
+    selected_brands = request.GET.getlist("brand")
+    if selected_brands:
+        products = products.filter(brand__slug__in=selected_brands)
+
+    # Price range filter
+    price_min = request.GET.get("price_min")
+    price_max = request.GET.get("price_max")
+    if price_min:
+        try:
+            products = products.filter(price__gte=float(price_min))
+        except ValueError:
+            pass
+    if price_max:
+        try:
+            products = products.filter(price__lte=float(price_max))
+        except ValueError:
+            pass
+
+    # Stock filter
+    in_stock = request.GET.get("in_stock")
+    if in_stock:
+        products = products.filter(stock__gt=0)
 
     # Sort
     sort = request.GET.get("sort", "-created_at")
@@ -77,17 +103,30 @@ async def product_list(request):
 
     page_obj = await sync_to_async(get_page_sync)()
 
+    # Get all brands for filter sidebar
+    def get_brands():
+        from products.models import Brand
+
+        return list(Brand.objects.only("id", "name", "slug").order_by("name"))
+
+    brands = await sync_to_async(get_brands)()
+
     context = {
         "page_obj": page_obj,
         "categories": await _get_cached_categories(),
+        "brands": brands,
         "current_category": category_slug,
         "current_sort": sort,
         "query": query,
+        "selected_brands": selected_brands,
+        "price_min": price_min,
+        "price_max": price_max,
+        "in_stock": in_stock,
     }
 
     if request.headers.get("HX-Target") == "product-grid":
         return await sync_to_async(render)(
-            request, "products/partials/product_grid.html", context
+            request, "pages/products/partials/product_grid.html", context
         )
 
     return await sync_to_async(render)(request, "pages/products/products.html", context)
@@ -311,3 +350,18 @@ def toggle_wishlist(request, product_id):
         )
 
     return redirect(product.get_absolute_url())
+
+
+def stock_status(request, product_id):
+    """HTMX endpoint for live stock status polling."""
+    product = get_object_or_404(Product, id=product_id)
+    stock = product.stock
+
+    if stock == 0:
+        html = '<span class="absolute top-2 end-2 inline-flex items-center px-2 py-0.5 text-xs font-bold text-red-700 bg-red-100 rounded-md">{% trans "Out of stock" %}</span>'
+    elif stock <= 5:
+        html = f'<span class="absolute top-2 end-2 inline-flex items-center px-2 py-0.5 text-xs font-bold text-amber-800 bg-amber-100 rounded-md">{stock} left</span>'
+    else:
+        html = ""
+
+    return JsonResponse({"stock": stock, "html": html})

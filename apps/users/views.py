@@ -7,7 +7,7 @@ from django.db.models import Count
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.translation import gettext as _
 from .forms import UserRegisterForm, ProfileUpdateForm, AddressForm
-from apps.orders.models import Order
+from orders.models import Order
 from .models import Profile, Address
 
 

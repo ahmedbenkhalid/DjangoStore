@@ -1,6 +1,6 @@
 from decimal import Decimal
 from django.test import TestCase
-from apps.products.models import Product, Category, Brand
+from products.models import Product, Category, Brand
 
 
 class DiscountPercentTestCase(TestCase):

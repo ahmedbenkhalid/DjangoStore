@@ -53,13 +53,11 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.humanize",
-    "apps.core",
-    "apps.users",
-    "apps.products",
-    "apps.cart",
-    "apps.orders",
-    "django_bootstrap5",
-    "django_bootstrap_icons",
+    "core",
+    "users",
+    "products",
+    "cart",
+    "orders",
     # "django_components",
 ]
 
@@ -70,13 +68,7 @@ if DEBUG:
     ]
 
 
-BOOTSTRAP5 = {
-    # Standard LTR Bootstrap; RTL is loaded conditionally in base.html via {% if LANGUAGE_CODE == 'ar' %}
-    "css_url": {
-        "url": "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css",
-        "crossorigin": "anonymous",
-    },
-}
+
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",

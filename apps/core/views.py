@@ -4,7 +4,7 @@ from django.core.cache import cache
 from django.shortcuts import render
 from django.db.models import Count
 from django.utils.http import url_has_allowed_host_and_scheme
-from apps.products.models import Category, Product
+from products.models import Category, Product
 from .models import Banner
 from django.urls import translate_url
 from django.http import HttpResponseRedirect
