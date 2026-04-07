@@ -1,0 +1,12 @@
+{% extends 'products/products.html' %}
+{% load i18n %}
+
+{% block title %}{{ category.name }} — SMART S3R{% endblock %}
+
+{% block extra_breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'categories:categories' %}" class="hover:text-corporate-600 transition-colors">{% trans "Categories" %}</a></li>
+<li class="breadcrumb-item active text-charcoal-900 font-semibold">{{ category.name }}</li>
+{% endblock %}
+
+{% block page_title %}{{ category.name }}{% endblock %}
+{% block page_subtitle %}{{ category.name }} products{% endblock %}

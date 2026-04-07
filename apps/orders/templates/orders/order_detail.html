@@ -1,0 +1,268 @@
+{% extends 'shared/base.html' %}
+{% load i18n %}
+{% load humanize %}
+{% load static %}
+
+{% block title %}{% trans "Order" %} #{{ order.id }} — SMART S3R{% endblock %}
+
+{% block content %}
+
+{# ── Page header ── #}
+<div class="flex items-center gap-4 mb-8">
+  <a href="{% url 'orders:order_list' %}" class="inline-flex items-center justify-center p-2 text-charcoal-500 border border-surface-200 rounded-lg hover:bg-surface-50 shadow-sm">
+    <i class="bi bi-arrow-left text-xl"></i>
+  </a>
+  <h1 class="font-bold text-3xl tracking-tight m-0 flex items-center gap-3">
+    {% trans "Order Details" %}
+    <span class="inline-flex items-center px-2.5 py-0.5 text-xs font-medium bg-surface-100 text-charcoal-600 rounded-full">#{{ order.id }}</span>
+  </h1>
+</div>
+
+<div class="flex flex-col xl:flex-row gap-8">
+
+  {# ── Left col ── #}
+  <div class="xl:w-2/3 flex flex-col gap-6">
+
+    {# Order items #}
+    <div class="bg-white border border-surface-200 rounded-lg shadow-sm overflow-hidden">
+      <div class="bg-surface-50 border-b border-surface-200 px-6 py-5 flex items-center gap-4">
+        <div class="bg-white rounded-full flex items-center justify-center text-corporate-600 shadow-sm w-10 h-10"><i class="bi bi-bag-fill text-lg mt-0.5"></i></div>
+        <h5 class="font-bold text-xl tracking-tight m-0">{% trans "Order Items" %}</h5>
+      </div>
+      <div class="p-6 md:p-8">
+        <div class="flex flex-col gap-4">
+          {% for item in items %}
+          <div class="flex items-center gap-4 pb-4 border-b border-surface-200 last:border-0 last:pb-0">
+            <div class="w-16 h-16 flex-shrink-0 bg-surface-100 rounded-lg overflow-hidden relative border border-surface-200">
+              {% if item.product.img %}
+                <img src="{{ item.product.img.url }}" class="w-full h-full object-cover" alt="{{ item.product.name }}" loading="lazy">
+              {% elif item.product.img_link %}
+                <img src="{{ item.product.img_link }}" class="w-full h-full object-cover" alt="{{ item.product.name }}" loading="lazy">
+              {% else %}
+                <div class="flex items-center justify-center h-full text-charcoal-200"><i class="bi bi-phone text-2xl"></i></div>
+              {% endif %}
+            </div>
+            <div class="flex-grow min-w-0">
+              <div class="font-bold text-sm truncate mb-1">{{ item.product.name }}</div>
+              <div class="text-charcoal-500 text-xs font-semibold">
+                {{ item.quantity }} × {% if request.LANGUAGE_CODE == 'ar' %}ج.م{% else %}EGP{% endif %} {{ item.price|floatformat:2|intcomma }}
+              </div>
+            </div>
+            <div class="font-bold text-sm whitespace-nowrap flex-shrink-0">
+              {% if request.LANGUAGE_CODE == 'ar' %}ج.م{% else %}EGP{% endif %} {{ item.subtotal|floatformat:2|intcomma }}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="h-px bg-surface-200 my-6"></div>
+
+        <div class="flex justify-between items-center mb-3">
+          <span class="text-charcoal-500 font-semibold text-sm">{% trans "Subtotal" %}</span>
+          <span class="font-bold text-charcoal-900">{% if request.LANGUAGE_CODE == 'ar' %}ج.م{% else %}EGP{% endif %} {{ order.total_amount|floatformat:2|intcomma }}</span>
+        </div>
+        <div class="flex justify-between items-center mb-6">
+          <span class="text-charcoal-500 font-semibold text-sm">{% trans "Shipping" %}</span>
+          <span class="text-green-600 font-black tracking-wider uppercase text-sm">{% trans "FREE" %}</span>
+        </div>
+        <div class="h-px bg-surface-200 my-4"></div>
+        <div class="flex justify-between items-end">
+          <span class="font-bold tracking-tight text-lg">{% trans "Total" %}</span>
+          <span class="font-black text-2xl text-corporate-600">
+            <span class="text-sm font-medium align-super text-charcoal-500">{% if request.LANGUAGE_CODE == 'ar' %}ج.م{% else %}EGP{% endif %}</span> {{ order.total_amount|floatformat:2|intcomma }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    {# Order status with vertical timeline #}
+    <div class="bg-white border border-surface-200 rounded-lg shadow-sm overflow-hidden">
+      <div class="bg-surface-50 border-b border-surface-200 px-6 py-5 flex items-center gap-4">
+        <div class="bg-white rounded-full flex items-center justify-center text-corporate-600 shadow-sm w-10 h-10"><i class="bi bi-activity text-lg"></i></div>
+        <h5 class="font-bold text-xl tracking-tight m-0">{% trans "Order Status" %}</h5>
+      </div>
+      <div class="p-6 md:p-8">
+
+        {# Current badge #}
+        <div class="mb-8">
+          {% if order.status == 'pending' %}
+          <span class="inline-flex items-center px-3 py-1 text-sm font-medium rounded-full bg-amber-100 text-amber-700 font-bold tracking-wider uppercase px-4">{{ order.get_status_display }}</span>
+          {% elif order.status == 'confirmed' %}
+          <span class="inline-flex items-center px-3 py-1 text-sm font-medium rounded-full bg-blue-100 text-blue-700 font-bold tracking-wider uppercase px-4">{{ order.get_status_display }}</span>
+          {% elif order.status == 'shipped' %}
+          <span class="inline-flex items-center px-3 py-1 text-sm font-medium rounded-full bg-corporate-100 text-corporate-700 font-bold tracking-wider uppercase px-4">{{ order.get_status_display }}</span>
+          {% elif order.status == 'delivered' %}
+          <span class="inline-flex items-center px-3 py-1 text-sm font-medium rounded-full bg-green-100 text-green-700 font-bold tracking-wider uppercase px-4">{{ order.get_status_display }}</span>
+          {% elif order.status == 'cancelled' %}
+          <span class="inline-flex items-center px-3 py-1 text-sm font-medium rounded-full bg-red-100 text-red-700 font-bold tracking-wider uppercase px-4">{{ order.get_status_display }}</span>
+          {% else %}
+          <span class="inline-flex items-center px-3 py-1 text-sm font-medium rounded-full bg-amber-100 text-amber-700 font-bold tracking-wider uppercase px-4">{{ order.get_status_display }}</span>
+          {% endif %}
+          {% if order.status == 'pending' or order.status == 'confirmed' %}
+          <form action="{% url 'orders:cancel_order' order.id %}" method="post" class="inline ms-3" onsubmit="return confirm('{% trans "Are you sure you want to cancel this order?" %}')">
+            {% csrf_token %}
+            <button type="submit" class="inline-flex items-center px-3 py-1 text-sm font-medium rounded-full bg-red-100 text-red-700 hover:bg-red-200 transition-colors">
+              <i class="bi bi-x-circle me-1"></i> {% trans "Cancel Order" %}
+            </button>
+          </form>
+          {% endif %}
+        </div>
+
+        {# Vertical timeline #}
+        {% if order.status != 'cancelled' %}
+        <div class="space-y-0">
+          {# Step 1: Pending #}
+          <div class="flex items-start gap-4">
+            <div class="flex flex-col items-center">
+              <div class="rounded-full flex items-center justify-center w-10 h-10 shadow-sm z-10 bg-green-600 text-white">
+                <i class="bi bi-check-lg text-xl"></i>
+              </div>
+              {% if order.status != 'pending' %}
+              <div class="w-0.5 h-12 bg-green-600"></div>
+              {% else %}
+              <div class="w-0.5 h-12 bg-surface-200"></div>
+              {% endif %}
+            </div>
+            <div class="pt-1">
+              <div class="font-bold text-sm text-charcoal-900">{% trans "Pending" %}</div>
+              <div class="text-xs text-charcoal-500">{% trans "Order received" %}</div>
+            </div>
+          </div>
+
+          {# Step 2: Confirmed #}
+          <div class="flex items-start gap-4">
+            <div class="flex flex-col items-center">
+              {% if order.status == 'confirmed' or order.status == 'shipped' or order.status == 'delivered' %}
+              <div class="rounded-full flex items-center justify-center w-10 h-10 shadow-sm z-10 bg-green-600 text-white">
+                <i class="bi bi-check-lg text-xl"></i>
+              </div>
+              <div class="w-0.5 h-12 {% if order.status == 'shipped' or order.status == 'delivered' %}bg-green-600{% else %}bg-surface-200{% endif %}"></div>
+              {% else %}
+              <div class="rounded-full flex items-center justify-center w-10 h-10 shadow-sm z-10 bg-white border-2 border-surface-200 text-charcoal-400">
+                <i class="bi bi-bag-check text-xl"></i>
+              </div>
+              <div class="w-0.5 h-12 bg-surface-200"></div>
+              {% endif %}
+            </div>
+            <div class="pt-1">
+              <div class="font-bold text-sm {% if order.status == 'confirmed' or order.status == 'shipped' or order.status == 'delivered' %}text-charcoal-900{% else %}text-charcoal-400{% endif %}">{% trans "Confirmed" %}</div>
+              <div class="text-xs text-charcoal-500">{% trans "Payment verified" %}</div>
+            </div>
+          </div>
+
+          {# Step 3: Shipped #}
+          <div class="flex items-start gap-4">
+            <div class="flex flex-col items-center">
+              {% if order.status == 'shipped' or order.status == 'delivered' %}
+              <div class="rounded-full flex items-center justify-center w-10 h-10 shadow-sm z-10 bg-green-600 text-white">
+                <i class="bi bi-check-lg text-xl"></i>
+              </div>
+              <div class="w-0.5 h-12 {% if order.status == 'delivered' %}bg-green-600{% else %}bg-surface-200{% endif %}"></div>
+              {% else %}
+              <div class="rounded-full flex items-center justify-center w-10 h-10 shadow-sm z-10 bg-white border-2 border-surface-200 text-charcoal-400">
+                <i class="bi bi-truck text-xl"></i>
+              </div>
+              <div class="w-0.5 h-12 bg-surface-200"></div>
+              {% endif %}
+            </div>
+            <div class="pt-1">
+              <div class="font-bold text-sm {% if order.status == 'shipped' or order.status == 'delivered' %}text-charcoal-900{% else %}text-charcoal-400{% endif %}">{% trans "Shipped" %}</div>
+              <div class="text-xs text-charcoal-500">{% trans "On the way" %}</div>
+            </div>
+          </div>
+
+          {# Step 4: Delivered #}
+          <div class="flex items-start gap-4">
+            <div class="flex flex-col items-center">
+              {% if order.status == 'delivered' %}
+              <div class="rounded-full flex items-center justify-center w-10 h-10 shadow-sm z-10 bg-green-600 text-white">
+                <i class="bi bi-check-lg text-xl"></i>
+              </div>
+              {% else %}
+              <div class="rounded-full flex items-center justify-center w-10 h-10 shadow-sm z-10 bg-white border-2 border-surface-200 text-charcoal-400">
+                <i class="bi bi-house-check text-xl"></i>
+              </div>
+              {% endif %}
+            </div>
+            <div class="pt-1">
+              <div class="font-bold text-sm {% if order.status == 'delivered' %}text-charcoal-900{% else %}text-charcoal-400{% endif %}">{% trans "Delivered" %}</div>
+              <div class="text-xs text-charcoal-500">{% trans "Order completed" %}</div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+      </div>
+    </div>
+
+  </div>{# /left #}
+
+
+  {# ── Right col ── #}
+  <div class="xl:w-1/3 flex flex-col gap-6">
+
+    {# Shipping info #}
+    <div class="bg-white border border-surface-200 rounded-lg shadow-sm overflow-hidden sticky top-24">
+      <div class="bg-surface-50 border-b border-surface-200 px-6 py-5 flex items-center gap-4">
+        <div class="bg-white rounded-full flex items-center justify-center text-green-600 shadow-sm w-10 h-10"><i class="bi bi-geo-alt-fill text-lg mt-0.5"></i></div>
+        <h5 class="font-bold text-xl tracking-tight m-0">{% trans "Shipping Details" %}</h5>
+      </div>
+      <div class="p-6">
+        <div class="flex items-center gap-4 mb-4">
+          <div class="bg-corporate-50 rounded-full w-8 h-8 flex flex-shrink-0 items-center justify-center text-corporate-600"><i class="bi bi-person-fill"></i></div>
+          <div class="min-w-0">
+            <div class="text-xs font-bold uppercase tracking-wider text-charcoal-400">{% trans "Name" %}</div>
+            <div class="font-semibold text-sm truncate">{{ order.user.get_full_name|default:order.user.username }}</div>
+          </div>
+        </div>
+        <div class="flex items-center gap-4 mb-4">
+          <div class="bg-corporate-50 rounded-full w-8 h-8 flex flex-shrink-0 items-center justify-center text-corporate-600"><i class="bi bi-telephone-fill"></i></div>
+          <div class="min-w-0">
+            <div class="text-xs font-bold uppercase tracking-wider text-charcoal-400">{% trans "Phone" %}</div>
+            <div class="font-semibold text-sm truncate">{{ order.phone }}</div>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 mb-4">
+          <div class="bg-corporate-50 rounded-full w-8 h-8 flex flex-shrink-0 items-center justify-center text-corporate-600 mt-1"><i class="bi bi-map-fill"></i></div>
+          <div class="min-w-0">
+            <div class="text-xs font-bold uppercase tracking-wider text-charcoal-400 mb-1">{% trans "Address" %}</div>
+            <div class="font-semibold text-sm leading-relaxed">{{ order.shipping_address }}</div>
+          </div>
+        </div>
+        {% if order.notes %}
+        <div class="flex items-start gap-3 p-4 rounded-lg border bg-blue-50 border-blue-200 text-blue-800 text-sm mt-6">
+          <i class="bi bi-chat-left-quote text-blue-600 text-lg mt-0.5"></i>
+          <span class="font-medium italic text-charcoal-700">{{ order.notes }}</span>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    {# Payment #}
+    <div class="bg-white border border-surface-200 rounded-lg shadow-sm overflow-hidden">
+      <div class="bg-surface-50 border-b border-surface-200 px-6 py-5 flex items-center gap-4">
+        <div class="bg-white rounded-full flex items-center justify-center text-corporate-600 shadow-sm w-10 h-10"><i class="bi bi-credit-card-fill text-lg"></i></div>
+        <h5 class="font-bold text-xl tracking-tight m-0">{% trans "Payment" %}</h5>
+      </div>
+      <div class="p-6">
+        <div class="flex items-center gap-4 p-4 rounded-lg border-2 border-corporate-600 bg-corporate-50">
+          <div class="bg-white rounded-lg flex flex-shrink-0 items-center justify-center w-12 h-12 shadow-sm text-corporate-600"><i class="bi bi-truck text-2xl"></i></div>
+          <div class="flex-grow min-w-0">
+            <div class="font-bold truncate">{% trans "Cash on Delivery" %}</div>
+            <div class="text-charcoal-500 text-xs font-medium mt-0.5 whitespace-nowrap">
+              {% if order.payment_status == 'paid' %}
+                <span class="text-green-600 font-bold uppercase tracking-wider"><i class="bi bi-check-all me-1"></i>{% trans "Paid" %}</span>
+              {% else %}
+                {% trans "Pay when your order arrives" %}
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>{# /right #}
+
+</div>
+
+{% endblock %}

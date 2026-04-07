@@ -1,0 +1,126 @@
+{% extends 'shared/base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans "Join SMART S3R" %}{% endblock %}
+
+{% block content %}
+<div class="flex justify-center items-center py-10 lg:py-20">
+  <div class="w-full max-w-xl">
+    <div class="bg-white border border-surface-200 rounded-2xl p-8 sm:p-10">
+      <div class="text-center mb-10">
+        <div class="bg-corporate-50 rounded-full inline-flex items-center justify-center mb-6 w-20 h-20 shadow-sm border border-corporate-100">
+          <i class="bi bi-person-plus-fill text-corporate-600 text-4xl mt-1"></i>
+        </div>
+        <h2 class="font-bold text-3xl tracking-tight mb-2">{% trans "Get Started" %}</h2>
+        <p class="text-charcoal-500 text-sm">{% trans "Free forever. No credit card needed." %}</p>
+      </div>
+
+      {% if form.non_field_errors %}
+        <div class="flex items-start gap-3 p-4 rounded-lg border bg-red-50 border-red-200 text-red-800 mb-6">
+          <i class="bi bi-exclamation-triangle-fill text-xl flex-shrink-0"></i>
+          <div>
+            {% for error in form.non_field_errors %}<span>{{ error }}</span><br/>{% endfor %}
+          </div>
+        </div>
+      {% endif %}
+
+      <form method="POST" novalidate x-data="{ showpassword1: false, showpassword2: false, password: '' }">
+        {% csrf_token %}
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-5">
+          {% for field in form %}
+          <div class="{% if field.name == 'first_name' or field.name == 'last_name' %}col-span-1{% else %}md:col-span-2 col-span-1{% endif %}">
+            <label class="block text-xs font-bold tracking-wider uppercase text-charcoal-500 mb-2 ms-1" for="{{ field.id_for_label }}">
+              {{ field.label }}
+              {% if field.field.required %}<span class="text-red-600">*</span>{% endif %}
+            </label>
+            <div class="relative">
+              <span class="absolute inset-y-0 start-0 flex items-center ps-4 pointer-events-none text-charcoal-400">
+                {% if field.name == 'username' %}<i class="bi bi-at text-lg"></i>
+                {% elif field.name == 'email' %}<i class="bi bi-envelope text-lg"></i>
+                {% elif field.name == 'first_name' %}<i class="bi bi-person text-lg"></i>
+                {% elif field.name == 'last_name' %}<i class="bi bi-person-badge text-lg"></i>
+                {% elif 'password' in field.name %}<i class="bi bi-shield-lock text-lg"></i>
+                {% elif field.name == 'phone' %}<i class="bi bi-phone text-lg"></i>
+                {% else %}<i class="bi bi-input-cursor-text text-lg"></i>
+                {% endif %}
+              </span>
+              <input
+                {% if 'password' in field.name %}:type="show{{ field.name }} ? 'text' : 'password'"{% else %}type="{{ field.field.widget.input_type }}"{% endif %}
+                name="{{ field.html_name }}"
+                id="{{ field.id_for_label }}"
+                class="block w-full ps-11 {% if 'password' in field.name %}pe-12{% endif %} px-3 py-3.5 bg-surface-100 border border-surface-200 rounded-lg focus:ring-2 focus:ring-corporate-600 font-medium transition-colors {% if field.errors %}bg-red-50 border-red-300 focus:ring-red-600{% endif %}"
+                placeholder="{{ field.label }}"
+                value="{{ field.value|default:'' }}"
+                {% if field.field.required %}required{% endif %}
+                {% if field.name == 'password' %}x-on:input="password = $event.target.value"{% endif %}
+              >
+              {% if 'password' in field.name %}
+                <button type="button" class="absolute inset-y-0 end-0 flex items-center pe-4 text-charcoal-400 hover:text-charcoal-700 transition-colors" x-on:click="show{{ field.name }} = !show{{ field.name }}" tabindex="-1">
+                  <i class="bi text-lg" :class="show{{ field.name }} ? 'bi-eye-slash' : 'bi-eye'"></i>
+                </button>
+              {% endif %}
+            </div>
+            {% if field.help_text and field.name != 'password' %}
+              <div class="text-charcoal-500 text-xs mt-2 ms-1 font-medium">{{ field.help_text|safe }}</div>
+            {% endif %}
+            {% if field.errors %}
+              <p class="text-red-600 text-xs font-semibold mt-2 ms-1 flex items-center"><i class="bi bi-exclamation-circle me-1"></i>{% for error in field.errors %}{{ error }}{% endfor %}</p>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+
+        {# Password Strength Indicator #}
+        <div class="mt-6 p-4 rounded-lg border border-surface-200 bg-surface-50" x-show="password.length > 0" x-cloak>
+          <div class="text-xs font-bold uppercase tracking-wider text-charcoal-500 mb-2">{% trans "Password Strength" %}</div>
+          <div class="flex gap-1 mb-3">
+            <div class="h-1.5 flex-1 rounded-full" :class="password.length >= 8 ? 'bg-green-600' : password.length >= 4 ? 'bg-amber-600' : 'bg-red-600'"></div>
+            <div class="h-1.5 flex-1 rounded-full" :class="password.length >= 8 && /[A-Z]/.test(password) ? 'bg-green-600' : password.length >= 4 ? 'bg-amber-600' : 'bg-surface-200'"></div>
+            <div class="h-1.5 flex-1 rounded-full" :class="password.length >= 12 && /[A-Z]/.test(password) && /[0-9]/.test(password) && /[^A-Za-z0-9]/.test(password) ? 'bg-green-600' : password.length >= 8 ? 'bg-amber-600' : 'bg-surface-200'"></div>
+          </div>
+          <ul class="space-y-1 text-xs">
+            <li class="flex items-center gap-2" :class="password.length >= 8 ? 'text-green-700' : 'text-charcoal-500'">
+              <i class="bi" :class="password.length >= 8 ? 'bi-check-circle-fill text-green-600' : 'bi-circle text-charcoal-300'"></i>
+              {% trans "At least 8 characters" %}
+            </li>
+            <li class="flex items-center gap-2" :class="/[A-Z]/.test(password) ? 'text-green-700' : 'text-charcoal-500'">
+              <i class="bi" :class="/[A-Z]/.test(password) ? 'bi-check-circle-fill text-green-600' : 'bi-circle text-charcoal-300'"></i>
+              {% trans "One uppercase letter" %}
+            </li>
+            <li class="flex items-center gap-2" :class="/[0-9]/.test(password) ? 'text-green-700' : 'text-charcoal-500'">
+              <i class="bi" :class="/[0-9]/.test(password) ? 'bi-check-circle-fill text-green-600' : 'bi-circle text-charcoal-300'"></i>
+              {% trans "One number" %}
+            </li>
+            <li class="flex items-center gap-2" :class="/[^A-Za-z0-9]/.test(password) ? 'text-green-700' : 'text-charcoal-500'">
+              <i class="bi" :class="/[^A-Za-z0-9]/.test(password) ? 'bi-check-circle-fill text-green-600' : 'bi-circle text-charcoal-300'"></i>
+              {% trans "One special character" %}
+            </li>
+          </ul>
+        </div>
+
+        <button type="submit" class="inline-flex items-center justify-center w-full px-4 py-3.5 text-base font-semibold text-white bg-corporate-600 rounded-lg hover:bg-corporate-700 shadow-lg mt-8">
+          <i class="bi bi-arrow-right text-xl me-1"></i>{% trans "Create My Account" %}
+        </button>
+      </form>
+
+      <p class="text-charcoal-500 text-xs font-medium text-center mt-6">
+        {% trans "By signing up, you agree to our" %}
+        <a href="#" class="text-corporate-600 hover:text-corporate-700 underline-offset-4 hover:underline transition-colors">{% trans "Terms of Service" %}</a> {% trans "and" %}
+        <a href="#" class="text-corporate-600 hover:text-corporate-700 underline-offset-4 hover:underline transition-colors">{% trans "Privacy Policy" %}</a>.
+      </p>
+
+      <div class="flex items-center my-8">
+        <div class="flex-1 h-px bg-surface-200"></div>
+        <span class="px-4 text-xs font-bold uppercase tracking-wider text-charcoal-400">{% trans "Already a member?" %}</span>
+        <div class="flex-1 h-px bg-surface-200"></div>
+      </div>
+
+      <a href="{% url 'login' %}" class="inline-flex items-center justify-center w-full px-4 py-3.5 text-sm font-semibold text-charcoal-700 bg-white border border-surface-200 rounded-lg hover:bg-surface-50 shadow-sm">
+        <i class="bi bi-box-arrow-in-right text-xl me-1"></i>{% trans "Sign In to Your Account" %}
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

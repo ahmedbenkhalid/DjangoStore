@@ -6,7 +6,8 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
 from django.core.cache import cache
 from django.core.paginator import Paginator
-from django.db.models import Prefetch
+from django.contrib import messages
+from django.utils.translation import gettext as _
 
 from products.models import Product, Category, Wishlist, Review
 from products.forms import ReviewForm
@@ -30,14 +31,16 @@ async def _get_cached_categories():
 async def product_list(request):
     """Products page with filtering, sorting, and pagination."""
 
-    # JSON autocomplete — minimal fields, no prefetch needed
     query = request.GET.get("q")
     if request.GET.get("format") == "json":
         qs = Product.objects.only("id", "name", "slug", "price", "img")
-        if query:
+        if query and len(query) <= 200:
             qs = qs.filter(name__icontains=query)
         result = [p async for p in qs[:10].values("id", "name", "slug", "price", "img")]
         return JsonResponse({"products": result})
+
+    if query and len(query) > 200:
+        query = query[:200]
 
     # Full queryset — single DB round-trip per page via Paginator
     products = Product.objects.select_related("category", "brand").only(
@@ -124,12 +127,26 @@ async def product_list(request):
         "in_stock": in_stock,
     }
 
+    if request.headers.get("X-Stock-Request") == "true":
+        products = Product.objects.filter(
+            id__in=[p.id for p in page_obj.object_list]
+        ).only("id", "stock")
+        stock_data = {
+            str(p.id): "out_of_stock"
+            if p.stock == 0
+            else "low_stock"
+            if p.stock <= 5
+            else "in_stock"
+            for p in products
+        }
+        return JsonResponse({"stock": stock_data})
+
     if request.headers.get("HX-Target") == "product-grid":
         return await sync_to_async(render)(
-            request, "pages/products/partials/product_grid.html", context
+            request, "products/partials/product_grid.html", context
         )
 
-    return await sync_to_async(render)(request, "pages/products/products.html", context)
+    return await sync_to_async(render)(request, "products/products.html", context)
 
 
 async def product_detail(request, slug):
@@ -203,9 +220,7 @@ async def product_detail(request, slug):
         "user_review": user_review,
         "review_form": ReviewForm(),
     }
-    return await sync_to_async(render)(
-        request, "pages/products/products_details.html", ctx
-    )
+    return await sync_to_async(render)(request, "products/products_details.html", ctx)
 
 
 @login_required
@@ -214,6 +229,14 @@ def add_review(request, product_id):
     from products.forms import ReviewForm as RF
 
     product = get_object_or_404(Product, id=product_id)
+
+    rate_key = f"review_rate_{request.user.id}_{product_id}"
+    if cache.get(rate_key):
+        messages.error(
+            request, _("Please wait a moment before submitting another review.")
+        )
+        return redirect(product.get_absolute_url())
+
     form = RF(request.POST)
 
     if form.is_valid():
@@ -225,9 +248,9 @@ def add_review(request, product_id):
                 "comment": form.cleaned_data["comment"],
             },
         )
-        # Clear product detail cache to refresh potential average rating displays elsewhere
         cache.delete(f"product_detail_{product.slug}")
         cache.delete("all_products_reviews")
+        cache.set(rate_key, True, 60)
 
     return redirect(product.get_absolute_url())
 
@@ -240,6 +263,10 @@ def delete_review(request, review_id):
     product_slug = review.product.slug
     review.delete()
     cache.delete(f"product_detail_{product_slug}")
+
+    if request.headers.get("HX-Request") == "true":
+        return JsonResponse({"status": "deleted", "review_id": review_id})
+
     return redirect(reverse("products:detail", kwargs={"slug": product_slug}))
 
 
@@ -249,12 +276,10 @@ async def category_list(request):
 
     if request.headers.get("HX-Target") == "category-grid":
         return await sync_to_async(render)(
-            request, "pages/category/partials/category_grid.html", context
+            request, "category/partials/category_grid.html", context
         )
 
-    return await sync_to_async(render)(
-        request, "pages/category/category_list.html", context
-    )
+    return await sync_to_async(render)(request, "category/category_list.html", context)
 
 
 async def category_detail(request, slug):
@@ -290,11 +315,11 @@ async def category_detail(request, slug):
 
     if request.headers.get("HX-Target") == "category-products":
         return await sync_to_async(render)(
-            request, "pages/category/partials/category_products.html", context
+            request, "category/partials/category_products.html", context
         )
 
     return await sync_to_async(render)(
-        request, "pages/category/category_detail.html", context
+        request, "category/category_detail.html", context
     )
 
 
@@ -316,9 +341,7 @@ def wishlist_list(request):
             "product__brand__name",
         )
     )
-    return render(
-        request, "pages/products/wishlist.html", {"wishlist_items": wishlist_items}
-    )
+    return render(request, "products/wishlist.html", {"wishlist_items": wishlist_items})
 
 
 @login_required
@@ -354,13 +377,15 @@ def toggle_wishlist(request, product_id):
 
 def stock_status(request, product_id):
     """HTMX endpoint for live stock status polling."""
+    from django.utils.translation import gettext as _
+
     product = get_object_or_404(Product, id=product_id)
     stock = product.stock
 
     if stock == 0:
-        html = '<span class="absolute top-2 end-2 inline-flex items-center px-2 py-0.5 text-xs font-bold text-red-700 bg-red-100 rounded-md">{% trans "Out of stock" %}</span>'
+        html = f'<span class="absolute top-2 end-2 inline-flex items-center px-2 py-0.5 text-xs font-bold text-red-700 bg-red-100 rounded-md">{_("Out of stock")}</span>'
     elif stock <= 5:
-        html = f'<span class="absolute top-2 end-2 inline-flex items-center px-2 py-0.5 text-xs font-bold text-amber-800 bg-amber-100 rounded-md">{stock} left</span>'
+        html = f'<span class="absolute top-2 end-2 inline-flex items-center px-2 py-0.5 text-xs font-bold text-amber-800 bg-amber-100 rounded-md">{_("Only")} {stock} {_("left")}</span>'
     else:
         html = ""
 

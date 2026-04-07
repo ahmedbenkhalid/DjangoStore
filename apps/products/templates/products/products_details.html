@@ -1,0 +1,516 @@
+{% extends 'shared/base.html' %}
+{% load i18n %}
+{% load humanize %}
+{% load static %}
+
+{% block title %}{{ product.get_name }} — SMART S3R{% endblock %}
+
+{% block content %}
+
+{# ── Breadcrumb ──────────────────────────────── #}
+<nav class="text-sm mb-6 text-charcoal-500" aria-label="Breadcrumb">
+  <ol class="flex items-center gap-2 flex-wrap">
+    <li><a href="{% url 'home' %}" class="text-charcoal-500 hover:text-corporate-600 transition-colors inline-flex items-center gap-1"><i class="bi bi-house"></i>{% trans "Home" %}</a></li>
+    <li class="text-charcoal-400">/</li>
+    <li><a href="{% url 'categories:categories' %}" class="text-charcoal-500 hover:text-corporate-600 transition-colors">{% trans "Store" %}</a></li>
+    <li class="text-charcoal-400">/</li>
+    {% if product.category %}
+    <li><a href="{{ product.category.get_absolute_url }}" class="text-charcoal-500 hover:text-corporate-600 transition-colors">{{ product.category.get_name }}</a></li>
+    <li class="text-charcoal-400">/</li>
+    {% endif %}
+    <li class="font-bold text-charcoal-900">{{ product.get_name }}</li>
+  </ol>
+</nav>
+
+
+{# ── Product Layout ──────────────────────────── #}
+<div class="flex flex-col lg:flex-row gap-8 lg:gap-12 mb-12">
+
+  {# Image Gallery #}
+  <div class="lg:w-1/2" x-data="{ zoomed: false }">
+    <div class="bg-white border border-surface-200 rounded-3xl overflow-hidden relative sticky top-24 shadow-sm flex items-center justify-center p-8 aspect-square lg:aspect-auto lg:h-[600px] cursor-zoom-in"
+         @click="zoomed = !zoomed"
+         :class="zoomed ? 'scale-150 cursor-zoom-out' : 'scale-100'">
+      {% if product.img %}
+        <img src="{{ product.img.url }}" alt="{{ product.get_name }}" class="max-w-full max-h-full object-contain drop-shadow-md transition-transform duration-300" loading="eager">
+      {% elif product.img_link %}
+        <img src="{{ product.img_link }}" alt="{{ product.get_name }}" class="max-w-full max-h-full object-contain drop-shadow-md transition-transform duration-300" loading="eager">
+      {% else %}
+        <i class="bi bi-phone text-9xl text-charcoal-200"></i>
+      {% endif %}
+      {% if product.stock == 0 %}
+        <span class="absolute top-4 end-4 inline-flex items-center px-3 py-1.5 text-sm font-bold text-white bg-red-600 rounded-full border-none">{% trans "Out of Stock" %}</span>
+      {% endif %}
+    </div>
+  </div>
+
+  {# Info #}
+  <div class="lg:w-1/2 flex flex-col justify-center py-2 lg:py-6 {% if request.LANGUAGE_CODE == 'ar' %}font-readex text-lg{% endif %}">
+
+      {# Badges #}
+      <div class="flex items-center gap-3 mb-4">
+        <span class="inline-flex items-center px-3 py-1.5 text-xs font-bold tracking-wider uppercase bg-surface-100 text-charcoal-700 rounded-full">{{ product.brand.get_name }}</span>
+        {% if product.type %}
+          <span class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-charcoal-700 bg-white border border-surface-200 rounded-full">{{ product.type }}</span>
+        {% endif %}
+      </div>
+
+      {# Title #}
+      <h1 class="font-bold text-3xl lg:text-4xl tracking-tight mb-4 leading-tight text-charcoal-900">{{ product.get_name }}</h1>
+
+      {# Rating #}
+      <div class="flex items-center gap-3 pb-6 border-b border-surface-200 mb-6">
+        <div class="flex text-lg text-amber-500">
+          {% for i in "12345" %}
+            <i class="bi {% if forloop.counter <= avg_rating %}bi-star-fill{% elif forloop.counter < avg_rating|add:1 %}bi-star-half{% else %}bi-star{% endif %} drop-shadow-sm"></i>
+          {% endfor %}
+        </div>
+        <span class="text-charcoal-500 text-sm font-semibold">{{ avg_rating }}/5 &bull; <a href="#reviews-section" class="text-corporate-600 hover:text-corporate-700 transition-colors">{{ review_count }} {% trans "reviews" %}</a></span>
+      </div>
+
+      {# Price + Social Proof #}
+      <div class="mb-8">
+        {% if product.on_sale %}
+          <div class="flex items-end gap-4">
+            <div class="font-black text-red-600 text-4xl lg:text-5xl leading-none">
+              <span class="text-xl align-super">{% if request.LANGUAGE_CODE == 'ar' %}ج.م{% else %}EGP{% endif %}</span>{{ product.discount_price|floatformat:2|intcomma }}
+            </div>
+            <div class="flex flex-col pb-1">
+              <span class="text-charcoal-400 line-through text-lg lg:text-xl font-medium">{% if request.LANGUAGE_CODE == 'ar' %>ج.م{% else %}EGP{% endif %} {{ product.price|floatformat:2|intcomma }}</span>
+            </div>
+            <div class="pb-1 hidden sm:block">
+               <span class="inline-flex items-center px-2.5 py-1 text-xs font-bold text-white bg-red-600 rounded-full">{% trans "SAVE" %} {{ product.discount_percent }}%</span>
+            </div>
+          </div>
+          <div class="mt-2 sm:hidden">
+             <span class="inline-flex items-center px-2.5 py-1 text-xs font-bold text-white bg-red-600 rounded-full">{% trans "SAVE" %} {{ product.discount_percent }}%</span>
+          </div>
+        {% else %}
+          <div class="font-black text-corporate-600 text-4xl lg:text-5xl leading-none">
+            <span class="text-xl align-super text-charcoal-900">{% if request.LANGUAGE_CODE == 'ar' %}ج.م{% else %}EGP{% endif %}</span>{{ product.price|floatformat:2|intcomma }}
+          </div>
+        {% endif %}
+
+        {# Social Proof: Reviews near price #}
+        {% if avg_rating > 0 %}
+        <div class="flex items-center gap-3 mt-3">
+          <div class="flex text-amber-500">
+            {% for i in "12345" %}
+              <i class="bi {% if forloop.counter <= avg_rating %}bi-star-fill{% else %}bi-star text-surface-300{% endif %}"></i>
+            {% endfor %}
+          </div>
+          <span class="text-sm font-medium text-charcoal-700">{{ avg_rating }}</span>
+          <span class="text-sm text-charcoal-400">({{ review_count }} {% trans "reviews" %})</span>
+        </div>
+        {% endif %}
+      </div>
+
+      {# Stock — Scarcity without exact count #}
+      {% if product.stock > 10 %}
+        <div class="flex items-start gap-3 p-4 rounded-lg border bg-green-50 border-green-200 text-green-800 mb-8 font-semibold shadow-sm">
+          <i class="bi bi-shield-check text-2xl text-green-600 flex-shrink-0"></i>
+          <span>{% trans "In stock — ready to ship" %}</span>
+        </div>
+      {% elif product.stock > 0 %}
+        <div class="flex items-start gap-3 p-4 rounded-lg border bg-amber-50 border-amber-200 text-amber-800 mb-8 font-semibold shadow-sm">
+          <span class="w-2 h-2 bg-amber-500 rounded-full animate-pulse mt-2 flex-shrink-0"></span>
+          <span>{% trans "Low stock — order soon!" %}</span>
+        </div>
+      {% else %}
+        <div class="flex items-start gap-3 p-4 rounded-lg border bg-red-50 border-red-200 text-red-800 mb-8 font-semibold shadow-sm">
+          <i class="bi bi-x-octagon text-2xl text-red-600 flex-shrink-0"></i>
+          <span>{% trans "Currently out of stock" %}</span>
+        </div>
+      {% endif %}
+
+      {# Perks #}
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
+        <div class="bg-surface-50 rounded-2xl p-4 flex flex-col items-center justify-center text-center border border-surface-200 hover:border-corporate-600/50 transition-colors">
+          <i class="bi bi-truck text-3xl mb-2 text-corporate-600"></i>
+          <span class="text-xs font-bold uppercase tracking-wider text-charcoal-500">{% trans "Free Delivery" %}</span>
+        </div>
+        <div class="bg-surface-50 rounded-2xl p-4 flex flex-col items-center justify-center text-center border border-surface-200 hover:border-corporate-600/50 transition-colors">
+          <i class="bi bi-arrow-return-left text-3xl mb-2 text-corporate-600"></i>
+          <span class="text-xs font-bold uppercase tracking-wider text-charcoal-500">{% trans "30-Day Returns" %}</span>
+        </div>
+        <div class="bg-surface-50 rounded-2xl p-4 flex flex-col items-center justify-center text-center border border-surface-200 hover:border-corporate-600/50 transition-colors">
+          <i class="bi bi-shield-lock text-3xl mb-2 text-corporate-600"></i>
+          <span class="text-xs font-bold uppercase tracking-wider text-charcoal-500">{% trans "Secure Payment" %}</span>
+        </div>
+        <div class="bg-surface-50 rounded-2xl p-4 flex flex-col items-center justify-center text-center border border-surface-200 hover:border-corporate-600/50 transition-colors">
+          <i class="bi bi-headset text-3xl mb-2 text-corporate-600"></i>
+          <span class="text-xs font-bold uppercase tracking-wider text-charcoal-500">{% trans "24/7 Support" %}</span>
+        </div>
+      </div>
+
+      {# Cart #}
+      <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 mb-8">
+        {% if user.is_authenticated %}
+          <form action="{% url 'cart:add' product.id %}" method="post"
+                x-data="{ submitting: false }" x-on:submit.prevent="submitting = true; $store.cart.addToCart($el).then(() => { submitting = false; $store.cart.showOffcanvas() })"
+                class="flex items-center gap-4 flex-grow m-0">
+            {% csrf_token %}
+            <div class="inline-flex items-center border border-surface-200 rounded-full bg-white flex-shrink-0 overflow-hidden">
+              <button class="inline-flex items-center justify-center px-4 py-2 text-charcoal-700 hover:bg-surface-50 transition-colors" type="button"
+                      onclick="var i=this.parentNode.querySelector('input');if(i.value>1)i.value=+i.value-1">
+                <i class="bi bi-dash-lg text-lg"></i>
+              </button>
+              <input class="w-16 text-center font-bold text-lg bg-transparent focus:outline-none border-0 focus:ring-0" type="number" name="quantity"
+                     value="1" min="1" max="{{ product.stock|default:10 }}">
+              <button class="inline-flex items-center justify-center px-4 py-2 text-charcoal-700 hover:bg-surface-50 transition-colors" type="button"
+                      onclick="var i=this.parentNode.querySelector('input');if(+i.value<+i.max)i.value=+i.value+1">
+                <i class="bi bi-plus-lg text-lg"></i>
+              </button>
+            </div>
+            <button type="submit" class="inline-flex items-center justify-center px-6 py-3 text-base font-semibold text-white bg-corporate-600 rounded-full hover:bg-corporate-700 flex-grow font-bold shadow-lg transition-colors {% if product.stock == 0 %}opacity-50 cursor-not-allowed{% endif %}" {% if product.stock == 0 %}disabled{% endif %} :disabled="submitting" :class="submitting ? '!bg-green-600 !hover:bg-green-700 text-white' : ''">
+              <i class="bi text-xl me-2" :class="submitting ? 'bi-check-circle-fill' : 'bi-bag-plus'"></i> <span x-text="submitting ? '{% trans 'Added!' %}' : '{% trans 'Add to Cart' %}'"></span>
+            </button>
+          </form>
+        {% else %}
+          <button type="button" class="inline-flex items-center justify-center px-6 py-3 text-base font-semibold text-white bg-corporate-600 rounded-full hover:bg-corporate-700 flex-grow font-bold shadow-lg transition-colors w-full sm:w-auto"
+                  data-hs-overlay="#authModal">
+            <i class="bi bi-bag-plus text-xl me-2"></i> {% trans "Add to Cart" %}
+          </button>
+        {% endif %}
+
+        {% if user.is_authenticated %}
+          <form action="{% url 'products:toggle_wishlist' product.id %}" method="post" class="m-0 sm:flex-shrink-0 flex">
+            {% csrf_token %}
+            <button type="submit" class="inline-flex items-center justify-center w-12 h-12 text-2xl rounded-full border transition-colors w-full sm:w-auto sm:aspect-square flex-grow {% if is_in_wishlist %}bg-red-50 text-red-600 border-red-200 hover:bg-red-600 hover:text-white{% else %}text-charcoal-400 border-surface-200 hover:bg-surface-50 hover:border-surface-200 hover:text-charcoal-700{% endif %}">
+              <i class="bi {% if is_in_wishlist %}bi-heart-fill{% else %}bi-heart{% endif %}"></i>
+            </button>
+          </form>
+        {% endif %}
+      </div>
+
+      {# External link #}
+      {% if product.external_link %}
+        <a href="{{ product.external_link }}" target="_blank" class="inline-flex items-center justify-center w-full px-4 py-2 text-sm font-bold text-charcoal-700 bg-white border border-surface-200 rounded-full hover:border-corporate-600 hover:bg-corporate-50 hover:text-corporate-600 transition-colors mb-8">
+          <i class="bi bi-box-arrow-up-right me-2 text-lg"></i>
+          {% trans "Visit Official Manufacturer Website" %}
+        </a>
+      {% endif %}
+
+      {# Meta #}
+      <div class="border-t border-surface-200 pt-6 mt-auto">
+        <ul class="flex flex-col gap-3 text-sm text-charcoal-500">
+          <li class="flex items-center gap-4">
+            <span class="w-24 font-bold uppercase tracking-wider text-charcoal-400 text-xs">{% trans "SKU" %}</span>
+            <span class="font-medium font-mono">{{ product.sku|default:"N/A" }}</span>
+          </li>
+          <li class="flex items-center gap-4">
+            <span class="w-24 font-bold uppercase tracking-wider text-charcoal-400 text-xs">{% trans "Category" %}</span>
+            <span class="font-medium text-corporate-600 hover:text-corporate-700 transition-colors cursor-pointer">
+              <a href="{{ product.category.get_absolute_url }}" class="text-corporate-600 hover:text-corporate-700 transition-colors">{{ product.category.name }}</a>
+            </span>
+          </li>
+          <li class="flex items-center gap-4 mt-2">
+            <span class="w-24 font-bold uppercase tracking-wider text-charcoal-400 text-xs">{% trans "Share" %}</span>
+            <div class="flex gap-2">
+              <a href="#" class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-surface-100 text-charcoal-500 hover:bg-corporate-600 hover:text-white transition-colors"><i class="bi bi-facebook"></i></a>
+              <a href="#" class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-surface-100 text-charcoal-500 hover:bg-charcoal-900 hover:text-white transition-colors"><i class="bi bi-twitter-x"></i></a>
+              <a href="#" class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-surface-100 text-charcoal-500 hover:bg-green-600 hover:text-white transition-colors"><i class="bi bi-whatsapp"></i></a>
+              <a href="#" class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-surface-100 text-charcoal-500 hover:bg-blue-600 hover:text-white transition-colors"><i class="bi bi-link-45deg text-lg"></i></a>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+  </div>
+</div>
+
+{# ── Tabs ────────────────────────────────────── #}
+<div class="mt-12 mb-20 {% if request.LANGUAGE_CODE == 'ar' %}font-readex text-lg{% endif %}" id="reviews-section"
+     x-data="{ activeTab: 'description' }">
+    <div class="flex justify-center border-b border-surface-200 mb-8">
+      <div class="flex gap-8 px-4 overflow-x-auto">
+        <button @click="activeTab = 'description'"
+                class="pb-4 text-lg font-bold border-b-4 border-transparent hover:text-corporate-600 transition-colors whitespace-nowrap text-charcoal-500"
+                :class="activeTab === 'description' ? '!text-corporate-600 !border-corporate-600' : ''">
+          {% trans "Description" %}
+        </button>
+        <button @click="activeTab = 'specs'"
+                class="pb-4 text-lg font-bold border-b-4 border-transparent hover:text-corporate-600 transition-colors whitespace-nowrap text-charcoal-500"
+                :class="activeTab === 'specs' ? '!text-corporate-600 !border-corporate-600' : ''">
+          {% trans "Specifications" %}
+        </button>
+        <button @click="activeTab = 'reviews'"
+                class="pb-4 text-lg font-bold border-b-4 border-transparent hover:text-corporate-600 transition-colors whitespace-nowrap text-charcoal-500"
+                :class="activeTab === 'reviews' ? '!text-corporate-600 !border-corporate-600' : ''">
+          {% trans "Reviews" %} <span class="inline-flex items-center ms-2 px-2 py-0.5 text-xs font-medium bg-surface-100 text-charcoal-700 rounded-full align-middle">{{ reviews|length }}</span>
+        </button>
+      </div>
+    </div>
+
+    {# Description #}
+    <div x-show="activeTab === 'description'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0">
+      <div class="max-w-4xl mx-auto text-charcoal-500 leading-loose">{{ product.description|linebreaks }}</div>
+    </div>
+
+    {# Specs #}
+    <div x-show="activeTab === 'specs'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" style="display: none;">
+      <div class="max-w-4xl mx-auto overflow-x-auto">
+        <table class="w-full">
+          <tbody>
+            <tr class="hover:bg-surface-50">
+              <th class="w-1/3 bg-surface-50 font-bold uppercase tracking-wider text-xs text-charcoal-500 px-4 py-3 text-start">{% trans "Brand" %}</th>
+              <td class="font-medium px-4 py-3 text-start">{{ product.brand.get_name }}</td>
+            </tr>
+            <tr class="hover:bg-surface-50">
+              <th class="w-1/3 bg-surface-50 font-bold uppercase tracking-wider text-xs text-charcoal-500 px-4 py-3 text-start">{% trans "Category" %}</th>
+              <td class="font-medium px-4 py-3 text-start">{{ product.category.get_name }}</td>
+            </tr>
+            <tr class="hover:bg-surface-50">
+              <th class="w-1/3 bg-surface-50 font-bold uppercase tracking-wider text-xs text-charcoal-500 px-4 py-3 text-start">{% trans "Condition" %}</th>
+              <td class="font-medium px-4 py-3 text-start">{% trans "New / Original Box" %}</td>
+            </tr>
+            <tr class="hover:bg-surface-50">
+              <th class="w-1/3 bg-surface-50 font-bold uppercase tracking-wider text-xs text-charcoal-500 px-4 py-3 text-start">{% trans "Availability" %}</th>
+              <td class="px-4 py-3 text-start">
+                {% if product.stock > 0 %}
+                  <span class="inline-flex items-center px-3 py-1.5 text-sm font-bold text-white bg-green-600 rounded-full">{% trans "In Stock" %}</span>
+                {% else %}
+                  <span class="inline-flex items-center px-3 py-1.5 text-sm font-bold text-white bg-red-600 rounded-full">{% trans "Out of Stock" %}</span>
+                {% endif %}
+              </td>
+            </tr>
+            <tr class="hover:bg-surface-50">
+              <th class="w-1/3 bg-surface-50 font-bold uppercase tracking-wider text-xs text-charcoal-500 px-4 py-3 text-start">{% trans "Shipping" %}</th>
+              <td class="font-medium px-4 py-3 text-start">{% trans "International Shipping Available" %}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    {# Reviews #}
+    <div x-show="activeTab === 'reviews'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" style="display: none;">
+      <div class="max-w-4xl mx-auto">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-10 pb-6 border-b border-surface-200">
+          <div>
+            <h3 class="font-bold text-2xl tracking-tight m-0 text-charcoal-900">{% trans "Verified Reviews" %}</h3>
+            <p class="text-charcoal-500 text-sm mt-1">{% trans "Hear what our customers have to say." %}</p>
+          </div>
+          {% if user.is_authenticated %}
+            <button class="inline-flex items-center px-6 py-3 text-base font-semibold text-white bg-corporate-600 rounded-full hover:bg-corporate-700 font-bold shadow-md transition-colors"
+                    data-hs-overlay="#reviewModal">
+              <i class="bi bi-pencil-square me-2 text-lg"></i> {% trans "Write a Review" %}
+            </button>
+          {% else %}
+            <button class="inline-flex items-center px-6 py-3 text-base font-semibold text-white bg-corporate-600 rounded-full hover:bg-corporate-700 font-bold shadow-md transition-colors"
+                    data-hs-overlay="#authModal">
+              <i class="bi bi-pencil-square me-2 text-lg"></i> {% trans "Write a Review" %}
+            </button>
+          {% endif %}
+        </div>
+
+        {% if reviews %}
+          <div class="grid gap-6">
+            {% for review in reviews %}
+            <div class="bg-white p-6 rounded-3xl border border-surface-200 shadow-sm hover:shadow-md transition-shadow">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+                <div class="flex items-center gap-4">
+                  {% if review.user.user.profile.avatar %}
+                    <img src="{{ review.user.user.profile.avatar.url }}"
+                         alt="{{ review.user.user.username }}"
+                         class="w-12 h-12 rounded-full object-cover border-2 border-corporate-600 border-opacity-20">
+                  {% else %}
+                    <div class="w-12 h-12 bg-corporate-50 rounded-full flex items-center justify-center border-2 border-corporate-100 text-corporate-600 font-bold text-xl uppercase">
+                      {{ review.user.user.username|first }}
+                    </div>
+                  {% endif %}
+                  <div>
+                    <div class="font-bold text-base text-charcoal-900">{{ review.user.user.get_full_name|default:review.user.user.username }}</div>
+                    <div class="text-charcoal-400 text-xs font-semibold tracking-wider mt-0.5">{{ review.created_at|date:"M d, Y" }}</div>
+                  </div>
+                </div>
+                <div class="flex p-2 bg-amber-50 rounded-full border border-amber-100">
+                  <div class="flex text-sm gap-0.5 text-amber-500">
+                    {% for i in "12345" %}
+                      <i class="bi {% if forloop.counter <= review.rating %}bi-star-fill{% else %}bi-star text-amber-200{% endif %} drop-shadow-sm"></i>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+              <p class="text-charcoal-500 mt-2 leading-relaxed text-[15px]">"{{ review.comment }}"</p>
+            </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="flex flex-col items-center justify-center py-16 px-4 bg-surface-50 rounded-3xl border border-surface-200 border-dashed text-center">
+            <div class="bg-white rounded-full flex items-center justify-center shadow-sm border border-surface-200 mb-6 w-20 h-20">
+              <i class="bi bi-chat-dots text-4xl text-charcoal-200 mt-1"></i>
+            </div>
+            <h5 class="font-bold text-xl tracking-tight mb-2 text-charcoal-900">
+              {% trans "No reviews yet" %}
+            </h5>
+            <p class="text-charcoal-500 max-w-md">
+              {% trans "Be the first to share your experience with this product and help others make an informed decision!" %}
+            </p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{# Review Modal #}
+{% if user.is_authenticated %}
+<div id="reviewModal" class="hs-overlay hidden size-full fixed top-0 start-0 z-[80] overflow-x-hidden overflow-y-auto pointer-events-none" role="dialog" tabindex="-1" aria-labelledby="reviewModalLabel">
+  <div class="hs-overlay-open:mt-7 hs-overlay-open:opacity-100 hs-overlay-open:duration-500 mt-0 opacity-0 ease-out transition-all sm:max-w-lg sm:w-full m-3 sm:mx-auto min-h-[calc(100%-3.5rem)] flex items-center">
+    <div class="w-full pointer-events-auto shadow-2xl rounded-3xl bg-white overflow-hidden flex flex-col border border-surface-200">
+
+      <div class="flex justify-between items-center py-4 px-6 border-b border-surface-200 bg-surface-50">
+        <h5 class="font-bold text-xl tracking-tight m-0 text-charcoal-900" id="reviewModalLabel">{% trans "Write a Review" %}</h5>
+        <button type="button" class="inline-flex items-center justify-center w-8 h-8 text-sm text-charcoal-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors" data-hs-overlay="#reviewModal">
+          <i class="bi bi-x-lg"></i>
+          <span class="sr-only">{% trans "Close" %}</span>
+        </button>
+      </div>
+
+      <form action="{% url 'products:add_review' product.id %}" method="post"
+            x-data="{
+                rating: {{ user_review.rating|default:0 }},
+                hover: 0,
+                comment: '{{ user_review.comment|default:''|escapejs }}'
+            }" class="m-0 flex flex-col flex-grow">
+        {% csrf_token %}
+        <div class="p-6 md:p-8 flex-grow overflow-y-auto">
+
+          {# Star Rating #}
+          <div class="mb-8 text-center bg-surface-50 p-6 rounded-2xl border border-surface-200 border-dashed">
+            <label class="block text-sm font-bold tracking-wider text-charcoal-500 uppercase mb-4">{% trans "Your Rating" %}</label>
+            <div class="flex justify-center gap-3">
+              {% for i in "12345" %}
+              <button type="button"
+                      class="inline-flex items-center justify-center w-14 h-14 text-3xl rounded-full bg-white border border-surface-200 shadow-sm hover:shadow-md hover:border-amber-500/50 transition-all"
+                      @click="rating = {{ forloop.counter }}"
+                      @mouseenter="hover = {{ forloop.counter }}"
+                      @mouseleave="hover = 0"
+                      :class="(hover || rating) >= {{ forloop.counter }} ? 'text-amber-500 border-amber-500 bg-amber-50' : 'text-charcoal-200'">
+                <i class="bi drop-shadow-sm transition-transform duration-200" :class="(hover || rating) >= {{ forloop.counter }} ? 'bi-star-fill scale-110' : 'bi-star'"></i>
+              </button>
+              {% endfor %}
+            </div>
+            <input type="hidden" name="rating" x-model="rating">
+          </div>
+
+          {# Comment #}
+          <div class="mb-2">
+            <label class="block text-sm font-bold tracking-wider text-charcoal-500 mb-3 px-1">{% trans "Your Review" %}</label>
+            <textarea name="comment"
+                      class="block w-full px-3 py-2 bg-surface-50 border border-surface-200 rounded-lg focus:ring-2 focus:ring-corporate-600 focus:border-corporate-600 rounded-2xl text-base shadow-sm resize-y min-h-[128px]"
+                      x-model="comment"
+                      placeholder="{% trans 'Share your experience with this product...' %}"></textarea>
+          </div>
+
+          {% if user_review %}
+          <div class="flex items-start gap-2 mt-4 px-2 text-blue-600">
+            <i class="bi bi-info-circle-fill mt-0.5"></i>
+            <p class="text-sm font-medium m-0 leading-snug tracking-tight">{% trans "You have already reviewed this product. Submitting will update your review." %}</p>
+          </div>
+          {% endif %}
+        </div>
+
+        <div class="py-4 px-6 md:px-8 border-t border-surface-200 bg-surface-50 flex justify-end gap-3 rounded-b-3xl mt-auto">
+          <button type="button" class="inline-flex items-center px-4 py-2 text-sm font-medium text-charcoal-700 bg-white border border-surface-200 rounded-lg hover:bg-surface-50 rounded-full px-6 font-bold" data-hs-overlay="#reviewModal">{% trans "Cancel" %}</button>
+          <button type="submit"
+                  class="inline-flex items-center px-6 py-3 text-base font-semibold text-white bg-corporate-600 rounded-lg hover:bg-corporate-700 rounded-full px-8 font-bold shadow-md transition-all"
+                  :disabled="rating == 0">
+            {% trans "Submit Review" %}
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{# ── Related Products ──────────────────────────── #}
+{% if related_products %}
+<section class="mt-16 mb-8 pt-8 border-t border-surface-200 {% if request.LANGUAGE_CODE == 'ar' %}font-readex text-lg{% endif %}">
+  <div class="flex items-end justify-between mb-8">
+    <h2 class="font-bold text-2xl lg:text-3xl tracking-tight m-0 text-charcoal-900">
+      {% trans "You May Also Like" %}
+    </h2>
+    <a href="{{ product.category.get_absolute_url }}" class="text-corporate-600 hover:text-corporate-700 transition-colors font-bold text-sm tracking-wide uppercase inline-flex items-center">
+      {% trans "View All" %} <i class="bi bi-arrow-right ms-1"></i>
+    </a>
+  </div>
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-6">
+    {% for rp in related_products %}
+    <a href="{{ rp.get_absolute_url }}" class="bg-white shadow-sm border border-surface-200 hover:shadow-xl transition-all duration-300 group overflow-hidden block rounded-lg">
+      <div class="aspect-[4/3] bg-surface-50 flex items-center justify-center p-6 relative overflow-hidden">
+        {% if rp.img %}
+          <img src="{{ rp.img.url }}" alt="{{ rp.name }}" class="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-500 drop-shadow-sm" loading="lazy">
+        {% elif rp.img_link %}
+          <img src="{{ rp.img_link }}" alt="{{ rp.name }}" class="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-500 drop-shadow-sm" loading="lazy">
+        {% else %}
+          <i class="bi bi-box text-6xl text-charcoal-200 group-hover:text-corporate-600 transition-colors"></i>
+        {% endif %}
+      </div>
+      <div class="p-4 bg-white">
+        <div class="text-[10px] font-bold text-charcoal-400 uppercase tracking-widest mb-1.5">{{ rp.brand.name }}</div>
+        <div class="font-bold text-sm text-charcoal-900 group-hover:text-corporate-600 transition-colors line-clamp-2 leading-tight mb-3 h-10">{{ rp.name }}</div>
+        <div class="font-black text-lg bg-surface-50 inline-block px-3 py-1 rounded-xl text-charcoal-900">
+          <span class="text-sm font-medium align-super text-charcoal-500 me-0.5">{% if request.LANGUAGE_CODE == 'ar' %}ج.م{% else %}EGP{% endif %}</span>{{ rp.price|floatformat:2|intcomma }}
+        </div>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org/",
+  "@type": "Product",
+  "name": "{{ product.get_name }}",
+  "image": "{% if product.img %}{{ product.img.url }}{% elif product.img_link %}{{ product.img_link }}{% endif %}",
+  "description": "{{ product.get_description }}",
+  "brand": {
+    "@type": "Brand",
+    "name": "{{ product.brand.get_name }}"
+  },
+  "offers": {
+    "@type": "Offer",
+    "url": "{{ request.build_absolute_uri }}",
+    "priceCurrency": "EGP",
+    "price": "{{ product.current_price }}",
+    "availability": "{% if product.stock > 0 %}https://schema.org/InStock{% else %}https://schema.org/OutOfStock{% endif %}",
+    "seller": {
+      "@type": "Organization",
+      "name": "SMART S3R"
+    }
+  },
+  {% if avg_rating > 0 %}
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "{{ avg_rating }}",
+    "reviewCount": "{{ review_count }}"
+  },
+  {% endif %}
+  "review": [
+    {% for review in reviews|slice:":5" %}
+    {
+      "@type": "Review",
+      "reviewRating": {
+        "@type": "Rating",
+        "ratingValue": "{{ review.rating }}"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "{{ review.user.user.username }}"
+      },
+      "reviewBody": "{{ review.comment|truncatechars:200 }}"
+    }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  ]
+}
+</script>
+{% endblock %}

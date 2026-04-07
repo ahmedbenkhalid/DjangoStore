@@ -1,0 +1,268 @@
+#!/usr/bin/env bash
+# =============================================================================
+# joit - Install joi to system PATH (Linux/macOS)
+# =============================================================================
+
+set -euo pipefail
+
+readonly JOI_VERSION="0.2.0"
+readonly JOI_SCRIPT="joi"
+
+# Colors
+C_RESET='\033[0m'
+C_GREEN='\033[32m'
+C_YELLOW='\033[33m'
+C_CYAN='\033[36m'
+C_RED='\033[31m'
+
+JOI_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# =============================================================================
+# Functions
+# =============================================================================
+log_success() {
+    echo -e "${C_GREEN}✓${C_RESET} $*"
+}
+
+log_warn() {
+    echo -e "${C_YELLOW}!${C_RESET} $*"
+}
+
+log_error() {
+    echo -e "${C_RED}✗${C_RESET} $*" >&2
+}
+
+log_info() {
+    echo -e "${C_CYAN}ℹ${C_RESET} $*"
+}
+
+# =============================================================================
+# Get install paths
+# =============================================================================
+get_install_dir() {
+    if [[ -n "${XDG_CONFIG_HOME:-}" ]]; then
+        echo "${XDG_CONFIG_HOME}/joi"
+    elif [[ "$(uname)" == "Darwin" ]]; then
+        echo "${HOME}/.local/share/joi"
+    else
+        echo "${HOME}/.local/share/joi"
+    fi
+}
+
+get_bin_dir() {
+    if [[ -n "${XDG_CONFIG_HOME:-}" ]]; then
+        echo "${XDG_CONFIG_HOME}/../bin"
+    elif [[ "$(uname)" == "Darwin" ]]; then
+        echo "${HOME}/.local/bin"
+    else
+        echo "${HOME}/.local/bin"
+    fi
+}
+
+get_bin_path() {
+    echo "$(get_bin_dir)/joi"
+}
+
+# =============================================================================
+# Check if in PATH
+# =============================================================================
+in_path() {
+    if [[ ":${PATH}:" == *":$(get_bin_dir):"* ]]; then
+        return 0
+    fi
+    return 1
+}
+
+# =============================================================================
+# Add to PATH
+# =============================================================================
+add_to_path() {
+    local bin_dir
+    bin_dir=$(get_bin_dir)
+    
+    local shell_rc=""
+    if [[ -n "${BASH_VERSION:-}" ]]; then
+        shell_rc="${HOME}/.bashrc"
+    elif [[ -n "${ZSH_VERSION:-}" ]]; then
+        shell_rc="${HOME}/.zshrc"
+    fi
+    
+    if [[ -n "$shell_rc" ]]; then
+        if ! grep -q "${bin_dir}" "$shell_rc" 2>/dev/null; then
+            echo "" >> "$shell_rc"
+            echo "# Added by joit - joi project tool" >> "$shell_rc"
+            echo "export PATH=\"\${PATH}:${bin_dir}\"" >> "$shell_rc"
+            log_info "Added ${bin_dir} to ${shell_rc}"
+            return 0
+        fi
+    fi
+    
+    log_warn "Could not update shell config automatically"
+    return 1
+}
+
+# =============================================================================
+# Show manual instructions
+# =============================================================================
+show_manual_instructions() {
+    local bin_dir
+    bin_dir=$(get_bin_dir)
+    
+    echo ""
+    log_warn "Manual installation required"
+    echo ""
+    echo "  Add this to your ~/.bashrc or ~/.zshrc:"
+    echo ""
+    echo -e "    ${C_CYAN}export PATH=\"\${PATH}:${bin_dir}\"${C_RESET}"
+    echo ""
+    echo "  Then restart your terminal or run:"
+    echo ""
+    echo -e "    ${C_CYAN}source ~/.bashrc${C_RESET}  # or ~/.zshrc"
+    echo ""
+}
+
+# =============================================================================
+# Uninstall
+# =============================================================================
+uninstall() {
+    local install_dir
+    install_dir=$(get_install_dir)
+    local bin_path
+    bin_path=$(get_bin_path)
+    
+    if [[ ! -f "$bin_path" ]] && [[ ! -L "$bin_path" ]]; then
+        log_warn "joi is not installed"
+        exit 0
+    fi
+    
+    echo ""
+    echo "Uninstalling joi..."
+    echo ""
+    
+    rm -f "$bin_path"
+    log_success "Removed ${bin_path}"
+    
+    if [[ -d "$install_dir" ]]; then
+        rm -rf "$install_dir"
+        log_success "Removed ${install_dir}"
+    fi
+    
+    echo ""
+    log_success "joi uninstalled"
+    echo "Restart your terminal to complete removal"
+    echo ""
+}
+
+# =============================================================================
+# Install
+# =============================================================================
+install() {
+    echo ""
+    echo "joit - Install joi to PATH"
+    echo "========================="
+    echo ""
+    
+    # Check if already installed
+    if in_path && [[ -f "$(get_bin_path)" ]] && [[ "${FORCE:-}" != "1" ]]; then
+        local installed_path
+        installed_path=$(get_bin_path)
+        echo -e "${C_GREEN}✓${C_RESET} joi is already installed at:"
+        echo "  ${installed_path}"
+        echo ""
+        echo -e "To reinstall, run: ${C_CYAN}joit install --force${C_RESET}"
+        exit 0
+    fi
+    
+    # Find source script
+    local source_script="${JOI_ROOT}/${JOI_SCRIPT}"
+    
+    if [[ ! -f "$source_script" ]]; then
+        source_script="${JOI_ROOT}/joi.ps1"
+    fi
+    
+    if [[ ! -f "$source_script" ]]; then
+        log_error "joi script not found in:"
+        echo "  ${JOI_ROOT}"
+        echo ""
+        echo "Make sure you're running joit from the joi project directory"
+        exit 1
+    fi
+    
+    local install_dir
+    install_dir=$(get_install_dir)
+    local bin_dir
+    bin_dir=$(get_bin_dir)
+    local bin_path
+    bin_path=$(get_bin_path)
+    
+    echo "Installing joi v${JOI_VERSION}..."
+    echo ""
+    
+    # Create directories
+    mkdir -p "$bin_dir"
+    mkdir -p "$install_dir"
+    echo "  Created: ${bin_dir}"
+    
+    # Copy script
+    cp "$source_script" "$bin_path"
+    chmod +x "$bin_path"
+    echo "  Copied: ${bin_path}"
+    
+    # Add to PATH
+    if ! in_path; then
+        if add_to_path; then
+            echo ""
+            log_success "Added ${bin_dir} to PATH"
+        else
+            show_manual_instructions
+        fi
+    else
+        echo ""
+        log_success "${bin_dir} is already in PATH"
+    fi
+    
+    echo ""
+    echo -e "${C_GREEN}========================================${C_RESET}"
+    echo -e "${C_GREEN}joi installed successfully!${C_RESET}"
+    echo -e "${C_GREEN}========================================${C_RESET}"
+    echo ""
+    
+    if ! in_path; then
+        echo "IMPORTANT: Restart your terminal for PATH changes to take effect"
+        echo ""
+    fi
+    
+    echo "Then run:"
+    echo -e "  ${C_CYAN}joi check${C_RESET}"
+    echo ""
+}
+
+# =============================================================================
+# Parse arguments
+# =============================================================================
+FORCE=0
+
+for arg in "$@"; do
+    case "$arg" in
+    --force|-f) FORCE=1 ;;
+    --uninstall|-u) uninstall ;;
+    --help|-h)
+        echo ""
+        echo "joit - Install joi to system PATH"
+        echo ""
+        echo "Usage: joit [command]"
+        echo ""
+        echo "Commands:"
+        echo "  install        Install joi to PATH (default)"
+        echo "  uninstall      Remove joi from PATH"
+        echo ""
+        echo "Options:"
+        echo "  --force, -f    Force reinstall"
+        echo "  --help, -h     Show this help"
+        echo ""
+        exit 0
+        ;;
+    esac
+done
+
+install

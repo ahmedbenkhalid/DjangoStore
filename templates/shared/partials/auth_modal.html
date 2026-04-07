@@ -1,0 +1,62 @@
+{% load i18n %}
+
+{% if not user.is_authenticated %}
+<div id="authModal" class="hs-overlay hidden size-full fixed top-0 start-0 z-[80] overflow-x-hidden overflow-y-auto pointer-events-none" role="dialog" tabindex="-1" aria-labelledby="authModalLabel">
+  <div class="hs-overlay-open:mt-7 hs-overlay-open:opacity-100 hs-overlay-open:duration-500 mt-0 opacity-0 ease-out transition-all sm:max-w-md sm:w-full m-3 sm:mx-auto min-h-[calc(100%-3.5rem)] flex items-center">
+    <div class="w-full pointer-events-auto shadow-xl rounded-xl bg-white overflow-hidden flex flex-col">
+      <div class="flex justify-center items-center py-6 px-4 relative border-b border-surface-100">
+        <div class="text-center w-full mt-2">
+          <h4 class="font-bold text-2xl mb-1 tracking-tight text-charcoal-900" id="authModalLabel">{% trans "Join Us" %}</h4>
+          <p class="text-charcoal-500 text-sm">{% trans "Experience the best of Smart S3R." %}</p>
+        </div>
+        <button type="button" class="absolute top-3 end-3 p-1 text-charcoal-400 hover:text-charcoal-600 hover:bg-surface-100 rounded-lg transition-colors" data-hs-overlay="#authModal">
+          <span class="sr-only">Close</span>
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      <div class="p-4 pt-0 overflow-y-auto">
+        <form action="{% url 'register' %}" method="post">
+          {% csrf_token %}
+
+          <div class="mb-4">
+            <input type="text" name="username" id="modal_username"
+                   class="block w-full px-3 py-2.5 bg-surface-50 border border-surface-200 rounded-lg text-sm text-charcoal-900 placeholder:text-charcoal-400 focus:ring-2 focus:ring-corporate-600 focus:border-corporate-600 outline-none transition-all"
+                   placeholder="{% trans 'Username' %}" required>
+          </div>
+
+          <div class="mb-4">
+            <input type="email" name="email" id="modal_email"
+                   class="block w-full px-3 py-2.5 bg-surface-50 border border-surface-200 rounded-lg text-sm text-charcoal-900 placeholder:text-charcoal-400 focus:ring-2 focus:ring-corporate-600 focus:border-corporate-600 outline-none transition-all"
+                   placeholder="{% trans 'Email' %}" required>
+          </div>
+
+          <div class="flex gap-4 mb-6">
+            <div class="w-1/2">
+              <input type="password" name="password1" id="modal_password1"
+                     class="block w-full px-3 py-2.5 bg-surface-50 border border-surface-200 rounded-lg text-sm text-charcoal-900 placeholder:text-charcoal-400 focus:ring-2 focus:ring-corporate-600 focus:border-corporate-600 outline-none transition-all"
+                     placeholder="{% trans 'Password' %}" required>
+            </div>
+            <div class="w-1/2">
+              <input type="password" name="password2" id="modal_password2"
+                     class="block w-full px-3 py-2.5 bg-surface-50 border border-surface-200 rounded-lg text-sm text-charcoal-900 placeholder:text-charcoal-400 focus:ring-2 focus:ring-corporate-600 focus:border-corporate-600 outline-none transition-all"
+                     placeholder="{% trans 'Confirm' %}" required>
+            </div>
+          </div>
+
+          <button type="submit" class="inline-flex items-center justify-center w-full px-4 py-2.5 text-sm font-semibold text-white bg-corporate-600 rounded-lg hover:bg-corporate-700 transition-colors shadow-sm mb-4">
+            {% trans "Create Account" %}
+          </button>
+        </form>
+      </div>
+
+      <div class="bg-surface-50 py-4 flex justify-center border-t border-surface-100">
+        <p class="text-charcoal-500 text-sm mb-0">
+          {% trans "Already a member?" %}
+          <a href="{% url 'login' %}" class="font-semibold text-corporate-600 hover:text-corporate-700 transition-colors">{% trans "Log in here" %}</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}

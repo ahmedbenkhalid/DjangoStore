@@ -120,4 +120,4 @@ def home(request):
         "most_liked_products": most_liked,
         "banners": banners,
     }
-    return render(request, "pages/home.html", context)
+    return render(request, "home.html", context)

@@ -5,6 +5,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib import messages
 from django.db.models import Count
 from django.views.decorators.csrf import csrf_exempt
+from django.middleware.csrf import rotate_token
 from django.utils.translation import gettext as _
 from .forms import UserRegisterForm, ProfileUpdateForm, AddressForm
 from orders.models import Order
@@ -18,6 +19,10 @@ def login_view(request):
         if form.is_valid():
             user = form.get_user()
             auth_login(request, user)
+            rotate_token(request)
+            from cart.views import _merge_session_to_db
+
+            _merge_session_to_db(request)
             messages.success(
                 request, _("Welcome back! You have been logged in successfully.")
             )
@@ -27,7 +32,7 @@ def login_view(request):
             messages.error(request, _("Invalid username or password."))
     else:
         form = AuthenticationForm()
-    return render(request, "pages/users/login.html", {"form": form})
+    return render(request, "users/login.html", {"form": form})
 
 
 @csrf_exempt
@@ -51,14 +56,13 @@ def register(request):
             messages.error(request, _("Please fix the errors below."))
     else:
         form = UserRegisterForm()
-    return render(request, "pages/users/register.html", {"form": form})
+    return render(request, "users/register.html", {"form": form})
 
 
 @login_required
 def profile(request):
     profile_obj, __ = Profile.objects.get_or_create(user=request.user)
 
-    # Prefetch items to avoid N+1 on order items
     recent_orders = list(
         Order.objects.filter(user=request.user)
         .prefetch_related("items__product__brand")
@@ -88,7 +92,7 @@ def profile(request):
 
     return render(
         request,
-        "pages/users/profile.html",
+        "users/profile.html",
         {
             "profile_obj": profile_obj,
             "recent_orders": recent_orders,
@@ -102,7 +106,7 @@ def profile(request):
 
 
 def checkout(request):
-    return render(request, "pages/users/checkout.html")
+    return render(request, "users/checkout.html")
 
 
 @login_required
@@ -110,7 +114,7 @@ def address_list(request):
     addresses = Address.objects.filter(user=request.user).order_by(
         "-is_default", "-created_at"
     )
-    return render(request, "pages/users/address_list.html", {"addresses": addresses})
+    return render(request, "users/address_list.html", {"addresses": addresses})
 
 
 @login_required
@@ -129,9 +133,7 @@ def address_add(request):
             messages.error(request, _("Please fix the errors below."))
     else:
         form = AddressForm()
-    return render(
-        request, "pages/users/address_form.html", {"form": form, "action": "add"}
-    )
+    return render(request, "users/address_form.html", {"form": form, "action": "add"})
 
 
 @login_required
@@ -151,9 +153,7 @@ def address_edit(request, pk):
             messages.error(request, _("Please fix the errors below."))
     else:
         form = AddressForm(instance=address)
-    return render(
-        request, "pages/users/address_form.html", {"form": form, "action": "edit"}
-    )
+    return render(request, "users/address_form.html", {"form": form, "action": "edit"})
 
 
 @login_required

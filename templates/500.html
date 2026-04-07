@@ -1,0 +1,17 @@
+{% extends 'shared/base.html' %}
+{% load i18n %}
+
+{% block title %}500 — {% trans "Server Error" %}{% endblock %}
+
+{% block content %}
+<div class="flex flex-col items-center justify-center py-20 px-4 text-center">
+  <div class="mb-8">
+    <span class="text-9xl font-black text-red-600">500</span>
+  </div>
+  <h1 class="text-3xl font-bold text-charcoal-900 mb-4">{% trans "Server Error" %}</h1>
+  <p class="text-charcoal-500 mb-8 max-w-md">{% trans "Something went wrong on our end. Please try again later." %}</p>
+  <a href="{% url 'home' %}" class="inline-flex items-center px-6 py-3 text-base font-semibold text-white bg-corporate-600 rounded-lg hover:bg-corporate-700 transition-colors">
+    <i class="bi bi-house me-2"></i> {% trans "Back to Home" %}
+  </a>
+</div>
+{% endblock %}

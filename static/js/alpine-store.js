@@ -1,5 +1,25 @@
 document.addEventListener('alpine:init', () => {
 
+  Alpine.store('toast', {
+    message: '',
+    type: 'info',
+    visible: false,
+    timer: null,
+
+    show(message, type = 'info') {
+      this.message = message;
+      this.type = type;
+      this.visible = true;
+      if (this.timer) clearTimeout(this.timer);
+      this.timer = setTimeout(() => { this.visible = false; }, 4000);
+    },
+
+    hide() {
+      this.visible = false;
+      if (this.timer) clearTimeout(this.timer);
+    }
+  });
+
   Alpine.store('cart', {
     adding: false,
     addedId: null,
@@ -26,6 +46,7 @@ document.addEventListener('alpine:init', () => {
         setTimeout(() => { this.addedId = null; }, 1500);
       } catch (e) {
         console.error('Cart error:', e);
+        Alpine.store('toast').show('Failed to add to cart. Please try again.', 'error');
       } finally {
         this.adding = false;
       }
@@ -46,8 +67,13 @@ document.addEventListener('alpine:init', () => {
     },
 
     showOffcanvas() {
-      const el = document.getElementById('cartOffcanvas');
-      if (el) bootstrap.Offcanvas.getOrCreateInstance(el).show();
+      const offcanvas = document.getElementById('cartOffcanvas');
+      if (offcanvas) {
+        const alpineData = Alpine.$data(offcanvas);
+        if (alpineData && alpineData.open !== undefined) {
+          alpineData.open = true;
+        }
+      }
     }
   });
 

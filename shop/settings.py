@@ -45,7 +45,6 @@ USE_X_FORWARDED_HOST = True
 INSTALLED_APPS = [
     "jazzmin",
     "django_htmx",
-    "django_cotton",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -66,8 +65,6 @@ if DEBUG:
         "debug_toolbar",
         "django_browser_reload",
     ]
-
-
 
 
 MIDDLEWARE = [
@@ -158,7 +155,7 @@ SERVER_EMAIL = DEFAULT_FROM_EMAIL
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR.parent / "db.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
     }
 }
 

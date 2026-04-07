@@ -1,0 +1,38 @@
+{% load i18n %}
+{% if messages %}
+<div class="flex justify-center mb-6" x-data="{ dismissals: {} }">
+  <div class="w-full md:w-2/3 lg:w-1/2 flex flex-col gap-2">
+    {% for message in messages %}
+    <div class="flex items-start gap-3 p-4 rounded-lg border shadow-sm
+      {% if message.tags == 'success' %}bg-green-50 border-green-200 text-green-800
+      {% elif message.tags == 'error' or message.tags == 'danger' %}bg-red-50 border-red-200 text-red-800
+      {% elif message.tags == 'warning' %}bg-amber-50 border-amber-200 text-amber-800
+      {% else %}bg-blue-50 border-blue-200 text-blue-800{% endif %}"
+      role="alert"
+      aria-live="polite"
+      x-show="!dismissals['{{ forloop.counter }}']"
+      x-transition:leave="transition-opacity duration-300"
+      x-transition:leave-start="opacity-100"
+      x-transition:leave-end="opacity-0"
+      x-init="setTimeout(() => { dismissals['{{ forloop.counter }}'] = true }, 5000)">
+
+      {% if message.tags == 'success' %}
+        <i class="bi bi-check-circle-fill text-xl flex-shrink-0" aria-hidden="true"></i>
+      {% elif message.tags == 'error' or message.tags == 'danger' %}
+        <i class="bi bi-exclamation-triangle-fill text-xl flex-shrink-0" aria-hidden="true"></i>
+      {% elif message.tags == 'warning' %}
+        <i class="bi bi-exclamation-circle-fill text-xl flex-shrink-0" aria-hidden="true"></i>
+      {% else %}
+        <i class="bi bi-info-circle-fill text-xl flex-shrink-0" aria-hidden="true"></i>
+      {% endif %}
+
+      <span class="text-sm font-medium flex-grow">{{ message }}</span>
+
+      <button type="button" class="flex-shrink-0 p-1 rounded-md hover:bg-black/5 transition-colors focus-visible:ring-2 focus-visible:ring-corporate-600 focus-visible:ring-offset-2" @click="dismissals['{{ forloop.counter }}'] = true" aria-label="{% trans 'Dismiss notification' %}">
+        <i class="bi bi-x-lg text-xs" aria-hidden="true"></i>
+      </button>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}

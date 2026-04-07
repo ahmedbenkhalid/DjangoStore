@@ -1,7 +1,6 @@
 {% extends "emails/base.html" %}
 
 {% block content %}
-<!-- Hero Section -->
 <tr>
     <td style="padding: 50px 40px 30px 40px; text-align: center;">
         <div style="width: 64px; height: 64px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 50%; display: inline-block; margin-bottom: 24px;">
@@ -15,14 +14,11 @@
         </p>
     </td>
 </tr>
-
-<!-- Order Details Card -->
 <tr>
     <td style="padding: 0 40px 30px 40px;">
         <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background: #f9fafb; border-radius: 12px; border: 1px solid #e5e7eb;">
             <tr>
                 <td style="padding: 24px;">
-                    <!-- Order Number -->
                     <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 20px;">
                         <tr>
                             <td>
@@ -38,8 +34,6 @@
                     </table>
                     
                     <div style="border-bottom: 1px solid #e5e7eb; margin-bottom: 16px;"></div>
-                    
-                    <!-- Order Items -->
                     <p style="margin: 0 0 12px 0; font-size: 12px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px;">Items</p>
                     {% for item in order_items %}
                     <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 12px;">
@@ -55,8 +49,6 @@
                     {% endfor %}
                     
                     <div style="border-bottom: 1px solid #e5e7eb; margin: 16px 0;"></div>
-                    
-                    <!-- Total -->
                     <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
                         <tr>
                             <td style="padding: 8px 0;">
@@ -72,8 +64,6 @@
         </table>
     </td>
 </tr>
-
-<!-- Shipping Info -->
 <tr>
     <td style="padding: 0 40px 30px 40px;">
         <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background: #eff6ff; border-radius: 12px;">
@@ -87,8 +77,6 @@
         </table>
     </td>
 </tr>
-
-<!-- Timeline Info -->
 <tr>
     <td style="padding: 0 40px 30px 40px; text-align: center;">
         <p style="margin: 0; font-size: 14px; color: #6b7280;">
@@ -96,8 +84,6 @@
         </p>
     </td>
 </tr>
-
-<!-- CTA Button -->
 <tr>
     <td style="padding: 0 40px 40px 40px; text-align: center;">
         <a href="{{ site_url|default:"#" }}/orders/{{ order.id }}" style="display: inline-block; background: linear-gradient(135deg, #4361ee 0%, #3f37c9 100%); color: #ffffff; text-decoration: none; font-size: 16px; font-weight: 600; padding: 16px 32px; border-radius: 8px;">

@@ -1,0 +1,57 @@
+{% extends 'shared/base.html' %}
+{% load i18n %}
+
+{% block title %}{% if action == 'add' %}{% trans "Add Address" %}{% else %}{% trans "Edit Address" %}{% endif %}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <div class="bg-white border border-surface-200 rounded-2xl overflow-hidden">
+        <div class="bg-surface-50 border-b border-surface-200 px-6 py-5">
+            <h4 class="font-bold text-xl tracking-tight mb-0">
+                {% if action == 'add' %}{% trans "Add New Address" %}{% else %}{% trans "Edit Address" %}{% endif %}
+            </h4>
+        </div>
+        <div class="p-6">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="space-y-5">
+                    <div>
+                        <label for="id_name" class="block text-xs font-bold uppercase tracking-wider text-charcoal-500 mb-2">{% trans "Address Name" %}</label>
+                        <input type="text" name="name" id="id_name" class="block w-full px-3 py-2 bg-surface-50 border border-surface-200 rounded-lg focus:ring-2 focus:ring-corporate-600" value="{{ form.name.value|default:'' }}" placeholder="{% trans 'Home, Work, etc.' %}" required>
+                    </div>
+                    <div>
+                        <label for="id_phone" class="block text-xs font-bold uppercase tracking-wider text-charcoal-500 mb-2">{% trans "Phone Number" %}</label>
+                        <input type="text" name="phone" id="id_phone" class="block w-full px-3 py-2 bg-surface-50 border border-surface-200 rounded-lg focus:ring-2 focus:ring-corporate-600" value="{{ form.phone.value|default:'' }}" placeholder="{% trans 'Phone Number' %}" required>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                        <div>
+                            <label for="id_city" class="block text-xs font-bold uppercase tracking-wider text-charcoal-500 mb-2">{% trans "City" %}</label>
+                            <input type="text" name="city" id="id_city" class="block w-full px-3 py-2 bg-surface-50 border border-surface-200 rounded-lg focus:ring-2 focus:ring-corporate-600" value="{{ form.city.value|default:'' }}" placeholder="{% trans 'City' %}" required>
+                        </div>
+                        <div>
+                            <label for="id_area" class="block text-xs font-bold uppercase tracking-wider text-charcoal-500 mb-2">{% trans "Area/District" %}</label>
+                            <input type="text" name="area" id="id_area" class="block w-full px-3 py-2 bg-surface-50 border border-surface-200 rounded-lg focus:ring-2 focus:ring-corporate-600" value="{{ form.area.value|default:'' }}" placeholder="{% trans 'Area/District (Optional)' %}">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="id_address" class="block text-xs font-bold uppercase tracking-wider text-charcoal-500 mb-2">{% trans "Address" %}</label>
+                        <textarea name="address" id="id_address" rows="3" class="block w-full px-3 py-2 bg-surface-50 border border-surface-200 rounded-lg focus:ring-2 focus:ring-corporate-600 resize-y min-h-[80px]" placeholder="{% trans 'Full address' %}" required>{{ form.address.value|default:'' }}</textarea>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <input type="checkbox" name="is_default" id="id_is_default" class="relative w-11 h-6 bg-surface-200 rounded-full peer-checked:bg-corporate-600 appearance-none cursor-pointer transition-colors before:content-[''] before:absolute before:top-[2px] before:start-[2px] before:bg-white before:rounded-full before:h-5 before:w-5 before:transition-all before:shadow checked:before:translate-x-full" {% if form.is_default.value %}checked{% endif %}>
+                        <label for="id_is_default" class="font-bold text-sm">{% trans "Set as default address" %}</label>
+                    </div>
+                </div>
+                <div class="flex gap-4 mt-8 pt-6 border-t border-surface-200">
+                    <button type="submit" class="inline-flex items-center px-6 py-2.5 text-sm font-semibold text-white bg-corporate-600 rounded-lg hover:bg-corporate-700">
+                        {% if action == 'add' %}{% trans "Add Address" %}{% else %}{% trans "Update Address" %}{% endif %}
+                    </button>
+                    <a href="{% url 'users:address_list' %}" class="inline-flex items-center px-6 py-2.5 text-sm font-medium text-charcoal-700 bg-white border border-surface-200 rounded-lg hover:bg-surface-50">
+                        {% trans "Cancel" %}
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,59 @@
+{% load i18n %}
+{% load humanize %}
+
+{% if page_obj.object_list %}
+<div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6">
+  {% for product in page_obj %}
+    {% include 'partials/product_card.html' with product=product %}
+  {% endfor %}
+</div>
+
+{# Pagination #}
+{% if page_obj.has_other_pages %}
+<div class="flex justify-center mt-12 mb-8">
+  <nav class="inline-flex items-center gap-1" aria-label="Pagination">
+    {% if page_obj.has_previous %}
+    <a href="?page={{ page_obj.previous_page_number }}"
+       hx-get="?page={{ page_obj.previous_page_number }}"
+       hx-target="#category-products"
+       hx-push-url="true"
+       class="inline-flex items-center justify-center w-9 h-9 text-sm font-medium text-charcoal-500 bg-white border border-surface-200 rounded-lg hover:bg-surface-50 transition-colors">
+      <i class="bi bi-chevron-left rtl:rotate-180 text-xs"></i>
+    </a>
+    {% endif %}
+
+    {% for num in page_obj.paginator.page_range %}
+    <a href="?page={{ num }}"
+       hx-get="?page={{ num }}"
+       hx-target="#category-products"
+       hx-push-url="true"
+       class="inline-flex items-center justify-center w-9 h-9 text-sm font-medium rounded-lg transition-colors {% if page_obj.number == num %}bg-corporate-600 text-white{% else %}text-charcoal-500 bg-white border border-surface-200 hover:bg-surface-50{% endif %}">
+      {{ num }}
+    </a>
+    {% endfor %}
+
+    {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}"
+       hx-get="?page={{ page_obj.next_page_number }}"
+       hx-target="#category-products"
+       hx-push-url="true"
+       class="inline-flex items-center justify-center w-9 h-9 text-sm font-medium text-charcoal-500 bg-white border border-surface-200 rounded-lg hover:bg-surface-50 transition-colors">
+      <i class="bi bi-chevron-right rtl:rotate-180 text-xs"></i>
+    </a>
+    {% endif %}
+  </nav>
+</div>
+{% endif %}
+
+{% else %}
+<div class="flex flex-col items-center justify-center py-20 px-4 bg-white border border-surface-200 rounded-xl text-center">
+  <div class="bg-surface-100 rounded-full flex items-center justify-center mb-6 w-24 h-24">
+    <i class="bi bi-bag-x text-5xl text-charcoal-400"></i>
+  </div>
+  <h3 class="font-bold text-2xl tracking-tight mb-2 text-charcoal-900">{% trans "No products found" %}</h3>
+  <p class="text-charcoal-500 mb-6">{% trans "No products in this category yet." %}</p>
+  <a href="{% url 'products:products' %}" class="inline-flex items-center px-6 py-2.5 text-sm font-semibold text-white bg-corporate-600 rounded-lg hover:bg-corporate-700 transition-colors">
+    <i class="bi bi-arrow-counterclockwise me-2"></i> {% trans "Browse All Products" %}
+  </a>
+</div>
+{% endif %}

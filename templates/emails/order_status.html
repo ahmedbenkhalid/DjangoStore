@@ -1,7 +1,6 @@
 {% extends "emails/base.html" %}
 
 {% block content %}
-<!-- Hero Section -->
 <tr>
     <td style="padding: 50px 40px 30px 40px; text-align: center;">
         <div style="width: 64px; height: 64px; background: linear-gradient(135deg, {% if order.status == 'SHIPPED' %}#f59e0b{% elif order.status == 'DELIVERED' %}#10b981{% elif order.status == 'CANCELLED' %}#ef4444{% else %}#4361ee{% endif %} 0%, {% if order.status == 'SHIPPED' %}#d97706{% elif order.status == 'DELIVERED' %}#059669{% elif order.status == 'CANCELLED' %}#dc2626{% else %}#3f37c9{% endif %} 100%); border-radius: 50%; display: inline-block; margin-bottom: 24px;">
@@ -17,8 +16,6 @@
         </p>
     </td>
 </tr>
-
-<!-- Status Card -->
 <tr>
     <td style="padding: 0 40px 30px 40px;">
         <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background: linear-gradient(135deg, {% if order.status == 'SHIPPED' %}#fef3c7{% elif order.status == 'DELIVERED' %}#d1fae5{% elif order.status == 'CANCELLED' %}#fee2e2{% else %}#eff6ff{% endif %} 0%, {% if order.status == 'SHIPPED' %}#fde68a{% elif order.status == 'DELIVERED' %}#a7f3d0{% elif order.status == 'CANCELLED' %}#fecaca{% else %}#dbeafe{% endif %} 100%); border-radius: 12px; text-align: center;">
@@ -32,8 +29,6 @@
         </table>
     </td>
 </tr>
-
-<!-- Order Summary -->
 <tr>
     <td style="padding: 0 40px 30px 40px;">
         <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background: #f9fafb; border-radius: 12px; border: 1px solid #e5e7eb;">
@@ -56,8 +51,6 @@
         </table>
     </td>
 </tr>
-
-<!-- Additional Info -->
 {% if order.status == 'SHIPPED' %}
 <tr>
     <td style="padding: 0 40px 30px 40px; text-align: center;">
@@ -75,8 +68,6 @@
     </td>
 </tr>
 {% endif %}
-
-<!-- CTA Button -->
 <tr>
     <td style="padding: 0 40px 40px 40px; text-align: center;">
         <a href="{{ site_url|default:"#" }}/orders/{{ order.id }}" style="display: inline-block; background: linear-gradient(135deg, #4361ee 0%, #3f37c9 100%); color: #ffffff; text-decoration: none; font-size: 16px; font-weight: 600; padding: 16px 32px; border-radius: 8px;">

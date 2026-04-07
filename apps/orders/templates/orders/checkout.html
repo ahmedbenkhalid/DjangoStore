@@ -1,0 +1,215 @@
+{% extends 'shared/base.html' %}
+{% load i18n %}
+{% load humanize %}
+{% load static %}
+
+{% block title %}{% trans "Checkout" %} — SMART S3R{% endblock %}
+
+{% block content %}
+
+{# ── Page Header ── #}
+<div class="mb-8">
+  <div class="inline-flex items-center px-2.5 py-0.5 text-xs font-medium bg-blue-100 text-blue-700 rounded-full gap-2 font-bold p-3 text-xs mb-3"><i class="bi bi-bag-check-fill"></i> {% trans "Almost there" %}</div>
+  <h1 class="font-bold text-4xl tracking-tight">{% trans "Checkout" %}</h1>
+</div>
+
+{# ── Multi-step indicator ── #}
+<div class="flex items-center gap-4 mb-8">
+  <div class="flex items-center gap-2 text-sm font-bold text-green-600 w-max">
+    <span class="rounded-full bg-green-600 text-white flex items-center justify-center w-7 h-7 text-xs"><i class="bi bi-check-lg text-lg mt-0.5"></i></span>
+    <span class="hidden sm:inline">{% trans "Cart" %}</span>
+  </div>
+  <div class="flex-grow h-px bg-surface-200"></div>
+  <div class="flex items-center gap-2 text-sm font-bold text-charcoal-900 w-max">
+    <span class="rounded-full bg-charcoal-900 text-white flex items-center justify-center w-7 h-7 text-xs">2</span>
+    <span>{% trans "Shipping" %}</span>
+  </div>
+  <div class="flex-grow h-px bg-surface-200"></div>
+  <div class="flex items-center gap-2 text-sm font-bold text-charcoal-400 w-max">
+    <span class="rounded-full border border-surface-200 flex items-center justify-center w-7 h-7 text-xs">3</span>
+    <span class="hidden sm:inline">{% trans "Confirm" %}</span>
+  </div>
+</div>
+
+
+<div class="flex flex-col lg:flex-row gap-8">
+
+  {# ── Left: Checkout Form ── #}
+  <div class="lg:w-7/12">
+
+    {# Shipping panel #}
+    <div class="bg-white border border-surface-200 rounded-lg shadow-sm overflow-hidden mb-6">
+      <div class="bg-surface-50 border-b border-surface-200 px-6 py-5 flex items-center gap-4">
+        <div class="bg-white rounded-full flex items-center justify-center text-green-600 shadow-sm w-10 h-10"><i class="bi bi-geo-alt-fill text-lg mt-1"></i></div>
+        <h5 class="font-bold text-xl tracking-tight m-0">{% trans "Shipping Details" %}</h5>
+      </div>
+      <div class="p-6 md:p-8">
+
+        {# Saved addresses #}
+        {% if addresses %}
+        <div class="mb-8">
+          <p class="block text-xs font-bold tracking-wider uppercase text-charcoal-500 mb-3 ms-1">{% trans "Saved Addresses" %}</p>
+          <div class="grid gap-3">
+            {% for addr in addresses %}
+            <div class="relative">
+              <input type="radio" name="saved_address" id="address_{{ addr.pk }}"
+                     class="peer sr-only"
+                     value="{{ addr.pk }}"
+                     data-phone="{{ addr.phone }}"
+                     data-address="{{ addr.address }}, {% if addr.area %}{{ addr.area }}, {% endif %}{{ addr.city }}"
+                      {% if addr.is_default %}checked{% endif %}
+                      x-on:change="selectedAddress = $el.value; document.getElementById('phone').value = $el.dataset.phone; document.getElementById('shipping_address').value = $el.dataset.address">
+              <label class="block p-4 bg-white border-2 border-surface-200 rounded-lg cursor-pointer transition-all peer-checked:border-corporate-600 peer-checked:bg-corporate-50 hover:border-surface-300" for="address_{{ addr.pk }}">
+                <div class="flex items-center gap-3 mb-2">
+                  <span class="font-bold">{{ addr.name }}</span>
+                  {% if addr.is_default %}<span class="inline-flex items-center px-2.5 py-0.5 text-xs font-medium bg-surface-100 text-charcoal-600 rounded-full font-bold text-[10px] uppercase">{% trans "Default" %}</span>{% endif %}
+                </div>
+                <div class="text-xs text-charcoal-500 font-medium leading-relaxed">
+                  <div class="flex items-center gap-2 mb-1"><i class="bi bi-telephone text-charcoal-400"></i>{{ addr.phone }}</div>
+                  <div class="flex items-start gap-2"><i class="bi bi-map text-charcoal-400 mt-0.5"></i><span>{{ addr.address }}, {{ addr.city }}{% if addr.area %} — {{ addr.area }}{% endif %}</span></div>
+                </div>
+              </label>
+              <div class="absolute top-4 end-4 text-corporate-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none">
+                <i class="bi bi-check-circle-fill text-xl"></i>
+              </div>
+            </div>
+            {% endfor %}
+            <div class="relative">
+              <input type="radio" name="saved_address" id="address_new" value="new" class="peer sr-only" x-on:change="selectedAddress = $el.value; document.getElementById('phone').value = ''; document.getElementById('shipping_address').value = ''">
+              <label class="block p-4 bg-white border-2 border-surface-200 border-dashed rounded-lg cursor-pointer transition-all peer-checked:border-corporate-600 peer-checked:bg-corporate-50 hover:border-surface-300 flex items-center gap-2 font-bold text-charcoal-500 peer-checked:text-corporate-600" for="address_new">
+                <i class="bi bi-plus-circle text-lg"></i> {% trans "Enter new address" %}
+              </label>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+        {# Main form #}
+        <form action="{% url 'orders:create_order' %}" method="post" id="checkout-form" x-data="{ selectedAddress: '' }" class="m-0">
+          {% csrf_token %}
+
+          <div id="new-address-form">
+            <div class="mb-5">
+              <label class="block text-xs font-bold tracking-wider uppercase text-charcoal-500 mb-2 ms-1 flex items-center gap-1.5" for="phone"><i class="bi bi-telephone text-charcoal-400"></i>{% trans "Phone Number" %}</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 start-0 flex items-center ps-4 pointer-events-none text-charcoal-400">
+                  <i class="bi bi-phone text-lg"></i>
+                </span>
+                <input type="text" name="phone" id="phone" class="block w-full px-3 py-3.5 bg-surface-50 border border-surface-200 rounded-lg focus:ring-2 focus:ring-corporate-600 ps-11 h-14 font-medium transition-colors"
+                       placeholder="+20 1XX XXX XXXX"
+                       value="{{ default_phone|default:'' }}"
+                       required>
+              </div>
+            </div>
+            <div class="mb-6">
+              <label class="block text-xs font-bold tracking-wider uppercase text-charcoal-500 mb-2 ms-1" for="shipping_address">{% trans "Shipping Address" %}</label>
+              <div class="relative flex">
+                <span class="absolute top-4 start-0 flex items-center ps-4 pointer-events-none text-charcoal-400">
+                  <i class="bi bi-geo-alt text-lg"></i>
+                </span>
+                <textarea name="shipping_address" id="shipping_address" rows="3" class="block w-full px-3 py-3.5 bg-surface-50 border border-surface-200 rounded-lg focus:ring-2 focus:ring-corporate-600 ps-11 pt-4 resize-y min-h-[80px] font-medium transition-colors text-base"
+                          placeholder="{% trans 'Enter your full delivery address' %}"
+                          required>{{ default_address|default:'' }}</textarea>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-8">
+            <label class="block text-xs font-bold tracking-wider uppercase text-charcoal-500 mb-2 ms-1 flex items-center gap-2" for="notes">
+              {% trans "Order Notes" %} <span class="font-normal normal-case text-charcoal-400">{% trans "(Optional)" %}</span>
+            </label>
+            <div class="relative flex">
+              <span class="absolute top-4 start-0 flex items-center ps-4 pointer-events-none text-charcoal-400">
+                <i class="bi bi-chat-left-text text-lg"></i>
+              </span>
+              <textarea name="notes" id="notes" rows="2" class="block w-full px-3 py-3.5 bg-surface-50 border border-surface-200 rounded-lg focus:ring-2 focus:ring-corporate-600 ps-11 pt-4 resize-y min-h-[80px] font-medium transition-colors text-base"
+                        placeholder="{% trans 'Special instructions for delivery' %}">{% if default_notes %}{{ default_notes }}{% endif %}</textarea>
+            </div>
+          </div>
+
+          {# Payment method #}
+          <div class="flex items-center gap-4 p-4 rounded-lg border-2 border-corporate-600 bg-corporate-50 mb-8">
+            <div class="bg-white rounded-lg flex items-center justify-center w-12 h-12 shadow-sm text-corporate-600"><i class="bi bi-cash-stack text-2xl"></i></div>
+            <div class="flex-grow">
+              <div class="font-bold">{% trans "Cash on Delivery" %}</div>
+              <div class="text-charcoal-500 text-xs font-medium mt-0.5">{% trans "Pay when your order arrives" %}</div>
+            </div>
+            <div class="text-corporate-600 text-xl"><i class="bi bi-check-circle-fill"></i></div>
+          </div>
+
+          <button type="submit" class="inline-flex items-center justify-center w-full px-4 py-3.5 text-base font-semibold text-white bg-corporate-600 rounded-lg hover:bg-corporate-700 shadow-sm">
+            <span>{% trans "Place Order" %}</span>
+            <i class="bi bi-arrow-right text-xl ms-1"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+
+  </div>{# /left #}
+
+
+  {# ── Right: Order Summary ── #}
+  <div class="lg:w-5/12">
+    <div class="bg-white border border-surface-200 rounded-lg shadow-sm overflow-hidden sticky top-24">
+      <div class="bg-surface-50 border-b border-surface-200 px-6 py-5 flex items-center gap-4">
+        <div class="bg-white rounded-full flex items-center justify-center text-corporate-600 shadow-sm w-10 h-10"><i class="bi bi-receipt text-lg mt-0.5"></i></div>
+        <h5 class="font-bold text-xl tracking-tight m-0">{% trans "Order Summary" %}</h5>
+      </div>
+      <div class="p-6 md:p-8">
+
+        {# Items #}
+        <div class="flex flex-col gap-4 mb-6">
+          {% for item in products %}
+          <div class="flex items-center gap-4 pb-4 border-b border-surface-200 last:border-0 last:pb-0">
+            <div class="w-16 h-16 flex-shrink-0 bg-surface-100 rounded-lg overflow-hidden relative border border-surface-200">
+              {% if item.product.img %}
+                <img src="{{ item.product.img.url }}" class="w-full h-full object-cover" alt="{{ item.product.name }}" loading="lazy">
+              {% elif item.product.img_link %}
+                <img src="{{ item.product.img_link }}" class="w-full h-full object-cover" alt="{{ item.product.name }}" loading="lazy">
+              {% else %}
+                <div class="flex items-center justify-center h-full text-charcoal-200"><i class="bi bi-phone text-2xl"></i></div>
+              {% endif %}
+            </div>
+            <div class="flex-grow min-w-0">
+              <div class="font-bold text-sm truncate mb-1">{{ item.product.name }}</div>
+              <div class="text-charcoal-500 text-xs font-semibold">
+                {{ item.quantity }} × {% if request.LANGUAGE_CODE == 'ar' %}ج.م{% else %}EGP{% endif %} {{ item.product.price|floatformat:2|intcomma }}
+              </div>
+            </div>
+            <div class="font-bold text-sm whitespace-nowrap flex-shrink-0">
+              {% if request.LANGUAGE_CODE == 'ar' %}ج.م{% else %}EGP{% endif %} {{ item.subtotal|floatformat:2|intcomma }}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="flex justify-between items-center mb-3">
+          <span class="text-charcoal-500 font-semibold text-sm">{% trans "Subtotal" %}</span>
+          <span class="font-bold text-charcoal-900">{% if request.LANGUAGE_CODE == 'ar' %}ج.م{% else %}EGP{% endif %} {{ total|floatformat:2|intcomma }}</span>
+        </div>
+        <div class="flex justify-between items-center mb-6">
+          <span class="text-charcoal-500 font-semibold text-sm">{% trans "Shipping" %}</span>
+          <span class="text-green-600 font-black tracking-wider uppercase text-sm">{% trans "FREE" %}</span>
+        </div>
+
+        <div class="h-px bg-surface-200 my-4"></div>
+
+        <div class="flex justify-between items-end mb-8">
+          <span class="font-bold text-lg tracking-tight">{% trans "Total" %}</span>
+          <span class="font-black text-2xl text-corporate-600">
+            <span class="text-sm font-medium align-super text-charcoal-500">{% if request.LANGUAGE_CODE == 'ar' %}ج.م{% else %}EGP{% endif %}</span> {{ total|floatformat:2|intcomma }}
+          </span>
+        </div>
+
+        <div class="flex items-start gap-3 p-4 rounded-lg border bg-blue-50 border-blue-200 text-blue-800 text-sm font-medium shadow-sm">
+          <i class="bi bi-shield-lock-fill text-blue-600 text-xl mt-0.5"></i>
+          <div>{% trans "Your order is protected by 256-bit SSL encryption." %}</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

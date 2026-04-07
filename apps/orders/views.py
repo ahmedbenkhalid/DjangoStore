@@ -28,10 +28,11 @@ def get_cart_products(request):
     """
     Get cart products with quantities and totals.
     Single IN-query with select_related — no N+1.
+    Returns (items, total, skipped_count).
     """
     cart = get_cart(request)
     if not cart:
-        return [], 0
+        return [], 0, 0
 
     product_ids = [int(pid) for pid in cart]
     product_dict = {
@@ -45,6 +46,7 @@ def get_cart_products(request):
 
     items = []
     total = 0
+    skipped = 0
     for pid_str, quantity in cart.items():
         product = product_dict.get(int(pid_str))
         if product and quantity > 0:
@@ -53,18 +55,26 @@ def get_cart_products(request):
             items.append(
                 {"product": product, "quantity": quantity, "subtotal": subtotal}
             )
+        else:
+            skipped += 1
 
-    return items, total
+    return items, total, skipped
 
 
 @login_required
 def checkout(request):
     """Checkout page — display cart items and shipping form."""
-    products, total = get_cart_products(request)
+    products, total, skipped = get_cart_products(request)
 
     if not products:
         messages.error(request, _("Your cart is empty."))
         return redirect("cart:detail")
+
+    if skipped > 0:
+        messages.warning(
+            request,
+            _("%(count)s item(s) are no longer available.") % {"count": skipped},
+        )
 
     from users.models import Address
 
@@ -109,7 +119,7 @@ def create_order(request):
     if request.method != "POST":
         return redirect("orders:checkout")
 
-    products, total = get_cart_products(request)
+    products, total, skipped = get_cart_products(request)
 
     if not products:
         messages.error(request, _("Your cart is empty."))
@@ -224,13 +234,20 @@ def order_confirmation(request, order_id):
 
 @login_required
 def order_list(request):
-    """User's order history."""
+    """User's order history with pagination."""
+    from django.core.paginator import Paginator
+
     orders = (
         Order.objects.filter(user=request.user)
         .prefetch_related("items__product")
         .only("id", "status", "total_amount", "created_at", "payment_status")
+        .order_by("-created_at")
     )
-    return render(request, "pages/orders/order_list.html", {"orders": orders})
+    paginator = Paginator(orders, 10)
+    page_obj = paginator.get_page(request.GET.get("page"))
+    return render(
+        request, "orders/order_list.html", {"orders": orders, "page_obj": page_obj}
+    )
 
 
 @login_required

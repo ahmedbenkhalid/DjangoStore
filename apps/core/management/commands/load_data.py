@@ -77,7 +77,9 @@ class Command(BaseCommand):
         for fixture_path in files_to_load:
             if not fixture_path.exists():
                 self.stderr.write(
-                    self.style.WARNING(f"  ⚠  {fixture_path.name} not found, skipping")
+                    self.style.WARNING(
+                        f"  [!]  {fixture_path.name} not found, skipping"
+                    )
                 )
                 continue
 
@@ -85,7 +87,7 @@ class Command(BaseCommand):
             total_loaded += count
 
         self.stdout.write(
-            self.style.SUCCESS(f"\n  ✔  Loaded {total_loaded} records total")
+            self.style.SUCCESS(f"\n  [OK]  Loaded {total_loaded} records total")
         )
 
     def _load_fixture(self, path: Path) -> int:
@@ -105,7 +107,9 @@ class Command(BaseCommand):
         try:
             model = apps.get_model(model_label)
         except LookupError:
-            self.stderr.write(self.style.ERROR(f"  ✘  Model '{model_label}' not found"))
+            self.stderr.write(
+                self.style.ERROR(f"  [X]  Model '{model_label}' not found")
+            )
             return 0
 
         count = 0
@@ -134,10 +138,10 @@ class Command(BaseCommand):
                     skipped += 1
             except Exception as e:
                 self.stderr.write(
-                    self.style.WARNING(f"  ⚠  {model_label} pk={pk}: {e}")
+                    self.style.WARNING(f"  [!]  {model_label} pk={pk}: {e}")
                 )
 
-        status = f"  ✔  {filename}: {count} created"
+        status = f"  [OK]  {filename}: {count} created"
         if skipped:
             status += f", {skipped} updated"
         self.stdout.write(self.style.SUCCESS(status))
@@ -173,17 +177,17 @@ class Command(BaseCommand):
                         count += 1
                 except Exception as e:
                     self.stderr.write(
-                        self.style.WARNING(f"  ⚠  {table_name} id={pk}: {e}")
+                        self.style.WARNING(f"  [!]  {table_name} id={pk}: {e}")
                     )
 
         self.stdout.write(
-            self.style.SUCCESS(f"  ✔  {filename}: {count} M2M relations loaded")
+            self.style.SUCCESS(f"  [OK]  {filename}: {count} M2M relations loaded")
         )
         return count
 
     def _clear_data(self):
         """Clear all data from project tables (preserves schema)."""
-        self.stdout.write(self.style.WARNING("  ℹ  Clearing existing data..."))
+        self.stdout.write(self.style.WARNING("  [i]  Clearing existing data..."))
 
         # Delete in reverse dependency order
         clear_order = [
@@ -213,4 +217,4 @@ class Command(BaseCommand):
                     pass
             cursor.execute("PRAGMA foreign_keys = ON")
 
-        self.stdout.write(self.style.SUCCESS("  ✔  Data cleared\n"))
+        self.stdout.write(self.style.SUCCESS("  [OK]  Data cleared\n"))

@@ -1,0 +1,37 @@
+{% load i18n %}
+{% load humanize %}
+
+<div class="p-4 bg-surface-50 rounded-xl">
+    <div class="flex justify-between items-center mb-4">
+        <span class="text-charcoal-500 font-semibold text-xs uppercase tracking-wider">{% trans "Subtotal" %}</span>
+        <span class="text-lg font-bold m-0 text-charcoal-900">
+            {% if request.LANGUAGE_CODE == 'ar' %}ج.م{% else %}EGP{% endif %} {{ cart_total|floatformat:2|intcomma }}
+        </span>
+    </div>
+
+    <div class="flex flex-col gap-3">
+        <a href="{% url 'cart:detail' %}"
+           class="inline-flex items-center justify-center w-full px-4 py-2.5 text-sm font-semibold text-charcoal-700 bg-white border border-surface-200 rounded-lg hover:bg-surface-50 transition-colors">
+           <i class="bi bi-bag-check me-2"></i> {% trans "View Cart" %}
+        </a>
+
+        {% if user.is_authenticated %}
+            <a href="{% url 'orders:checkout' %}"
+               class="inline-flex items-center justify-center w-full px-4 py-2.5 text-sm font-semibold text-white bg-corporate-600 rounded-lg hover:bg-corporate-700 transition-colors shadow-sm">
+               <i class="bi bi-shield-lock-fill me-2"></i>
+               <span>{% trans "Secure Checkout" %}</span>
+            </a>
+        {% else %}
+            <button type="button"
+                    class="inline-flex items-center justify-center w-full px-4 py-2.5 text-sm font-semibold text-white bg-corporate-600 rounded-lg hover:bg-corporate-700 transition-colors shadow-sm"
+                    data-hs-overlay="#authModal">
+                <i class="bi bi-shield-lock-fill me-2"></i>
+                <span>{% trans "Secure Checkout" %}</span>
+            </button>
+        {% endif %}
+    </div>
+
+    <p class="text-center text-charcoal-400 mt-4 mb-0 text-[11px]">
+        <i class="bi bi-patch-check-fill text-corporate-600"></i> {% trans "Taxes and shipping calculated at checkout" %}
+    </p>
+</div>
