@@ -369,7 +369,12 @@ def toggle_wishlist(request, product_id):
         # Update cache with fresh count
         cache.set(f"wishlist_count_{request.user.id}", count, 300)
         return JsonResponse(
-            {"status": "success", "action": action, "wishlist_count": count}
+            {
+                "status": "success",
+                "action": action,
+                "wishlist_count": count,
+                "in_wishlist": action == "added",
+            }
         )
 
     return redirect(product.get_absolute_url())
