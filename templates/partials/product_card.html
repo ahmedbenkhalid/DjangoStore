@@ -24,7 +24,7 @@
     {% if product.stock <= 5 and product.stock > 0 %}
       <span class="absolute top-2 end-2 inline-flex items-center gap-1 px-2 py-0.5 text-xs font-bold text-amber-800 bg-amber-100 rounded-md">
         <span class="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse"></span>
-        {% trans "Low Stock" %}
+        {% trans "Low stock" %}
       </span>
     {% elif product.stock == 0 %}
       <span class="absolute top-2 end-2 inline-flex items-center px-2 py-0.5 text-xs font-bold text-red-700 bg-red-100 rounded-md">
@@ -46,19 +46,19 @@
                     class="inline-flex items-center px-4 py-2 text-sm font-semibold text-white bg-corporate-600 rounded-lg hover:bg-corporate-700 transition-colors shadow-lg focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2"
                     :disabled="submitting">
               <i class="bi" :class="submitting ? 'bi-check-circle-fill' : 'bi-cart-plus'" aria-hidden="true"></i>
-              <span class="ms-1" x-text="submitting ? '{% trans 'Added!' %}' : '{% trans 'Add to Cart' %}'"></span>
+              <span class="ms-1" x-text="submitting ? '{% trans 'Added!' %}' : '{% trans 'Add to cart' %}'"></span>
             </button>
           </form>
         {% else %}
           <span class="inline-flex items-center px-4 py-2 text-sm font-semibold text-charcoal-400 bg-white/80 rounded-lg cursor-not-allowed">
-            <i class="bi bi-x-circle me-1" aria-hidden="true"></i> {% trans "Out of Stock" %}
+            <i class="bi bi-x-circle me-1" aria-hidden="true"></i> {% trans "Out of stock" %}
           </span>
         {% endif %}
       {% else %}
         <button type="button"
                 class="inline-flex items-center px-4 py-2 text-sm font-semibold text-white bg-corporate-600 rounded-lg hover:bg-corporate-700 transition-colors shadow-lg focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2"
                 data-hs-overlay="#authModal">
-          <i class="bi bi-cart-plus me-1" aria-hidden="true"></i> {% trans "Add to Cart" %}
+          <i class="bi bi-cart-plus me-1" aria-hidden="true"></i> {% trans "Add to cart" %}
         </button>
       {% endif %}
     </div>
@@ -74,7 +74,7 @@
                 }).then(r => r.json()).then(d => { inWishlist = d.in_wishlist; }).catch(() => {});
               "
               class="absolute bottom-3 start-3 p-2 bg-white/90 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-all hover:bg-white hover:scale-110 focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-corporate-600 focus-visible:ring-offset-2"
-              :aria-label="inWishlist ? '{% trans 'Remove from Wishlist' %}' : '{% trans 'Add to Wishlist' %}'">
+              :aria-label="inWishlist ? '{% trans 'Remove from wishlist' %}' : '{% trans 'Add to wishlist' %}'">
         <i class="bi text-sm" :class="inWishlist ? 'bi-heart-fill text-red-500' : 'bi-heart text-charcoal-600'" aria-hidden="true"></i>
       </button>
     {% endif %}

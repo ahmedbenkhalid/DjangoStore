@@ -161,13 +161,13 @@
               </button>
             </div>
             <button type="submit" class="inline-flex items-center justify-center px-6 py-3 text-base font-semibold text-white bg-corporate-600 rounded-full hover:bg-corporate-700 flex-grow font-bold shadow-lg transition-colors {% if product.stock == 0 %}opacity-50 cursor-not-allowed{% endif %}" {% if product.stock == 0 %}disabled{% endif %} :disabled="submitting" :class="submitting ? '!bg-green-600 !hover:bg-green-700 text-white' : ''">
-              <i class="bi text-xl me-2" :class="submitting ? 'bi-check-circle-fill' : 'bi-bag-plus'"></i> <span x-text="submitting ? '{% trans 'Added!' %}' : '{% trans 'Add to Cart' %}'"></span>
+              <i class="bi text-xl me-2" :class="submitting ? 'bi-check-circle-fill' : 'bi-bag-plus'"></i> <span x-text="submitting ? '{% trans 'Added!' %}' : '{% trans 'Add to cart' %}'"></span>
             </button>
           </form>
         {% else %}
           <button type="button" class="inline-flex items-center justify-center px-6 py-3 text-base font-semibold text-white bg-corporate-600 rounded-full hover:bg-corporate-700 flex-grow font-bold shadow-lg transition-colors w-full sm:w-auto"
                   data-hs-overlay="#authModal">
-            <i class="bi bi-bag-plus text-xl me-2"></i> {% trans "Add to Cart" %}
+            <i class="bi bi-bag-plus text-xl me-2"></i> {% trans "Add to cart" %}
           </button>
         {% endif %}
 
@@ -433,7 +433,7 @@
       {% trans "You May Also Like" %}
     </h2>
     <a href="{{ product.category.get_absolute_url }}" class="text-corporate-600 hover:text-corporate-700 transition-colors font-bold text-sm tracking-wide uppercase inline-flex items-center">
-      {% trans "View All" %} <i class="bi bi-arrow-right ms-1"></i>
+      {% trans "View all" %} <i class="bi bi-arrow-right ms-1"></i>
     </a>
   </div>
   <div class="grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-6">

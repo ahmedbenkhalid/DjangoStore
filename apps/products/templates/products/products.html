@@ -24,7 +24,7 @@
     <span class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-bold text-corporate-600 bg-corporate-50 rounded-md mb-2">
       <i class="bi bi-bag-heart-fill"></i> {% trans "Shop" %}
     </span>
-    <h1 class="font-bold text-3xl tracking-tight text-charcoal-900">{% block page_title %}{% trans "All Products" %}{% endblock %}</h1>
+    <h1 class="font-bold text-3xl tracking-tight text-charcoal-900">{% block page_title %}{% trans "All products" %}{% endblock %}</h1>
     {% if page_obj.paginator.count %}
       <p class="text-charcoal-500 text-sm mt-1">
         {% block page_subtitle %}
@@ -63,11 +63,11 @@
           </a>
           <a href="?sort=price{% if current_category %}&category={{ current_category }}{% endif %}{% if query %}&q={{ query }}{% endif %}"
              class="block px-4 py-2 text-sm {% if current_sort == 'price' %}bg-corporate-50 text-corporate-600 font-semibold{% else %}text-charcoal-700{% endif %} hover:bg-surface-50 transition-colors">
-            {% trans "Price: Low to High" %}
+            {% trans "Price: low to high" %}
           </a>
           <a href="?sort=-price{% if current_category %}&category={{ current_category }}{% endif %}{% if query %}&q={{ query }}{% endif %}"
              class="block px-4 py-2 text-sm {% if current_sort == '-price' %}bg-corporate-50 text-corporate-600 font-semibold{% else %}text-charcoal-700{% endif %} hover:bg-surface-50 transition-colors">
-            {% trans "Price: High to Low" %}
+            {% trans "Price: high to low" %}
           </a>
           <a href="?sort=name{% if current_category %}&category={{ current_category }}{% endif %}{% if query %}&q={{ query }}{% endif %}"
              class="block px-4 py-2 text-sm {% if current_sort == 'name' %}bg-corporate-50 text-corporate-600 font-semibold{% else %}text-charcoal-700{% endif %} hover:bg-surface-50 transition-colors">
@@ -92,7 +92,7 @@
     <div class="flex flex-col gap-1">
       <a href="{% url 'products:products' %}{% if current_sort %}?sort={{ current_sort }}{% endif %}"
          class="flex items-center justify-between py-2 px-3 rounded-lg text-sm transition-colors {% if not current_category %}bg-corporate-50 text-corporate-600 font-semibold{% else %}text-charcoal-700 hover:bg-surface-50{% endif %}">
-        <span>{% trans "All Products" %}</span>
+        <span>{% trans "All products" %}</span>
       </a>
       {% for cat in categories %}
       <a href="?category={{ cat.slug }}{% if current_sort %}&sort={{ current_sort }}{% endif %}"
