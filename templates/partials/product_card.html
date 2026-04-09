@@ -4,9 +4,9 @@
 <div class="group bg-white border border-surface-200 rounded-xl overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 {% if class %}{{ class }}{% endif %}">
   <a href="{{ product.get_absolute_url }}" class="block relative aspect-square bg-surface-50 overflow-hidden">
     {% if product.img %}
-      <img src="{{ product.img.url }}" alt="{{ product.name }}" loading="lazy" decoding="async" width="400" height="400" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+      <img src="{{ product.img.url }}" alt="{{ product.name }}" loading="lazy" decoding="async" width="400" height="400" class="w-full h-full object-cover">
     {% elif product.img_link %}
-      <img src="{{ product.img_link }}" alt="{{ product.name }}" loading="lazy" decoding="async" width="400" height="400" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+      <img src="{{ product.img_link }}" alt="{{ product.name }}" loading="lazy" decoding="async" width="400" height="400" class="w-full h-full object-cover">
     {% else %}
       <div class="flex items-center justify-center h-full">
         <i class="bi bi-phone text-5xl text-charcoal-200 group-hover:text-corporate-300 transition-colors" aria-hidden="true"></i>

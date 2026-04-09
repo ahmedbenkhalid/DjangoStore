@@ -30,13 +30,7 @@ document.addEventListener("alpine:init", () => {
       this.adding = true;
 
       const formData = new FormData(form);
-      const csrf =
-        document.querySelector("[name=csrfmiddlewaretoken]")?.value ||
-        document.cookie
-          .split("; ")
-          .find((c) => c.startsWith("csrftoken="))
-          ?.split("=")[1] ||
-        "";
+      const csrf = Alpine.store("utils").csrf();
 
       try {
         const res = await fetch(form.action, {
@@ -47,33 +41,36 @@ document.addEventListener("alpine:init", () => {
           },
           body: formData,
         });
-        if (res.ok) await this.refresh();
-        this.addedId = form.dataset.productId || Date.now();
-        setTimeout(() => {
-          this.addedId = null;
-        }, 1500);
+        const data = await res.json();
+        if (res.ok && data.success) {
+          this.updateUI(data);
+          this.addedId = form.dataset.productId || Date.now();
+          setTimeout(() => { this.addedId = null; }, 1500);
+        } else {
+          Alpine.store("toast").show(data.error || "Error updating cart", "error");
+        }
       } catch (e) {
         console.error("Cart error:", e);
-        Alpine.store("toast").show(
-          "Failed to add to cart. Please try again.",
-          "error",
-        );
+        Alpine.store("toast").show("Connection error", "error");
       } finally {
         this.adding = false;
       }
     },
 
+    updateUI(data) {
+      if (data.items_html) document.querySelector(".js-cart-body").innerHTML = data.items_html;
+      if (data.footer_html) document.querySelector(".js-cart-footer").innerHTML = data.footer_html;
+      document.querySelectorAll(".js-cart-badge").forEach((el) => (el.textContent = data.cart_count));
+    },
+
     async refresh() {
       try {
-        const res = await fetch("/cart/fragment/", {
+        const url = window.CART_FRAGMENT_URL || "/cart/fragment/";
+        const res = await fetch(url, {
           headers: { "X-Requested-With": "XMLHttpRequest" },
         });
         const data = await res.json();
-        document.querySelector(".js-cart-body").innerHTML = data.items_html;
-        document.querySelector(".js-cart-footer").innerHTML = data.footer_html;
-        document
-          .querySelectorAll(".js-cart-badge")
-          .forEach((el) => (el.textContent = data.cart_count));
+        this.updateUI(data);
       } catch (e) {
         console.error("Cart refresh error:", e);
       }

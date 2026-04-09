@@ -132,10 +132,27 @@ async def cart_detail(request):
     return await sync_to_async(render)(request, "cart/cart_detail.html", ctx)
 
 
-@sync_to_async
-def cart_add(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
-    cart = get_cart(request)
+async def _build_cart_response(request, cart):
+    ctx = await _build_cart_context(request)
+    items_html = await sync_to_async(render_to_string)(
+        "shared/partials/cart_items.html", ctx, request=request
+    )
+    footer_html = await sync_to_async(render_to_string)(
+        "shared/partials/cart_footer.html", ctx, request=request
+    )
+    return JsonResponse(
+        {
+            "success": True,
+            "cart_count": ctx["cart_count"],
+            "items_html": items_html,
+            "footer_html": footer_html,
+        }
+    )
+
+
+async def cart_add(request, product_id):
+    product = await sync_to_async(get_object_or_404)(Product, id=product_id)
+    cart = await sync_to_async(get_cart)(request)
 
     try:
         quantity = int(request.POST.get("quantity", 1))
@@ -169,26 +186,25 @@ def cart_add(request, product_id):
     else:
         cart[pid] = new_qty
 
-    save_cart(request, cart)
+    await sync_to_async(save_cart)(request, cart)
 
     if request.headers.get("X-Requested-With") == "XMLHttpRequest":
-        return JsonResponse({"success": True, "cart_count": sum(cart.values())})
+        return await _build_cart_response(request, cart)
 
     messages.success(request, _("Cart updated."))
     return redirect("cart:detail")
 
 
-@sync_to_async
-def cart_remove(request, product_id):
-    cart = get_cart(request)
+async def cart_remove(request, product_id):
+    cart = await sync_to_async(get_cart)(request)
     pid = str(product_id)
 
     if pid in cart:
         del cart[pid]
-        save_cart(request, cart)
+        await sync_to_async(save_cart)(request, cart)
 
     if request.headers.get("X-Requested-With") == "XMLHttpRequest":
-        return JsonResponse({"success": True, "cart_count": sum(cart.values())})
+        return await _build_cart_response(request, cart)
 
     messages.success(request, _("Item removed from cart."))
     return redirect("cart:detail")
