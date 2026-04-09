@@ -28,7 +28,7 @@
 
   {# Image Gallery #}
   <div class="lg:w-1/2">
-    <div class="bg-white border border-surface-200 rounded-3xl overflow-hidden relative sticky top-24 shadow-sm flex items-center justify-center p-8 aspect-square lg:aspect-auto lg:h-[600px]">
+    <div class="bg-white border border-surface-200 rounded-3xl overflow-hidden relative top-24 shadow-sm flex items-center justify-center p-8 aspect-square lg:aspect-auto lg:h-[600px]">
       {% if product.img %}
         <img src="{{ product.img.url }}" alt="{{ product.get_name }}" class="max-w-full max-h-full object-contain drop-shadow-md" loading="eager">
       {% elif product.img_link %}
