@@ -53,7 +53,7 @@
 
         {# Cart - Auth Check #}
         {% if user.is_authenticated %}
-        <button onclick="$store.cart.showOffcanvas()" class="relative p-2.5 rounded-full text-charcoal-600 hover:bg-corporate-50 hover:text-corporate-600 transition-all">
+        <button @click="$store.cart.showOffcanvas()" class="relative p-2.5 rounded-full text-charcoal-600 hover:bg-corporate-50 hover:text-corporate-600 transition-all">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
           {% if cart_count > 0 %}
           <span class="absolute -top-0.5 -end-0.5 w-5 h-5 bg-corporate-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center js-cart-badge">{{ cart_count }}</span>
@@ -129,7 +129,7 @@
     </div>
 
     {# Mobile/Tablet Header (below lg) #}
-    <div class="lg:hidden flex items-center justify-between h-14">
+    <div class="lg:hidden flex items-center justify-between h-14" x-data="{}">
       
       {# Mobile Menu Toggle - Alpine.js #}
       <button @click="drawerOpen = true" class="p-2 rounded-xl text-charcoal-700 hover:bg-charcoal-100 transition-all" aria-label="{% trans 'Menu' %}">
@@ -146,7 +146,7 @@
 
       {# Cart - Auth Check #}
       {% if user.is_authenticated %}
-      <button onclick="$store.cart.showOffcanvas()" class="relative p-2 rounded-xl text-charcoal-700 hover:bg-charcoal-100 transition-all">
+      <button @click="$store.cart.showOffcanvas()" class="relative p-2 rounded-xl text-charcoal-700 hover:bg-charcoal-100 transition-all">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
         {% if cart_count > 0 %}
         <span class="absolute -top-0.5 -end-0.5 w-4 h-4 bg-corporate-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center js-cart-badge">{{ cart_count }}</span>
