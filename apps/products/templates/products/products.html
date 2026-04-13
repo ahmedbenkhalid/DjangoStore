@@ -24,11 +24,23 @@
     <span class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-bold text-corporate-600 bg-corporate-50 rounded-md mb-2">
       <i class="bi bi-bag-heart-fill"></i> {% trans "Shop" %}
     </span>
-    <h1 class="font-bold text-3xl tracking-tight text-charcoal-900">{% block page_title %}{% trans "All products" %}{% endblock %}</h1>
+    <h1 class="font-bold text-3xl tracking-tight text-charcoal-900">
+      {% block page_title %}
+        {% if on_sale == 'true' %}
+          {% trans "Special Offers" %}
+        {% else %}
+          {% trans "All products" %}
+        {% endif %}
+      {% endblock %}
+    </h1>
     {% if page_obj.paginator.count %}
       <p class="text-charcoal-500 text-sm mt-1">
         {% block page_subtitle %}
-          {% blocktrans with total=page_obj.paginator.count %}{{ total }} products{% endblocktrans %}
+          {% if on_sale == 'true' %}
+            {% blocktrans with total=page_obj.paginator.count %}{{ total }} deals found{% endblocktrans %}
+          {% else %}
+            {% blocktrans with total=page_obj.paginator.count %}{{ total }} products{% endblocktrans %}
+          {% endif %}
         {% endblock %}
       </p>
     {% endif %}
@@ -101,6 +113,17 @@
       </a>
       {% endfor %}
     </div>
+
+    <p class="text-xs font-bold text-charcoal-400 uppercase tracking-widest mt-8 mb-4">{% trans "Offers" %}</p>
+    <div class="flex flex-col gap-1">
+      <a href="?on_sale=true{% if current_sort %}&sort={{ current_sort }}{% endif %}"
+         class="flex items-center justify-between py-2 px-3 rounded-lg text-sm transition-colors {% if on_sale == 'true' %}bg-red-50 text-red-600 font-semibold{% else %}text-charcoal-700 hover:bg-surface-50{% endif %}">
+        <span class="flex items-center gap-2">
+          <i class="bi bi-percent text-red-500"></i>
+          {% trans "On Sale" %}
+        </span>
+      </a>
+    </div>
   </aside>
 
   {# Product Grid #}
@@ -151,6 +174,13 @@
                   <label class="flex items-center gap-2 cursor-pointer group">
                     <input type="checkbox" name="in_stock" value="1" class="w-4 h-4 text-corporate-600 bg-white border-surface-200 rounded focus:ring-corporate-600 focus:ring-2" {% if in_stock %}checked{% endif %}>
                     <span class="text-sm text-charcoal-700 group-hover:text-corporate-600 transition-colors">{% trans "In Stock Only" %}</span>
+                  </label>
+                </div>
+                <div class="mb-6">
+                  <h3 class="text-sm font-bold text-charcoal-900 mb-3">{% trans "Offers" %}</h3>
+                  <label class="flex items-center gap-2 cursor-pointer group text-red-600">
+                    <input type="checkbox" name="on_sale" value="true" class="w-4 h-4 text-red-600 bg-white border-surface-200 rounded focus:ring-red-600 focus:ring-2" {% if on_sale == 'true' %}checked{% endif %}>
+                    <span class="text-sm font-semibold group-hover:text-red-700 transition-colors">{% trans "On Sale" %}</span>
                   </label>
                 </div>
                 <div class="mb-6">

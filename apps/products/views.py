@@ -63,6 +63,11 @@ async def product_list(request):
     if category_slug:
         products = products.filter(category__slug=category_slug)
 
+    on_sale = request.GET.get("on_sale")
+    if on_sale == "true":
+        from django.db.models import F
+        products = products.filter(discount_price__lt=F("price"))
+
     if query:
         products = products.filter(name__icontains=query)
 
@@ -125,6 +130,7 @@ async def product_list(request):
         "price_min": price_min,
         "price_max": price_max,
         "in_stock": in_stock,
+        "on_sale": on_sale,
     }
 
     if request.headers.get("X-Stock-Request") == "true":

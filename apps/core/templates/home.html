@@ -9,61 +9,38 @@
 {% block content %}
 
 {# Hero Carousel Section #}
-{% cache 3600 home_hero request.LANGUAGE_CODE banners.0.id %}
 <div id="indicators-carousel" class="relative w-full mb-12 z-0" data-carousel="slide">
-    <!-- Carousel wrapper -->
     <div class="relative h-56 overflow-hidden rounded-2xl md:h-96 lg:h-[500px]">
          {% if banners %}
              {% for banner in banners %}
-             <!-- Item {{ forloop.counter }} -->
              <div class="hidden duration-700 ease-in-out" data-carousel-item="{% if forloop.first %}active{% endif %}">
-                 {% if banner.image %}
-                 <img src="{{ banner.image.url }}" class="absolute block w-full h-full object-cover" alt="{{ banner.get_title|default:'Banner' }}">
-                 {% elif banner.image_link %}
-                 <img src="{{ banner.image_link }}" class="absolute block w-full h-full object-cover" alt="{{ banner.get_title|default:'Banner' }}">
+                 {% if banner.image_link %}
+                 <img src="{{ banner.image_link }}" class="absolute block w-full h-full object-cover" alt="{{ banner.get_title|default:'Banner' }}" loading="{% if forloop.first %}eager{% else %}lazy{% endif %}">
+                 {% elif banner.image %}
+                 <img src="{{ banner.image.url }}" class="absolute block w-full h-full object-cover" alt="{{ banner.get_title|default:'Banner' }}" loading="{% if forloop.first %}eager{% else %}lazy{% endif %}">
                  {% endif %}
-                 
-                 <!-- Overlay content -->
-                 <div class="absolute inset-0 bg-black/40 flex items-center">
-                    <div class="text-center md:text-start rtl:md:text-right px-8 md:px-16 w-full max-w-screen-xl mx-auto">
-                        {% if banner.get_title %}
-                        <h2 class="text-3xl md:text-5xl lg:text-6xl font-black text-white mb-4 drop-shadow-md">{{ banner.get_title }}</h2>
-                        {% endif %}
-                        {% if banner.get_subtitle %}
-                        <p class="text-lg md:text-xl text-white/90 mb-8 drop-shadow max-w-2xl">{{ banner.get_subtitle }}</p>
-                        {% endif %}
-                        {% if banner.link and banner.get_link_text %}
-                        <a href="{{ banner.link }}" class="inline-flex items-center px-8 py-3 text-base font-bold text-white bg-corporate-600 rounded-lg hover:bg-corporate-700 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5">
-                            {{ banner.get_link_text }}
-                            <i class="bi bi-arrow-left ms-2 rtl:rotate-180"></i>
-                        </a>
-                        {% endif %}
-                    </div>
+              </div>
+              {% endfor %}
+          {% else %}
+             <div class="hidden duration-700 ease-in-out" data-carousel-item="active">
+                 <div class="absolute inset-0 bg-gradient-to-br from-corporate-600 to-corporate-800 flex items-center justify-center p-8">
+                     <div class="text-center">
+                         <h1 class="text-3xl md:text-5xl lg:text-6xl font-black text-white mb-4 drop-shadow-md">
+                             {% trans "Premium tech, delivered" %}
+                         </h1>
+                         <p class="text-lg md:text-xl text-corporate-50 mb-8 drop-shadow max-w-2xl mx-auto">
+                             {% trans "Discover the latest laptops, smartphones, and accessories at unbeatable prices." %}
+                         </p>
+                         <a href="{% url 'products:products' %}" class="inline-flex items-center px-8 py-3 text-base font-bold text-corporate-600 bg-white rounded-lg hover:bg-corporate-50 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5">
+                             {% trans "Shop now" %}
+                             <i class="bi bi-arrow-left ms-2 rtl:rotate-180"></i>
+                         </a>
+                     </div>
                  </div>
              </div>
-             {% endfor %}
-         {% else %}
-            <!-- Default Item -->
-            <div class="hidden duration-700 ease-in-out" data-carousel-item="active">
-                <div class="absolute inset-0 bg-gradient-to-br from-corporate-600 to-corporate-800 flex items-center justify-center p-8">
-                    <div class="text-center">
-                        <h1 class="text-3xl md:text-5xl lg:text-6xl font-black text-white mb-4 drop-shadow-md">
-                            {% trans "Premium tech, delivered" %}
-                        </h1>
-                        <p class="text-lg md:text-xl text-corporate-50 mb-8 drop-shadow max-w-2xl mx-auto">
-                            {% trans "Discover the latest laptops, smartphones, and accessories at unbeatable prices." %}
-                        </p>
-                        <a href="{% url 'products:products' %}" class="inline-flex items-center px-8 py-3 text-base font-bold text-corporate-600 bg-white rounded-lg hover:bg-corporate-50 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5">
-                            {% trans "Shop now" %}
-                            <i class="bi bi-arrow-left ms-2 rtl:rotate-180"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
-         {% endif %}
+          {% endif %}
     </div>
 
-    <!-- Slider indicators -->
     <div class="absolute z-30 flex -translate-x-1/2 space-x-3 rtl:space-x-reverse bottom-5 left-1/2">
         {% if banners %}
             {% for banner in banners %}
@@ -74,7 +51,6 @@
         {% endif %}
     </div>
 
-    <!-- Slider controls -->
     <button type="button" class="absolute top-0 start-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none" data-carousel-prev>
         <span class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-black/30 group-hover:bg-black/50 focus:ring-4 focus:ring-white focus:outline-none transition-colors">
             <svg class="w-4 h-4 text-white rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
@@ -92,7 +68,6 @@
         </span>
     </button>
 </div>
-{% endcache %}
 
 
 {# Trust Bar #}
@@ -136,6 +111,30 @@
     </div>
   </div>
 </section>
+
+
+{# Flash Sales / Offers Section #}
+{% if sale_products %}
+<section class="mb-16">
+  <div class="flex items-end justify-between mb-6">
+    <div>
+      <span class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-bold text-white bg-red-600 rounded-md mb-2">
+        <i class="bi bi-lightning-fill"></i> {% trans "Flash Sale" %}
+      </span>
+      <h2 class="font-bold text-2xl lg:text-3xl tracking-tight text-charcoal-900">{% trans "Exclusive Offers" %}</h2>
+    </div>
+    <a href="{% url 'products:products' %}?on_sale=true" class="inline-flex items-center text-sm font-semibold text-red-600 hover:text-red-700 transition-colors">
+      {% trans "View all offers" %} <i class="bi bi-arrow-left ms-1 rtl:rotate-180"></i>
+    </a>
+  </div>
+
+  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6">
+    {% for product in sale_products %}
+      {% include 'partials/product_card.html' with product=product %}
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
 
 
 {# Categories Grid #}

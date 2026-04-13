@@ -1,0 +1,40 @@
+{% load i18n %}
+{# Search Modal #}
+<div id="searchModal" class="hs-overlay hidden size-full fixed top-0 start-0 z-[80] overflow-x-hidden overflow-y-auto pointer-events-none" role="dialog" tabindex="-1" aria-labelledby="searchModalLabel">
+  <div class="hs-overlay-open:mt-7 hs-overlay-open:opacity-100 hs-overlay-open:duration-500 mt-0 opacity-0 ease-out transition-all sm:max-w-md sm:w-full m-3 sm:mx-auto min-h-[calc(100%-3.5rem)] flex items-center">
+    <div class="w-full pointer-events-auto shadow-xl rounded-xl bg-white overflow-hidden flex flex-col">
+      <div class="flex justify-center items-center py-6 px-4 relative border-b border-surface-100">
+        <div class="text-center w-full mt-2">
+          <h4 class="font-bold text-2xl mb-1 tracking-tight text-charcoal-900" id="searchModalLabel">{% trans "Search Products" %}</h4>
+          <p class="text-charcoal-500 text-sm">{% trans "Find what you're looking for" %}</p>
+        </div>
+        <button type="button" class="absolute top-3 end-3 p-1 text-charcoal-400 hover:text-charcoal-600 hover:bg-surface-100 rounded-lg transition-colors" data-hs-overlay="#searchModal">
+          <span class="sr-only">Close</span>
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      <div class="p-4 pt-0 overflow-y-auto">
+         <form action="{% url 'search' %}" method="GET" class="mb-6">
+           <div class="relative">
+             <div class="absolute inset-y-0 start-0 flex items-center px-3 pointer-events-none">
+               <svg class="w-5 h-5 text-charcoal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M15 11a6 6 0 100-12 6 6 0 000 12z"/>
+               </svg>
+             </div>
+             <input type="text" name="q" id="modal_search"
+                    class="block w-full pl-10 pr-4 py-3 bg-surface-50 border border-surface-200 rounded-lg text-lg text-charcoal-900 placeholder:text-charcoal-400 focus:ring-2 focus:ring-corporate-600 focus:border-corporate-600 outline-none"
+                    placeholder="{% trans 'Search for products, brands, and more...' %}" required>
+           </div>
+           <button type="submit" class="w-full mt-4 inline-flex items-center justify-center px-4 py-3 text-sm font-semibold text-white bg-corporate-600 rounded-lg hover:bg-corporate-700 transition-colors shadow-sm">
+             {% trans "Search" %}
+           </button>
+         </form>
+        
+        <div class="text-center text-charcoal-500 text-sm">
+          {% trans "Try searching for laptops, smartphones, or accessories" %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

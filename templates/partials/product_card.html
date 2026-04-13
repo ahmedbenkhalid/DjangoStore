@@ -123,24 +123,8 @@
               :class="added ? 'bg-green-600 hover:bg-green-700' : 'bg-corporate-600 hover:bg-corporate-700'"
               class="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-bold text-white rounded-lg shadow-lg transition-all duration-200 disabled:opacity-70 disabled:cursor-wait active:scale-[0.98]"
             >
-              <template x-if="!submitting && !added">
-                <span class="flex items-center gap-2">
-                  <i class="bi bi-bag-plus"></i>
-                  <span>{% trans "Add to cart" %}</span>
-                </span>
-              </template>
-              <template x-if="submitting && !added">
-                <span class="flex items-center gap-2">
-                  <i class="bi bi-arrow-repeat animate-spin"></i>
-                  <span>{% trans "Adding..." %}</span>
-                </span>
-              </template>
-              <template x-if="added">
-                <span class="flex items-center gap-2">
-                  <i class="bi bi-check-circle-fill"></i>
-                  <span>{% trans "Added!" %}</span>
-                </span>
-              </template>
+              <i class="bi" :class="submitting ? 'bi-arrow-repeat animate-spin' : (added ? 'bi-check-circle-fill' : 'bi-bag-plus')"></i>
+              <span x-text="submitting ? '{% trans 'Adding...' %}' : (added ? '{% trans 'Added!' %}' : '{% trans 'Add to cart' %}')">{% trans "Add to cart" %}</span>
             </button>
           </form>
         {% else %}

@@ -127,10 +127,33 @@ def home(request):
         banners = list(Banner.objects.filter(is_active=True))
         cache.set("home_banners", banners, 3600)
 
+    # Products on Sale
+    sale_products = cache.get("sale_products")
+    if sale_products is None:
+        from django.db.models import F
+        sale_products = list(
+            Product.objects.filter(discount_price__lt=F("price"))
+            .select_related("brand")
+            .only(
+                "id",
+                "name",
+                "slug",
+                "img",
+                "img_link",
+                "price",
+                "discount_price",
+                "brand__id",
+                "brand__name",
+            )
+            .order_by("-updated_at")[:8]
+        )
+        cache.set("sale_products", sale_products, 3600)
+
     context = {
         "categories": categories,
         "featured_products": featured_products,
         "most_liked_products": most_liked,
         "banners": banners,
+        "sale_products": sale_products,
     }
     return render(request, "home.html", context)

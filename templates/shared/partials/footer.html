@@ -1,12 +1,9 @@
 {% load i18n %}
 <footer
   class="bg-surface-50 text-charcoal-700 mt-10 pt-10 pb-6 border-t border-surface-200 text-sm"
-  x-data="{ subscribed: false }"
 >
   <div class="container mx-auto px-4 lg:px-8">
-    <div
-      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 pb-10"
-    >
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 pb-10">
       <div class="lg:col-span-4 lg:pe-8">
         <div class="mb-6">
           <a
@@ -23,7 +20,7 @@
           </a>
         </div>
         <p class="text-charcoal-500 mb-6 leading-relaxed">
-          {% trans "Your destination for premium electronics. Quality products, honest prices, and exceptional support." %}
+          {% trans "Your destination for premium electronics" %}
         </p>
         <div class="p-4 rounded-xl bg-white border border-surface-200">
           <h6
@@ -31,30 +28,26 @@
           >
             {% trans "Stay Updated" %}
           </h6>
-          <template x-if="!subscribed">
-            <form @submit.prevent="subscribed = true" class="flex gap-2">
-              <input
-                type="email"
-                class="flex-1 px-3 py-2 text-sm bg-surface-50 border border-surface-200 rounded-lg focus:ring-2 focus:ring-corporate-600 focus:border-corporate-600 outline-none placeholder:text-charcoal-400"
-                placeholder="{% trans 'Email address' %}"
-                required
-              />
-              <button
-                type="submit"
-                class="px-4 py-2 text-sm font-bold text-white bg-corporate-600 rounded-lg hover:bg-corporate-700 transition-colors"
-              >
-                {% trans "Join" %}
-              </button>
-            </form>
-          </template>
-          <template x-if="subscribed">
-            <div class="text-green-600 flex items-center gap-2 py-1">
-              <i class="bi bi-check-circle-fill"></i>
-              <span class="font-bold text-xs"
-                >{% trans "Thanks for joining!" %}</span
-              >
-            </div>
-          </template>
+          <form
+            action="#"
+            method="POST"
+            class="flex flex-col gap-2"
+          >
+            {% csrf_token %}
+            <input
+              type="email"
+              name="email"
+              placeholder="{% trans 'Enter your email address' %}"
+              required
+              class="block w-full px-3 py-2 bg-surface-100 border border-surface-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-corporate-600 focus:border-transparent"
+            >
+            <button
+              type="submit"
+              class="w-full px-4 py-2 bg-corporate-600 text-white text-sm font-medium rounded-lg hover:bg-corporate-700 transition-colors"
+            >
+              {% trans "Subscribe" %}
+            </button>
+          </form>
         </div>
       </div>
       <div class="lg:col-span-2 col-span-1">
@@ -71,8 +64,7 @@
               >{% trans "All Products" %}</a
             >
           </li>
-          {% if menu_categories %}
-          {% for cat in menu_categories|slice:":4" %}
+          {% if menu_categories %} {% for cat in menu_categories|slice:":4" %}
           <li>
             <a
               href="{% url 'products:products' %}?category={{ cat.slug }}"
@@ -186,14 +178,12 @@
       </div>
     </div>
     <div class="pt-6 border-t border-surface-200">
-      <div
-        class="flex flex-col md:flex-row justify-between items-center gap-4"
-      >
+      <div class="flex flex-col md:flex-row justify-between items-center gap-4">
         <div class="text-center md:text-start">
           <p class="text-charcoal-500 text-xs m-0">
             &copy; {% now "Y" %}
-            <span class="font-bold text-charcoal-900">SMART S3R</span>.
-            {% trans "All rights reserved." %}
+            <span class="font-bold text-charcoal-900">SMART S3R</span>. {% trans
+            "All rights reserved." %}
           </p>
         </div>
         <div class="text-center md:text-end">

@@ -317,7 +317,12 @@ function Invoke-Check {
             if ($pyVer -match '(\d+\.\d+\.\d+)') {
                 Write-Success "Python $($C_DIM)$($Matches[1])$($C_RESET)"
             }
-            $pkgCount = & $python -m pip list 2>$null | Measure-Object | Select-Object -ExpandProperty Count
+            $pkgCount = if (Get-Command uv -ErrorAction SilentlyContinue) {
+                (& uv pip list 2>$null | Measure-Object | Select-Object -ExpandProperty Count) - 2
+            } else {
+                & $python -m pip list 2>$null | Measure-Object | Select-Object -ExpandProperty Count
+            }
+            if ($pkgCount -lt 0) { $pkgCount = 0 }
             Write-Item "$pkgCount packages installed"
         }
         else {
@@ -367,6 +372,16 @@ function Invoke-Check {
     Write-Host ""
 }
 
+function Invoke-CompileMessages {
+    $python = Get-PythonPath
+    if (-not $python) { return }
+    Write-Dim "  $S_BULLET Compiling translations..."
+    & $python manage.py compilemessages >$null 2>&1
+    if ($LASTEXITCODE -eq 0) {
+        Write-Success "Translations compiled"
+    }
+}
+
 function Invoke-Install {
     Write-Header
     Write-Step "Installing dependencies"
@@ -388,9 +403,16 @@ function Invoke-Install {
         Write-Host ""; Write-ErrorMsg "Installation failed"; return $EXIT_ERROR
     }
     $python = Get-PythonPath
-    $pkgCount = & $python -m pip list 2>$null | Measure-Object | Select-Object -ExpandProperty Count
+    $pkgCount = if (Get-Command uv -ErrorAction SilentlyContinue) {
+        (& uv pip list 2>$null | Measure-Object | Select-Object -ExpandProperty Count) - 2
+    } else {
+        & $python -m pip list 2>$null | Measure-Object | Select-Object -ExpandProperty Count
+    }
+    if ($pkgCount -lt 0) { $pkgCount = 0 }
     $elapsed = Get-Elapsed
     Write-Host ""; Write-Success "Installed $($C_BOLD)$pkgCount$($C_RESET) packages in $($C_DIM)$elapsed$($C_RESET)"
+    
+    Invoke-CompileMessages
     Write-Host ""
     return $EXIT_SUCCESS
 }
@@ -418,7 +440,9 @@ function Invoke-Seed {
     $python = Get-PythonPath
     if (-not $python) { return $EXIT_DEP }
 
-    if ($Clear) {
+    $shouldClear = $Clear -or $script:JOI_CLEAR
+
+    if ($shouldClear) {
         Write-Warn "This will delete all existing data"
         if (-not (Confirm-Action "Continue?" "n")) {
             Write-Info "Cancelled"; return $EXIT_SUCCESS
@@ -469,6 +493,9 @@ function Invoke-Server {
     Write-Header
     $python = Get-PythonPath
     if (-not $python) { return $EXIT_DEP }
+    
+    Invoke-CompileMessages
+
     $port = if ($Port) { $Port } else { $script:JOI_PORT }
     Write-Host ""; Write-Success "Starting server on ${C_CYAN}http://127.0.0.1:$port$C_RESET"
     Write-Dim "  Press Ctrl+C to stop"; Write-Host ""
@@ -528,11 +555,17 @@ function Invoke-Setup {
     }
     $python = Get-PythonPath
     if (-not $python) { return $EXIT_DEP }
-    $pkgCount = & $python -m pip list 2>$null | Measure-Object | Select-Object -ExpandProperty Count
+    $pkgCount = if (Get-Command uv -ErrorAction SilentlyContinue) {
+        (& uv pip list 2>$null | Measure-Object | Select-Object -ExpandProperty Count) - 2
+    } else {
+        & $python -m pip list 2>$null | Measure-Object | Select-Object -ExpandProperty Count
+    }
+    if ($pkgCount -lt 0) { $pkgCount = 0 }
     $elapsed = Get-Elapsed
     Write-Host ""; Write-Success "Installed $($C_BOLD)$pkgCount$($C_RESET) packages in $($C_DIM)$elapsed$($C_RESET)"
 
-    if (-not $SkipMigrations) {
+    $shouldSkipMig = $SkipMigrations -or $script:JOI_SKIP_MIGRATIONS
+    if (-not $shouldSkipMig) {
         Write-Step "Database"
         Write-Host ""
         Write-Dim "  $S_BULLET makemigrations"
@@ -542,13 +575,13 @@ function Invoke-Setup {
         Write-Host ""; Write-Success "Migrations applied"
     }
 
-    $createAdmin = if ($AdminFlag) { $AdminFlag } else { $script:JOI_CREATE_ADMIN }
-    if ($createAdmin -eq 'y' -or ($script:JOI_YES -and -not $AdminFlag)) {
+    $createAdmin = if ($AdminFlag) { $AdminFlag } elseif ($script:JOI_ADMIN_FLAG) { $script:JOI_ADMIN_FLAG } else { $script:JOI_CREATE_ADMIN }
+    if ($createAdmin -eq 'y' -or ($script:JOI_YES -and -not $AdminFlag -and -not $script:JOI_ADMIN_FLAG)) {
         Write-Step "Admin user"; Write-Host ""
         & $python manage.py createsuperuser
         Write-Host ""; Write-Success "Admin user created"
     }
-    elseif (-not $AdminFlag) {
+    elseif (-not $AdminFlag -and -not $script:JOI_ADMIN_FLAG) {
         if (Confirm-Action "Create admin user?" "n") {
             Write-Step "Admin user"; Write-Host ""
             & $python manage.py createsuperuser
@@ -556,7 +589,7 @@ function Invoke-Setup {
         }
     }
 
-    $seed = if ($SeedFlag) { $SeedFlag } else { $script:JOI_SEED_DATA }
+    $seed = if ($SeedFlag) { $SeedFlag } elseif ($script:JOI_SEED_FLAG) { $script:JOI_SEED_FLAG } else { $script:JOI_SEED_DATA }
     $fixtures = Join-Path $JOI_ROOT "fixtures"
     if ($seed -eq 'y') {
         if (Test-Path $fixtures) {
@@ -565,7 +598,7 @@ function Invoke-Setup {
             Write-Host ""; Write-Success "Database seeded"
         }
     }
-    elseif (-not $SeedFlag) {
+    elseif (-not $SeedFlag -and -not $script:JOI_SEED_FLAG) {
         if (Confirm-Action "Seed database with sample data?" "n") {
             if (Test-Path $fixtures) {
                 Write-Step "Seed data"; Write-Host ""
@@ -574,6 +607,8 @@ function Invoke-Setup {
             }
         }
     }
+
+    Invoke-CompileMessages
 
     $elapsed = [math]::Round(((Get-Date) - $setupStart).TotalSeconds, 1)
     Write-Host ""; Write-Success "Setup complete! $($C_DIM)${elapsed}s$($C_RESET)"
@@ -679,6 +714,16 @@ function Main {
             '--verbose' { $script:JOI_VERBOSE = $true }
             '--quiet' { $script:JOI_QUIET = $true }
             '--debug' { $script:JOI_DEBUG = $true; Set-PSDebug -Trace 1 }
+            '--port' {
+                $i++
+                if ($i -lt $args.Count) { $script:JOI_PORT = $args[$i] }
+            }
+            '--clear' { $script:JOI_CLEAR = $true }
+            '--seed' { $script:JOI_SEED_FLAG = "y" }
+            '--no-seed' { $script:JOI_SEED_FLAG = "n" }
+            '--admin' { $script:JOI_ADMIN_FLAG = "y" }
+            '--no-admin' { $script:JOI_ADMIN_FLAG = "n" }
+            '--skip-migrations' { $script:JOI_SKIP_MIGRATIONS = $true }
             default { $remainingArgs += $arg }
         }
         $i++

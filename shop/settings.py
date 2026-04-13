@@ -214,7 +214,7 @@ STATICFILES_DIRS = [
 
 # Media files (User uploads)
 MEDIA_URL = "media/"
-MEDIA_ROOT = BASE_DIR.parent / "www" / "media"
+MEDIA_ROOT = BASE_DIR / "www" / "media"
 
 # Jazzmin Admin Configuration
 JAZZMIN_SETTINGS = {

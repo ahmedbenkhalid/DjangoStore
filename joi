@@ -298,6 +298,18 @@ load_config() {
 # =============================================================================
 # Dependency checks
 # =============================================================================
+setup_uv_env() {
+  if [[ "$(uname -s)" == "Linux" ]]; then
+    # Detect if we are on a mounted drive (WSL or Linux mount)
+    if [[ "${JOI_ROOT}" == /mnt/* || "${JOI_ROOT}" == /media/* ]]; then
+      if [[ -z "${UV_LINK_MODE:-}" ]]; then
+        log_dim "  ${S_BULLET} Detected Linux on mounted drive, setting UV_LINK_MODE=copy"
+        export UV_LINK_MODE=copy
+      fi
+    fi
+  fi
+}
+
 check_uv() {
   if ! command -v uv &>/dev/null; then
     log_warn "uv is not installed"
@@ -319,6 +331,24 @@ check_uv() {
 }
 
 check_venv() {
+  local python_exec
+  if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" ]]; then
+    python_exec="${JOI_ROOT}/.venv/Scripts/python.exe"
+  else
+    python_exec="${JOI_ROOT}/.venv/bin/python"
+  fi
+
+  if [[ -d "${JOI_ROOT}/.venv" && ! -f "${python_exec}" ]]; then
+    log_warn "Existing .venv directory is invalid for this platform"
+    if confirm "Recreate it?" "y"; then
+      local backup=".venv_$(date +%Y%m%d_%H%M%S)"
+      mv "${JOI_ROOT}/.venv" "${JOI_ROOT}/${backup}"
+      log_info "Moved invalid .venv to ${backup}"
+    else
+      log_error "Invalid virtual environment. Setup may fail."
+    fi
+  fi
+
   if [[ ! -d "${JOI_ROOT}/.venv" ]]; then
     start_timer
     if show_progress "Creating virtual environment" uv venv; then
@@ -369,7 +399,11 @@ cmd_check() {
       log_success "Python ${C_DIM}${py_version}${C_RESET}"
       
       local pkg_count
-      pkg_count=$("${python}" -m pip list 2>/dev/null | tail -n +3 | wc -l)
+      if command -v uv &>/dev/null; then
+        pkg_count=$(uv pip list 2>/dev/null | tail -n +3 | wc -l)
+      else
+        pkg_count=$("${python}" -m pip list 2>/dev/null | tail -n +3 | wc -l || echo "0")
+      fi
       log_item "${pkg_count} packages installed"
     else
       log_warn "Virtual environment exists but Python not found"
@@ -414,6 +448,17 @@ cmd_check() {
   echo ""
 }
 
+cmd_compile() {
+  local python
+  python="$(get_python)" || return 0
+  log_dim "  ${S_BULLET} Compiling translations..."
+  if "${python}" manage.py compilemessages >/dev/null 2>&1; then
+    log_success "Translations compiled"
+  else
+    log_warn "Failed to compile translations (is gettext installed?)"
+  fi
+}
+
 # =============================================================================
 # Command: install
 # =============================================================================
@@ -423,10 +468,13 @@ cmd_install() {
   log_step "Installing dependencies"
   
   check_uv || return $?
+  setup_uv_env
   check_venv || return $?
   
-  # Clean up Windows-created venv artifacts on Unix
-  [[ -L "${JOI_ROOT}/.venv/lib64" ]] && rm -f "${JOI_ROOT}/.venv/lib64"
+  # Clean up Windows-created venv artifacts on Unix (skip on Windows)
+  if [[ "$OSTYPE" != "msys" && "$OSTYPE" != "cygwin" ]]; then
+    [[ -L "${JOI_ROOT}/.venv/lib64" ]] && rm -f "${JOI_ROOT}/.venv/lib64"
+  fi
   
   start_timer
   if show_progress "Running uv sync" uv sync; then
@@ -435,10 +483,16 @@ cmd_install() {
     local python
     python=$(get_python)
     local count
-    count=$("${python}" -m pip list 2>/dev/null | tail -n +3 | wc -l)
+    if command -v uv &>/dev/null; then
+      count=$(uv pip list 2>/dev/null | tail -n +3 | wc -l)
+    else
+      count=$("${python}" -m pip list 2>/dev/null | tail -n +3 | wc -l || echo "0")
+    fi
     
     echo ""
     log_success "Installed ${C_BOLD}${count}${C_RESET} packages in ${C_DIM}${elapsed}${C_RESET}"
+    
+    cmd_compile
   else
     echo ""
     log_error "Installation failed"
@@ -489,7 +543,7 @@ cmd_seed() {
   local python
   python="$(get_python)" || return "${EXIT_DEP}"
 
-  local clear=0
+  local clear="${JOI_CLEAR:-0}"
   while [[ $# -gt 0 ]]; do
     case "$1" in
     --clear) clear=1; shift ;;
@@ -576,12 +630,15 @@ cmd_server() {
   local python
   python="$(get_python)" || return "${EXIT_DEP}"
 
+  cmd_compile
+
   local port="${JOI_PORT}"
   while [[ $# -gt 0 ]]; do
     case "$1" in
     --port) port="$2"; shift 2 ;;
     --port=*) port="${1#*=}"; shift ;;
-    *) shift ;;
+    -*) shift ;;
+    *) port="$1"; shift ;;
     esac
   done
 
@@ -642,7 +699,7 @@ cmd_reset() {
 # Command: setup (full setup flow)
 # =============================================================================
 cmd_setup() {
-  local flag_seed="" flag_admin="" flag_migrations="1"
+  local flag_seed="${JOI_SEED_FLAG:-}" flag_admin="${JOI_ADMIN_FLAG:-}" flag_migrations="${JOI_SKIP_MIGRATIONS:-0}"
 
   while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -650,7 +707,7 @@ cmd_setup() {
     --no-seed) flag_seed="n"; shift ;;
     --admin) flag_admin="y"; shift ;;
     --no-admin) flag_admin="n"; shift ;;
-    --skip-migrations) flag_migrations="0"; shift ;;
+    --skip-migrations) flag_migrations="1"; shift ;;
     *) shift ;;
     esac
   done
@@ -664,6 +721,7 @@ cmd_setup() {
   # Step 1: uv
   log_step "Package manager"
   check_uv || return $?
+  setup_uv_env
 
   # Step 2: venv
   log_step "Virtual environment"
@@ -671,7 +729,10 @@ cmd_setup() {
 
   # Step 3: dependencies
   log_step "Dependencies"
-  [[ -L "${JOI_ROOT}/.venv/lib64" ]] && rm -f "${JOI_ROOT}/.venv/lib64"
+  # Clean up Windows-created venv artifacts on Unix (skip on Windows)
+  if [[ "$OSTYPE" != "msys" && "$OSTYPE" != "cygwin" ]]; then
+    [[ -L "${JOI_ROOT}/.venv/lib64" ]] && rm -f "${JOI_ROOT}/.venv/lib64"
+  fi
   
   start_timer
   if show_progress "Running uv sync" uv sync; then
@@ -680,7 +741,11 @@ cmd_setup() {
     local python
     python=$(get_python)
     local count
-    count=$("${python}" -m pip list 2>/dev/null | tail -n +3 | wc -l)
+    if command -v uv &>/dev/null; then
+      count=$(uv pip list 2>/dev/null | tail -n +3 | wc -l)
+    else
+      count=$("${python}" -m pip list 2>/dev/null | tail -n +3 | wc -l || echo "0")
+    fi
     
     echo ""
     log_success "Installed ${C_BOLD}${count}${C_RESET} packages in ${C_DIM}${elapsed}${C_RESET}"
@@ -694,7 +759,7 @@ cmd_setup() {
   python="$(get_python)" || return "${EXIT_DEP}"
 
   # Step 4: migrations
-  if [[ "${flag_migrations}" == "1" ]]; then
+  if [[ "${flag_migrations}" == "0" ]]; then
     log_step "Database"
     
     start_timer
@@ -749,6 +814,8 @@ cmd_setup() {
       fi
     fi
   fi
+
+  cmd_compile
 
   # Calculate total time
   local setup_end
@@ -893,6 +960,14 @@ main() {
     --verbose) JOI_VERBOSE=1; shift ;;
     --quiet) JOI_QUIET=1; shift ;;
     --debug) JOI_DEBUG=1; set -x; shift ;;
+    --port) JOI_PORT="$2"; shift 2 ;;
+    --port=*) JOI_PORT="${1#*=}"; shift ;;
+    --clear) JOI_CLEAR=1; shift ;;
+    --seed) JOI_SEED_FLAG="y"; shift ;;
+    --no-seed) JOI_SEED_FLAG="n"; shift ;;
+    --admin) JOI_ADMIN_FLAG="y"; shift ;;
+    --no-admin) JOI_ADMIN_FLAG="n"; shift ;;
+    --skip-migrations) JOI_SKIP_MIGRATIONS=1; shift ;;
     -*) log_error "Unknown option: $1"; echo "  Run 'joi --help' for usage"; exit "${EXIT_USAGE}" ;;
     *) break ;;
     esac
