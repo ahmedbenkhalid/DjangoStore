@@ -124,11 +124,10 @@ def home(request):
         cache.set("most_liked_products", most_liked, 1800)
 
     # Banners
-    banners = cache.get("home_banners_v2")
-    # If here is no Caching make caching
+    banners = cache.get("home_banners_v3")
     if banners is None:
         banners = list(Banner.objects.filter(is_active=True))
-        cache.set("home_banners_v2", banners, 3600)
+        cache.set("home_banners_v3", banners, 3600)
 
     # Products on Sale
     sale_products = cache.get("sale_products")
