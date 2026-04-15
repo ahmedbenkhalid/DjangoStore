@@ -24,7 +24,7 @@
         {% else %}
             <button type="button"
                     class="inline-flex items-center justify-center w-full px-4 py-2.5 text-sm font-semibold text-white bg-corporate-600 rounded-lg hover:bg-corporate-700 transition-colors shadow-sm"
-                    data-hs-overlay="#authModal">
+                    @click="$dispatch('open-auth')">
                 <i class="bi bi-shield-lock-fill me-2"></i>
                 <span>{% trans "Secure Checkout" %}</span>
             </button>

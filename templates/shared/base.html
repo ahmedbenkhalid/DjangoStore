@@ -25,7 +25,6 @@
     ></script>
     <script src="{% static 'js/alpine-store.js' %}"></script>
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.js"></script>
     <script>
       window.CART_FRAGMENT_URL = "{% url 'cart:offcanvas_fragment' %}";
       document.body.addEventListener("htmx:configRequest", (event) => {
