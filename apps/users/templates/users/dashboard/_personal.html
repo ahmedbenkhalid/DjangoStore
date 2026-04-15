@@ -4,6 +4,8 @@
 <div x-data="{
     emailMkt: {% if form.email_marketing.value %}true{% else %}false{% endif %},
     pushNotif: {% if form.push_notifications.value != False %}true{% else %}false{% endif %},
+    personalExpanded: true,
+    notificationsExpanded: true,
     submitting: false
 }">
 
@@ -17,78 +19,82 @@
           @htmx:after-on-load="if(event.detail.successful) { Alpine.store('toast').show('Profile updated successfully!', 'success'); } else { Alpine.store('toast').show('Failed to update profile', 'error'); }">
         {% csrf_token %}
 
-        {# Personal Information #}
-        <div class="bg-white border border-surface-200 rounded-2xl overflow-hidden mb-6">
-            <div class="bg-surface-50 border-b border-surface-200 px-6 py-5">
-                <h5 class="font-bold text-xl tracking-tight mb-1 flex items-center gap-2">
-                    <i class="bi bi-person-vcard text-corporate-600 pt-1"></i>{% trans "Personal Information" %}
-                </h5>
-                <p class="text-charcoal-500 text-sm mb-0">{% trans "Update your personal details" %}</p>
-            </div>
-            <div class="p-6 md:p-8" id="personal-form-container">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-0">
-                    {# First Name #}
+        {# Collapsible Card - Personal Information #}
+        <div class="bg-white border border-surface-200 rounded-2xl overflow-hidden mb-4">
+            <button type="button" @click="personalExpanded = !personalExpanded" class="w-full bg-surface-50 border-b border-surface-200 px-5 py-4 flex items-center justify-between hover:bg-surface-100 transition-colors">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-corporate-100 flex items-center justify-center">
+                        <i class="bi bi-person-vcard text-corporate-600 text-lg"></i>
+                    </div>
+                    <div class="text-start">
+                        <h5 class="font-bold text-base text-charcoal-800 flex items-center gap-2">
+                            {% trans "Personal Information" %}
+                        </h5>
+                        <p class="text-charcoal-500 text-xs mb-0">{% trans "Update your personal details" %}</p>
+                    </div>
+                </div>
+                <i class="bi bi-chevron-down text-charcoal-400 transition-transform" :class="personalExpanded ? 'rotate-180' : ''"></i>
+            </button>
+            
+            <div x-show="personalExpanded" x-collapse class="p-5 md:p-6" id="personal-form-container">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block pb-1">
                             <span class="text-xs font-bold uppercase tracking-wider text-charcoal-700">{% trans "First Name" %}</span>
                         </label>
                         <div class="relative">
-                            <div class="absolute inset-y-0 start-0 flex items-center ps-4 pointer-events-none text-charcoal-500">
-                                <i class="bi bi-person"></i>
+                            <div class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none text-charcoal-400">
+                                <i class="bi bi-person text-sm"></i>
                             </div>
-                            <input type="text" name="first_name" class="block w-full ps-10 px-3 py-2 bg-surface-50 border border-surface-200 rounded-lg focus:ring-2 focus:ring-corporate-600 placeholder:text-charcoal-300" 
+                            <input type="text" name="first_name" class="block w-full ps-9 px-3 py-2.5 bg-surface-50 border border-surface-200 rounded-lg focus:ring-2 focus:ring-corporate-600 focus:border-corporate-600 placeholder:text-charcoal-300 text-sm" 
                                    value="{{ form.first_name.value|default:user.first_name }}" placeholder="{% trans 'First name' %}">
                         </div>
                     </div>
 
-                    {# Last Name #}
                     <div>
                         <label class="block pb-1">
                             <span class="text-xs font-bold uppercase tracking-wider text-charcoal-700">{% trans "Last Name" %}</span>
                         </label>
                         <div class="relative">
-                            <div class="absolute inset-y-0 start-0 flex items-center ps-4 pointer-events-none text-charcoal-500">
-                                <i class="bi bi-person"></i>
+                            <div class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none text-charcoal-400">
+                                <i class="bi bi-person text-sm"></i>
                             </div>
-                            <input type="text" name="last_name" class="block w-full ps-10 px-3 py-2 bg-surface-50 border border-surface-200 rounded-lg focus:ring-2 focus:ring-corporate-600 placeholder:text-charcoal-300" 
+                            <input type="text" name="last_name" class="block w-full ps-9 px-3 py-2.5 bg-surface-50 border border-surface-200 rounded-lg focus:ring-2 focus:ring-corporate-600 focus:border-corporate-600 placeholder:text-charcoal-300 text-sm" 
                                    value="{{ form.last_name.value|default:user.last_name }}" placeholder="{% trans 'Last name' %}">
                         </div>
                     </div>
 
-                    {# Phone #}
                     <div>
                         <label class="block pb-1">
                             <span class="text-xs font-bold uppercase tracking-wider text-charcoal-700">{% trans "Phone Number" %}</span>
                         </label>
                         <div class="relative">
-                            <div class="absolute inset-y-0 start-0 flex items-center ps-4 pointer-events-none text-charcoal-500">
-                                <i class="bi bi-phone"></i>
+                            <div class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none text-charcoal-400">
+                                <i class="bi bi-phone text-sm"></i>
                             </div>
-                            <input type="text" name="phone" class="block w-full ps-10 px-3 py-2 bg-surface-50 border border-surface-200 rounded-lg focus:ring-2 focus:ring-corporate-600 placeholder:text-charcoal-300" 
+                            <input type="text" name="phone" class="block w-full ps-9 px-3 py-2.5 bg-surface-50 border border-surface-200 rounded-lg focus:ring-2 focus:ring-corporate-600 focus:border-corporate-600 placeholder:text-charcoal-300 text-sm" 
                                    value="{{ form.phone.value|default:'' }}" placeholder="+20 1xx xxxx xxx">
                         </div>
                     </div>
 
-                    {# Date of Birth #}
                     <div>
                         <label class="block pb-1">
                             <span class="text-xs font-bold uppercase tracking-wider text-charcoal-700">{% trans "Date of Birth" %}</span>
                         </label>
                         <div class="relative">
-                            <div class="absolute inset-y-0 start-0 flex items-center ps-4 pointer-events-none text-charcoal-500">
-                                <i class="bi bi-calendar-event"></i>
+                            <div class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none text-charcoal-400">
+                                <i class="bi bi-calendar-event text-sm"></i>
                             </div>
-                            <input type="date" name="date_of_birth" class="block w-full ps-10 px-3 py-2 bg-surface-50 border border-surface-200 rounded-lg focus:ring-2 focus:ring-corporate-600 text-charcoal-700" 
+                            <input type="date" name="date_of_birth" class="block w-full ps-9 px-3 py-2.5 bg-surface-50 border border-surface-200 rounded-lg focus:ring-2 focus:ring-corporate-600 focus:border-corporate-600 text-charcoal-700 text-sm" 
                                    value="{{ form.date_of_birth.value|default:'' }}">
                         </div>
                     </div>
 
-                    {# Gender #}
                     <div>
                         <label class="block pb-1">
                             <span class="text-xs font-bold uppercase tracking-wider text-charcoal-700">{% trans "Gender" %}</span>
                         </label>
-                        <select name="gender" class="block w-full px-3 py-2 bg-surface-50 border border-surface-200 rounded-lg focus:ring-2 focus:ring-corporate-600">
+                        <select name="gender" class="block w-full px-3 py-2.5 bg-surface-50 border border-surface-200 rounded-lg focus:ring-2 focus:ring-corporate-600 focus:border-corporate-600 text-sm">
                             <option value="" {% if not form.gender.value %}selected{% endif %}>{% trans "Select" %}</option>
                             <option value="male" {% if form.gender.value == "male" %}selected{% endif %}>{% trans "Male" %}</option>
                             <option value="female" {% if form.gender.value == "female" %}selected{% endif %}>{% trans "Female" %}</option>
@@ -96,32 +102,30 @@
                         </select>
                     </div>
 
-                    {# Email (read-only) #}
                     <div>
                         <label class="block pb-1">
                             <span class="text-xs font-bold uppercase tracking-wider text-charcoal-700">{% trans "Email" %}</span>
                         </label>
                         <div class="relative opacity-60">
-                            <div class="absolute inset-y-0 start-0 flex items-center ps-4 pointer-events-none">
-                                <i class="bi bi-envelope"></i>
+                            <div class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
+                                <i class="bi bi-envelope text-sm text-charcoal-400"></i>
                             </div>
-                            <input type="email" class="block w-full ps-10 px-3 py-2 bg-surface-100 border border-surface-200 rounded-lg cursor-not-allowed" value="{{ user.email }}" disabled>
+                            <input type="email" class="block w-full ps-9 px-3 py-2.5 bg-surface-100 border border-surface-200 rounded-lg cursor-not-allowed text-sm" value="{{ user.email }}" disabled>
                         </div>
-                        <div class="text-xs text-charcoal-500 mt-2 font-medium">
-                            <i class="bi bi-lock me-1"></i>{% trans "Contact support to change email" %}
-                        </div>
+                        <p class="text-[10px] text-charcoal-400 mt-1.5 font-medium">
+                            <i class="bi bi-lock me-1"></i>{% trans "Contact support to change" %}
+                        </p>
                     </div>
 
-                    {# Address #}
                     <div class="md:col-span-2">
                         <label class="block pb-1">
                             <span class="text-xs font-bold uppercase tracking-wider text-charcoal-700">{% trans "Default Address" %}</span>
                         </label>
                         <div class="relative">
-                            <div class="absolute top-3 start-0 flex items-center ps-4 pointer-events-none text-charcoal-500">
-                                <i class="bi bi-geo-alt"></i>
+                            <div class="absolute top-3 start-0 flex items-center ps-3.5 pointer-events-none text-charcoal-400">
+                                <i class="bi bi-geo-alt text-sm"></i>
                             </div>
-                            <textarea name="address" rows="3" class="block w-full ps-10 px-3 py-2 bg-surface-50 border border-surface-200 rounded-lg focus:ring-2 focus:ring-corporate-600 placeholder:text-charcoal-300 resize-y min-h-[80px]" 
+                            <textarea name="address" rows="2" class="block w-full ps-9 px-3 py-2.5 bg-surface-50 border border-surface-200 rounded-lg focus:ring-2 focus:ring-corporate-600 focus:border-corporate-600 placeholder:text-charcoal-300 resize-y text-sm" 
                                       placeholder="{% trans 'Your default shipping address' %}">{{ form.address.value|default:'' }}</textarea>
                         </div>
                     </div>
@@ -129,47 +133,54 @@
             </div>
         </div>
 
-        {# Notification Preferences #}
-        <div class="bg-white border border-surface-200 rounded-2xl overflow-hidden mb-6">
-            <div class="bg-surface-50 border-b border-surface-200 px-6 py-5">
-                <h5 class="font-bold text-xl tracking-tight mb-1 flex items-center gap-2">
-                    <i class="bi bi-bell text-blue-600 pt-1"></i>{% trans "Notification Preferences" %}
-                </h5>
-                <p class="text-charcoal-500 text-sm mb-0">{% trans "Manage how you receive updates" %}</p>
-            </div>
-            <div class="p-6 md:p-8">
-                <div class="flex flex-col gap-4 mb-0">
-                    {# Email Marketing #}
-                    <div class="flex items-center justify-between p-4 rounded-xl border border-surface-200 bg-white">
-                        <div class="flex items-center gap-4">
-                            <div class="bg-corporate-50 rounded-xl flex items-center justify-center w-12 h-12">
-                                <i class="bi bi-envelope-heart text-corporate-600 text-xl"></i>
+        {# Collapsible Card - Notification Preferences #}
+        <div class="bg-white border border-surface-200 rounded-2xl overflow-hidden mb-4">
+            <button type="button" @click="notificationsExpanded = !notificationsExpanded" class="w-full bg-surface-50 border-b border-surface-200 px-5 py-4 flex items-center justify-between hover:bg-surface-100 transition-colors">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
+                        <i class="bi bi-bell text-blue-600 text-lg"></i>
+                    </div>
+                    <div class="text-start">
+                        <h5 class="font-bold text-base text-charcoal-800 flex items-center gap-2">
+                            {% trans "Notifications" %}
+                        </h5>
+                        <p class="text-charcoal-500 text-xs mb-0">{% trans "Manage how you receive updates" %}</p>
+                    </div>
+                </div>
+                <i class="bi bi-chevron-down text-charcoal-400 transition-transform" :class="notificationsExpanded ? 'rotate-180' : ''"></i>
+            </button>
+            
+            <div x-show="notificationsExpanded" x-collapse class="p-5 md:p-6">
+                <div class="flex flex-col gap-3">
+                    <div class="flex items-center justify-between p-4 rounded-xl border border-surface-200 bg-white hover:border-corporate-200 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg bg-corporate-50 flex items-center justify-center">
+                                <i class="bi bi-envelope-heart text-corporate-600"></i>
                             </div>
                             <div>
-                                <div class="font-bold">{% trans "Email Promotions" %}</div>
+                                <div class="font-semibold text-sm text-charcoal-800">{% trans "Email Promotions" %}</div>
                                 <div class="text-charcoal-500 text-xs">{% trans "Receive deals and special offers" %}</div>
                             </div>
                         </div>
                         <div>
                             <input type="hidden" name="email_marketing" value="">
-                            <input type="checkbox" name="email_marketing" x-model="emailMkt" class="relative w-11 h-6 bg-surface-200 rounded-full peer-checked:bg-corporate-600 appearance-none cursor-pointer transition-colors before:content-[''] before:absolute before:top-[2px] before:start-[2px] before:bg-white before:rounded-full before:h-5 before:w-5 before:transition-all before:shadow checked:before:translate-x-full">
+                            <input type="checkbox" name="email_marketing" x-model="emailMkt" class="relative w-10 h-5 bg-surface-200 rounded-full peer-checked:bg-corporate-600 appearance-none cursor-pointer transition-colors before:content-[''] before:absolute before:top-0.5 before:start-0.5 before:bg-white before:rounded-full before:h-4 before:w-4 before:transition-all checked:before:translate-x-full">
                         </div>
                     </div>
 
-                    {# Push Notifications #}
-                    <div class="flex items-center justify-between p-4 rounded-xl border border-surface-200 bg-white">
-                        <div class="flex items-center gap-4">
-                            <div class="bg-green-50 rounded-xl flex items-center justify-center w-12 h-12">
-                                <i class="bi bi-app-indicator text-green-600 text-xl"></i>
+                    <div class="flex items-center justify-between p-4 rounded-xl border border-surface-200 bg-white hover:border-green-200 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center">
+                                <i class="bi bi-app-indicator text-green-600"></i>
                             </div>
                             <div>
-                                <div class="font-bold">{% trans "Push Notifications" %}</div>
+                                <div class="font-semibold text-sm text-charcoal-800">{% trans "Push Notifications" %}</div>
                                 <div class="text-charcoal-500 text-xs">{% trans "Order updates and alerts" %}</div>
                             </div>
                         </div>
                         <div>
                             <input type="hidden" name="push_notifications" value="">
-                            <input type="checkbox" name="push_notifications" x-model="pushNotif" class="relative w-11 h-6 bg-surface-200 rounded-full peer-checked:bg-green-600 appearance-none cursor-pointer transition-colors before:content-[''] before:absolute before:top-[2px] before:start-[2px] before:bg-white before:rounded-full before:h-5 before:w-5 before:transition-all before:shadow checked:before:translate-x-full">
+                            <input type="checkbox" name="push_notifications" x-model="pushNotif" class="relative w-10 h-5 bg-surface-200 rounded-full peer-checked:bg-green-600 appearance-none cursor-pointer transition-colors before:content-[''] before:absolute before:top-0.5 before:start-0.5 before:bg-white before:rounded-full before:h-4 before:w-4 before:transition-all checked:before:translate-x-full">
                         </div>
                     </div>
                 </div>
@@ -177,10 +188,10 @@
         </div>
 
         {# Save Button #}
-        <div class="flex gap-4">
-            <button type="submit" class="inline-flex items-center px-6 py-2.5 text-sm font-semibold text-white bg-corporate-600 rounded-lg hover:bg-corporate-700 shadow-sm transition-all" :disabled="submitting" :class="submitting ? 'opacity-50 cursor-not-allowed' : ''">
-                <i class="bi bi-check2-circle text-lg me-2"></i>
-                <span x-text="submitting ? 'Saving...' : '{% trans "Save All Changes" %}'"></span>
+        <div class="flex justify-end">
+            <button type="submit" class="inline-flex items-center px-5 py-2.5 text-sm font-semibold text-white bg-corporate-600 rounded-xl hover:bg-corporate-700 shadow-md hover:shadow-lg transition-all" :disabled="submitting" :class="submitting ? 'opacity-50 cursor-not-allowed' : ''">
+                <i class="bi bi-check2-circle me-2"></i>
+                <span x-text="submitting ? 'Saving...' : '{% trans "Save Changes" %}'"></span>
             </button>
         </div>
     </form>

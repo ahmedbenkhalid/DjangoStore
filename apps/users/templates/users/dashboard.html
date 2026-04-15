@@ -13,6 +13,13 @@
     orderDetailContent: null,
     addressModal: null,
     
+    get greeting() {
+        const hour = new Date().getHours();
+        if (hour < 12) return '{% trans "Good morning" %}';
+        if (hour < 18) return '{% trans "Good afternoon" %}';
+        return '{% trans "Good evening" %}';
+    },
+    
     init() {
         this.$watch('activeTab', value => {
             const url = new URL(window.location);
@@ -61,124 +68,114 @@
     }
 }">
 
-    {# Breadcrumb #}
-    <nav class="text-sm mb-6 text-charcoal-500 font-medium flex items-center gap-2">
-        <a href="{% url 'home' %}" class="hover:text-corporate-600 transition-colors flex items-center gap-1">
-            <i class="bi bi-house pt-1"></i>{% trans "Home" %}
-        </a>
-        <i class="bi bi-chevron-right text-[10px] mt-0.5"></i>
-        <span class="font-bold text-charcoal-700">{% trans "My Profile" %}</span>
-    </nav>
-
     {# Main Layout #}
-    <div class="flex flex-col lg:flex-row gap-8">
+    <div class="flex flex-col lg:flex-row gap-6 lg:gap-8">
         
         {# Sidebar (Desktop) #}
         <div class="lg:w-64 xl:w-72 lg:hidden xl:block">
             <div class="bg-white border border-surface-200 rounded-2xl overflow-hidden sticky top-24">
                 
                 {# Avatar & Names #}
-                <div class="p-6 text-center border-b border-surface-200 bg-surface-50">
+                <div class="p-5 text-center border-b border-surface-200">
                     <form method="post" enctype="multipart/form-data" id="avatarForm">
                         {% csrf_token %}
                         <input type="file" name="avatar" id="id_avatar" class="hidden" onchange="document.getElementById('avatarForm').submit()">
                     </form>
 
-                    <div class="relative inline-block mb-4">
+                    <div class="relative inline-block mb-3">
                         {% if profile_obj.avatar %}
-                            <img src="{{ profile_obj.avatar.url }}" class="rounded-full shadow-md w-24 h-24 object-cover border-4 border-corporate-100" alt="{{ user.username }}">
+                            <img src="{{ profile_obj.avatar.url }}" class="rounded-full shadow-md w-20 h-20 object-cover border-3 border-corporate-100" alt="{{ user.username }}">
                         {% else %}
-                            <div class="rounded-full flex items-center justify-center text-corporate-600 font-bold text-4xl shadow-md w-24 h-24 bg-corporate-50 border-4 border-corporate-100">
+                            <div class="rounded-full flex items-center justify-center text-corporate-600 font-bold text-3xl shadow-md w-20 h-20 bg-corporate-50 border-3 border-corporate-100">
                                 {{ user.username|first|upper }}
                             </div>
                         {% endif %}
-                        <button type="button" class="inline-flex items-center justify-center w-8 h-8 text-white bg-corporate-600 rounded-full hover:bg-corporate-700 absolute bottom-0 end-0 shadow-lg min-h-0" 
+                        <button type="button" class="inline-flex items-center justify-center w-7 h-7 text-white bg-corporate-600 rounded-full hover:bg-corporate-700 absolute bottom-0 end-0 shadow-lg min-h-0" 
                                 onclick="document.getElementById('id_avatar').click();">
                             <i class="bi bi-camera-fill text-xs"></i>
                         </button>
                     </div>
 
-                    <h6 class="font-bold text-xl tracking-tight mb-1">
+                    <h6 class="font-bold text-lg mb-0.5">
                         {% if user.get_full_name %}{{ user.get_full_name }}{% else %}{{ user.username }}{% endif %}
                     </h6>
-                    <p class="text-charcoal-500 text-sm mb-3 truncate px-2">{{ user.email }}</p>
+                    <p class="text-charcoal-500 text-xs mb-2 truncate px-2">{{ user.email }}</p>
 
-                    {# Verified badge #}
-                    <div class="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium bg-green-100 text-green-700 rounded-full border border-green-200">
-                        <i class="bi bi-patch-check-fill text-green-600"></i>
+                    <div class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium bg-green-50 text-green-700 rounded-full border border-green-200">
+                        <i class="bi bi-patch-check-fill text-sm"></i>
                         {% trans "Verified" %}
                     </div>
-
-                    {# Member since #}
-                    <div class="text-charcoal-400 mt-3 text-xs font-semibold uppercase tracking-wider">
-                        <i class="bi bi-calendar3 me-1"></i>
-                        {% trans "Member since" %} {{ user.date_joined|date:"M Y" }}
-                    </div>
                 </div>
 
-                {# Quick Stats #}
-                <div class="flex border-b border-surface-200 text-center py-4 bg-white">
-                    <a href="#" @click.prevent="switchTab('orders')" class="flex-1 hover:text-corporate-600 transition-colors">
-                        <div class="font-black text-xl">{{ order_count }}</div>
-                        <div class="text-charcoal-500 text-xs font-semibold uppercase tracking-wider">{% trans "Orders" %}</div>
-                    </a>
-                    <div class="w-px bg-surface-200"></div>
-                    <a href="#" @click.prevent="switchTab('wishlist')" class="flex-1 hover:text-corporate-600 transition-colors">
-                        <div class="font-black text-xl">{{ wishlist_count }}</div>
-                        <div class="text-charcoal-500 text-xs font-semibold uppercase tracking-wider">{% trans "Wishlist" %}</div>
-                    </a>
-                    <div class="w-px bg-surface-200"></div>
-                    <a href="#" @click.prevent="switchTab('addresses')" class="flex-1 hover:text-corporate-600 transition-colors">
-                        <div class="font-black text-xl">{{ address_count }}</div>
-                        <div class="text-charcoal-500 text-xs font-semibold uppercase tracking-wider">{% trans "Addrs" %}</div>
-                    </a>
+                {# Quick Stats - Activity Dashboard Style #}
+                <div class="grid grid-cols-3 gap-2 p-3 border-b border-surface-200">
+                    <button @click.prevent="switchTab('orders')" class="flex flex-col items-center p-3 rounded-xl hover:bg-surface-50 transition-all group">
+                        <div class="w-10 h-10 rounded-full bg-corporate-50 flex items-center justify-center mb-2 group-hover:bg-corporate-100 transition-colors">
+                            <i class="bi bi-bag-check text-corporate-600 text-lg"></i>
+                        </div>
+                        <div class="font-black text-xl text-charcoal-800">{{ order_count }}</div>
+                        <div class="text-charcoal-400 text-[10px] font-semibold uppercase tracking-wider mt-0.5">{% trans "Orders" %}</div>
+                    </button>
+                    <button @click.prevent="switchTab('wishlist')" class="flex flex-col items-center p-3 rounded-xl hover:bg-surface-50 transition-all group">
+                        <div class="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center mb-2 group-hover:bg-red-100 transition-colors">
+                            <i class="bi bi-heart text-red-500 text-lg"></i>
+                        </div>
+                        <div class="font-black text-xl text-charcoal-800">{{ wishlist_count }}</div>
+                        <div class="text-charcoal-400 text-[10px] font-semibold uppercase tracking-wider mt-0.5">{% trans "Wishlist" %}</div>
+                    </button>
+                    <button @click.prevent="switchTab('addresses')" class="flex flex-col items-center p-3 rounded-xl hover:bg-surface-50 transition-all group">
+                        <div class="w-10 h-10 rounded-full bg-amber-50 flex items-center justify-center mb-2 group-hover:bg-amber-100 transition-colors">
+                            <i class="bi bi-geo-alt text-amber-500 text-lg"></i>
+                        </div>
+                        <div class="font-black text-xl text-charcoal-800">{{ address_count }}</div>
+                        <div class="text-charcoal-400 text-[10px] font-semibold uppercase tracking-wider mt-0.5">{% trans "Addrs" %}</div>
+                    </button>
                 </div>
 
-                {# Nav Links #}
-                <div class="flex flex-col p-3 gap-1">
+                {# Nav Links - Compact #}
+                <div class="flex flex-col p-2 gap-0.5">
                     <button @click="switchTab('personal')" 
-                            class="inline-flex items-center px-3 py-2.5 text-sm text-charcoal-700 hover:bg-surface-100 rounded-lg justify-start transition-all w-full text-start"
-                            :class="activeTab === 'personal' ? 'bg-corporate-50 text-corporate-600 font-semibold' : ''">
+                            class="inline-flex items-center px-3 py-2.5 text-sm text-charcoal-600 hover:bg-surface-50 rounded-lg justify-start transition-all w-full text-start rounded-s-xl"
+                            :class="activeTab === 'personal' ? 'bg-corporate-50 text-corporate-600 font-semibold border-s-2 border-corporate-600' : ''">
                         <i class="bi bi-person-gear text-lg me-3 w-5"></i>
-                        <span>{% trans "Personal Info" %}</span>
+                        <span>{% trans "Personal" %}</span>
                     </button>
                     <button @click="switchTab('orders')" 
-                            class="inline-flex items-center px-3 py-2.5 text-sm text-charcoal-700 hover:bg-surface-100 rounded-lg justify-start transition-all w-full text-start"
-                            :class="activeTab === 'orders' ? 'bg-corporate-50 text-corporate-600 font-semibold' : ''">
-                        <i class="bi bi-bag-check text-lg me-3 w-5"></i>
-                        <span class="flex-grow text-start">{% trans "My Orders" %}</span>
+                            class="inline-flex items-center px-3 py-2.5 text-sm text-charcoal-600 hover:bg-surface-50 rounded-lg justify-start transition-all w-full text-start rounded-s-xl"
+                            :class="activeTab === 'orders' ? 'bg-corporate-50 text-corporate-600 font-semibold border-s-2 border-corporate-600' : ''">
+                        <i class="bi bi-box-seam text-lg me-3 w-5"></i>
+                        <span class="flex-grow text-start">{% trans "Orders" %}</span>
                         {% if order_count > 0 %}
-                        <span class="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-corporate-100 text-corporate-700 rounded-full">{{ order_count }}</span>
+                        <span class="inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium bg-corporate-100 text-corporate-700 rounded-full">{{ order_count }}</span>
                         {% endif %}
                     </button>
                     <button @click="switchTab('addresses')" 
-                            class="inline-flex items-center px-3 py-2.5 text-sm text-charcoal-700 hover:bg-surface-100 rounded-lg justify-start transition-all w-full text-start"
-                            :class="activeTab === 'addresses' ? 'bg-corporate-50 text-corporate-600 font-semibold' : ''">
+                            class="inline-flex items-center px-3 py-2.5 text-sm text-charcoal-600 hover:bg-surface-50 rounded-lg justify-start transition-all w-full text-start rounded-s-xl"
+                            :class="activeTab === 'addresses' ? 'bg-corporate-50 text-corporate-600 font-semibold border-s-2 border-corporate-600' : ''">
                         <i class="bi bi-geo-alt text-lg me-3 w-5"></i>
                         <span>{% trans "Addresses" %}</span>
                     </button>
                     <button @click="switchTab('wishlist')" 
-                            class="inline-flex items-center px-3 py-2.5 text-sm text-charcoal-700 hover:bg-surface-100 rounded-lg justify-start transition-all w-full text-start"
-                            :class="activeTab === 'wishlist' ? 'bg-corporate-50 text-corporate-600 font-semibold' : ''">
+                            class="inline-flex items-center px-3 py-2.5 text-sm text-charcoal-600 hover:bg-surface-50 rounded-lg justify-start transition-all w-full text-start rounded-s-xl"
+                            :class="activeTab === 'wishlist' ? 'bg-corporate-50 text-corporate-600 font-semibold border-s-2 border-corporate-600' : ''">
                         <i class="bi bi-heart text-lg me-3 w-5"></i>
                         <span class="flex-grow text-start">{% trans "Wishlist" %}</span>
                         {% if wishlist_count > 0 %}
-                        <span class="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-corporate-100 text-corporate-700 rounded-full">{{ wishlist_count }}</span>
+                        <span class="inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium bg-corporate-100 text-corporate-700 rounded-full">{{ wishlist_count }}</span>
                         {% endif %}
                     </button>
                     <button @click="switchTab('security')" 
-                            class="inline-flex items-center px-3 py-2.5 text-sm text-charcoal-700 hover:bg-surface-100 rounded-lg justify-start transition-all w-full text-start"
-                            :class="activeTab === 'security' ? 'bg-corporate-50 text-corporate-600 font-semibold' : ''">
+                            class="inline-flex items-center px-3 py-2.5 text-sm text-charcoal-600 hover:bg-surface-50 rounded-lg justify-start transition-all w-full text-start rounded-s-xl"
+                            :class="activeTab === 'security' ? 'bg-corporate-50 text-corporate-600 font-semibold border-s-2 border-corporate-600' : ''">
                         <i class="bi bi-shield-lock text-lg me-3 w-5"></i>
                         <span>{% trans "Security" %}</span>
                     </button>
 
-                    <div class="h-px bg-surface-200 my-2"></div>
+                    <div class="h-px bg-surface-200 my-1"></div>
 
-                    {# Logout #}
                     <form action="{% url 'users:logout' %}" method="post" class="m-0">
                         {% csrf_token %}
-                        <button type="submit" class="inline-flex items-center px-3 py-2.5 text-sm text-red-600 hover:bg-red-50 rounded-lg justify-start w-full">
+                        <button type="submit" class="inline-flex items-center px-3 py-2.5 text-sm text-red-600 hover:bg-red-50 rounded-lg justify-start w-full rounded-s-xl">
                             <i class="bi bi-box-arrow-right text-lg me-3 w-5"></i>
                             <span>{% trans "Logout" %}</span>
                         </button>
@@ -187,9 +184,95 @@
             </div>
         </div>
 
-        {# Content Area #}
+{# Content Area #}
         <div class="flex-1 min-h-[60vh] pb-24 lg:pb-0">
-            
+             
+            {# Welcome Banner - Activity Dashboard #}
+            <div class="bg-gradient-to-r from-corporate-600 to-corporate-700 rounded-2xl p-6 mb-6 text-white relative overflow-hidden">
+                <div class="absolute end-0 top-0 w-1/2 h-full opacity-10">
+                    <svg class="w-full h-full" viewBox="0 0 200 200" fill="currentColor">
+                        <path d="M100 0C44.5 0 0 44.5 0 100s44.5 100 100 100 100-44.5 100-100S155.5 0 100 0zm0 160c-33.1 0-60-27-60-60s27-60 60-60 60 27 60 60-27 60-60 60z"/>
+                        <circle cx="100" cy="100" r="30"/>
+                        <circle cx="100" cy="40" r="15"/>
+                        <circle cx="100" cy="160" r="15"/>
+                        <circle cx="40" cy="100" r="15"/>
+                        <circle cx="160" cy="100" r="15"/>
+                    </svg>
+                </div>
+                <div class="relative">
+                    <p class="text-corporate-100 text-sm font-medium mb-1" x-text="greeting"></p>
+                    <h1 class="font-bold text-2xl mb-1">
+                        {% if user.get_full_name %}{{ user.get_full_name }}{% else %}{{ user.username }}{% endif %}
+                    </h1>
+                    <p class="text-corporate-100 text-sm">{% trans "Welcome back! Here's your activity summary." %}</p>
+                    
+                    {# Quick Stats Row #}
+                    <div class="grid grid-cols-3 gap-3 mt-5">
+                        <div class="bg-white/10 backdrop-blur rounded-xl p-3 text-center">
+                            <div class="font-black text-2xl">{{ order_count }}</div>
+                            <div class="text-xs text-corporate-100">{% trans "Orders" %}</div>
+                        </div>
+                        <div class="bg-white/10 backdrop-blur rounded-xl p-3 text-center">
+                            <div class="font-black text-2xl">{{ wishlist_count }}</div>
+                            <div class="text-xs text-corporate-100">{% trans "Wishlist" %}</div>
+                        </div>
+                        <div class="bg-white/10 backdrop-blur rounded-xl p-3 text-center">
+                            <div class="font-black text-2xl">{{ address_count }}</div>
+                            <div class="text-xs text-corporate-100">{% trans "Addresses" %}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# Breadcrumb #}
+            <nav class="text-sm mb-4 text-charcoal-500 font-medium flex items-center gap-2">
+                <a href="{% url 'home' %}" class="hover:text-corporate-600 transition-colors flex items-center gap-1">
+                    <i class="bi bi-house pt-1"></i>{% trans "Home" %}
+                </a>
+                <i class="bi bi-chevron-right text-[10px] mt-0.5"></i>
+                <span class="font-bold text-charcoal-700">{% trans "My Profile" %}</span>
+            </nav>
+
+            {# Quick Actions #}
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                <button @click="switchTab('orders')" class="flex items-center gap-3 p-3 bg-white border border-surface-200 rounded-xl hover:border-corporate-300 hover:shadow-md transition-all text-start">
+                    <div class="w-10 h-10 rounded-lg bg-corporate-50 flex items-center justify-center">
+                        <i class="bi bi-truck text-corporate-600"></i>
+                    </div>
+                    <div>
+                        <div class="font-semibold text-sm text-charcoal-800">{% trans "Track Order" %}</div>
+                        <div class="text-xs text-charcoal-500">{% trans "View status" %}</div>
+                    </div>
+                </button>
+                <button @click="switchTab('wishlist')" class="flex items-center gap-3 p-3 bg-white border border-surface-200 rounded-xl hover:border-red-300 hover:shadow-md transition-all text-start">
+                    <div class="w-10 h-10 rounded-lg bg-red-50 flex items-center justify-center">
+                        <i class="bi bi-heart text-red-500"></i>
+                    </div>
+                    <div>
+                        <div class="font-semibold text-sm text-charcoal-800">{% trans "Wishlist" %}</div>
+                        <div class="text-xs text-charcoal-500">{{ wishlist_count }} {% trans "items" %}</div>
+                    </div>
+                </button>
+                <button @click="switchTab('addresses')" class="flex items-center gap-3 p-3 bg-white border border-surface-200 rounded-xl hover:border-amber-300 hover:shadow-md transition-all text-start">
+                    <div class="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center">
+                        <i class="bi bi-geo-alt text-amber-600"></i>
+                    </div>
+                    <div>
+                        <div class="font-semibold text-sm text-charcoal-800">{% trans "Addresses" %}</div>
+                        <div class="text-xs text-charcoal-500">{% trans "Manage" %}</div>
+                    </div>
+                </button>
+                <a href="{% url 'products:products' %}" class="flex items-center gap-3 p-3 bg-white border border-surface-200 rounded-xl hover:border-green-300 hover:shadow-md transition-all text-start">
+                    <div class="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center">
+                        <i class="bi bi-bag-heart text-green-600"></i>
+                    </div>
+                    <div>
+                        <div class="font-semibold text-sm text-charcoal-800">{% trans "Shop Now" %}</div>
+                        <div class="text-xs text-charcoal-500">{% trans "Browse" %}</div>
+                    </div>
+                </a>
+            </div>
+             
             {# Personal Tab #}
             <div x-show="activeTab === 'personal'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
                 {% include 'users/dashboard/_personal.html' %}
@@ -218,45 +301,60 @@
         </div>
     </div>
 
-    {# Mobile Bottom Navigation #}
-    <nav class="lg:hidden fixed bottom-0 start-0 end-0 bg-white border-t border-surface-200 z-40 safe-area-pb">
-        <div class="flex justify-around">
+    {# Mobile Bottom Navigation - Improved #}
+    <nav class="lg:hidden fixed bottom-0 start-0 end-0 bg-white border-t border-surface-200 z-40 safe-area-pb shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+        <div class="flex justify-around items-end">
             <button @click="switchTab('personal')" 
-                    class="flex flex-col items-center py-3 px-4 transition-colors"
-                    :class="activeTab === 'personal' ? 'text-corporate-600' : 'text-charcoal-500'">
-                <i class="bi bi-person-gear text-xl"></i>
-                <span class="text-[10px] mt-1 font-medium">{% trans "Profile" %}</span>
+                    class="flex flex-col items-center py-2.5 px-3 transition-all relative"
+                    :class="activeTab === 'personal' ? 'text-corporate-600' : 'text-charcoal-400'">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center transition-colors" :class="activeTab === 'personal' ? 'bg-corporate-50' : ''">
+                    <i class="bi bi-person text-xl"></i>
+                </div>
+                <span class="text-[9px] mt-1 font-medium">{% trans "Profile" %}</span>
+                <div class="absolute -bottom-px w-8 h-0.5 bg-corporate-600 rounded-full" x-show="activeTab === 'personal'"></div>
             </button>
             
             <button @click="switchTab('orders')" 
-                    class="flex flex-col items-center py-3 px-4 transition-colors relative"
-                    :class="activeTab === 'orders' ? 'text-corporate-600' : 'text-charcoal-500'">
-                <i class="bi bi-bag-check text-xl"></i>
-                <span class="text-[10px] mt-1 font-medium">{% trans "Orders" %}</span>
+                    class="flex flex-col items-center py-2.5 px-3 transition-all relative"
+                    :class="activeTab === 'orders' ? 'text-corporate-600' : 'text-charcoal-400'">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center transition-colors" :class="activeTab === 'orders' ? 'bg-corporate-50' : ''">
+                    <i class="bi bi-box-seam text-xl"></i>
+                </div>
+                <span class="text-[9px] mt-1 font-medium">{% trans "Orders" %}</span>
                 {% if order_count > 0 %}
-                <span class="absolute top-2 end-2 w-4 h-4 bg-red-500 text-white text-[8px] font-bold rounded-full flex items-center justify-center">{{ order_count }}</span>
+                <span class="absolute top-1 end-3 w-4 h-4 bg-red-500 text-white text-[7px] font-bold rounded-full flex items-center justify-center">{{ order_count }}</span>
                 {% endif %}
+                <div class="absolute -bottom-px w-8 h-0.5 bg-corporate-600 rounded-full" x-show="activeTab === 'orders'"></div>
             </button>
             
             <button @click="switchTab('addresses')" 
-                    class="flex flex-col items-center py-3 px-4 transition-colors"
-                    :class="activeTab === 'addresses' ? 'text-corporate-600' : 'text-charcoal-500'">
-                <i class="bi bi-geo-alt text-xl"></i>
-                <span class="text-[10px] mt-1 font-medium">{% trans "Address" %}</span>
+                    class="flex flex-col items-center py-2.5 px-3 transition-all relative"
+                    :class="activeTab === 'addresses' ? 'text-corporate-600' : 'text-charcoal-400'">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center transition-colors" :class="activeTab === 'addresses' ? 'bg-corporate-50' : ''">
+                    <i class="bi bi-geo-alt text-xl"></i>
+                </div>
+                <span class="text-[9px] mt-1 font-medium">{% trans "Address" %}</span>
+                <div class="absolute -bottom-px w-8 h-0.5 bg-corporate-600 rounded-full" x-show="activeTab === 'addresses'"></div>
             </button>
             
             <button @click="switchTab('wishlist')" 
-                    class="flex flex-col items-center py-3 px-4 transition-colors"
-                    :class="activeTab === 'wishlist' ? 'text-corporate-600' : 'text-charcoal-500'">
-                <i class="bi bi-heart text-xl"></i>
-                <span class="text-[10px] mt-1 font-medium">{% trans "Wishlist" %}</span>
+                    class="flex flex-col items-center py-2.5 px-3 transition-all relative"
+                    :class="activeTab === 'wishlist' ? 'text-red-500' : 'text-charcoal-400'">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center transition-colors" :class="activeTab === 'wishlist' ? 'bg-red-50' : ''">
+                    <i class="bi bi-heart text-xl"></i>
+                </div>
+                <span class="text-[9px] mt-1 font-medium">{% trans "Wishlist" %}</span>
+                <div class="absolute -bottom-px w-8 h-0.5 bg-red-500 rounded-full" x-show="activeTab === 'wishlist'"></div>
             </button>
             
             <button @click="switchTab('security')" 
-                    class="flex flex-col items-center py-3 px-4 transition-colors"
-                    :class="activeTab === 'security' ? 'text-corporate-600' : 'text-charcoal-500'">
-                <i class="bi bi-shield-lock text-xl"></i>
-                <span class="text-[10px] mt-1 font-medium">{% trans "Security" %}</span>
+                    class="flex flex-col items-center py-2.5 px-3 transition-all relative"
+                    :class="activeTab === 'security' ? 'text-corporate-600' : 'text-charcoal-400'">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center transition-colors" :class="activeTab === 'security' ? 'bg-corporate-50' : ''">
+                    <i class="bi bi-shield-lock text-xl"></i>
+                </div>
+                <span class="text-[9px] mt-1 font-medium">{% trans "Security" %}</span>
+                <div class="absolute -bottom-px w-8 h-0.5 bg-corporate-600 rounded-full" x-show="activeTab === 'security'"></div>
             </button>
         </div>
     </nav>

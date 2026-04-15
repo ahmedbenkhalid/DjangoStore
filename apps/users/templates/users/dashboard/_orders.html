@@ -2,72 +2,88 @@
 {% load humanize %}
 
 {# Orders Header #}
-<div class="flex justify-between items-center mb-6">
-    <div>
-        <h2 class="font-bold text-2xl tracking-tight text-charcoal-900 flex items-center gap-2">
-            <i class="bi bi-bag-check text-corporate-600"></i>{% trans "My Orders" %}
-        </h2>
-        <p class="text-charcoal-500 text-sm mt-1">{% trans "Track your purchases and manage returns" %}</p>
+<div class="flex justify-between items-center mb-5">
+    <div class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-2xl bg-corporate-100 flex items-center justify-center">
+            <i class="bi bi-box-seam text-corporate-600 text-xl"></i>
+        </div>
+        <div>
+            <h2 class="font-bold text-xl text-charcoal-800">{% trans "My Orders" %}</h2>
+            <p class="text-charcoal-500 text-xs mb-0">{% trans "Track your purchases" %}</p>
+        </div>
     </div>
+    {% if orders %}
+    <span class="inline-flex items-center px-2.5 py-1 text-xs font-semibold bg-corporate-100 text-corporate-700 rounded-full">
+        {{ orders|length }} {% trans "orders" %}
+    </span>
+    {% endif %}
 </div>
 
 {# Orders List #}
 <div id="orders-list-container">
     {% if orders %}
-    <div class="flex flex-col gap-4">
+    <div class="flex flex-col gap-3">
         {% for order in orders %}
-        <div class="bg-white shadow-sm border border-surface-200 rounded-xl p-5 hover:shadow-lg transition-all duration-300 cursor-pointer"
+        <div class="bg-white border border-surface-200 rounded-xl p-4 hover:border-corporate-300 hover:shadow-lg transition-all duration-300 cursor-pointer"
              @click="$dispatch('open-order-drawer', {{ order.id }})">
-            <div class="flex flex-col md:flex-row md:items-center gap-4 text-center md:text-start">
+            <div class="flex flex-col md:flex-row md:items-center gap-3">
                 {# Order ID & Date #}
-                <div class="md:w-1/4">
-                    <div class="mb-2">
-                        <span class="inline-flex items-center px-2.5 py-0.5 text-xs font-medium bg-surface-100 text-charcoal-600 rounded-full font-bold uppercase tracking-wider">
-                            ID: {{ order.id }}
+                <div class="md:w-1/5">
+                    <div class="mb-1.5">
+                        <span class="inline-flex items-center px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-surface-100 text-charcoal-600 rounded-md">
+                            #{{ order.id }}
                         </span>
                     </div>
-                    <div class="text-charcoal-400 text-xs font-semibold uppercase tracking-wider">
-                        <i class="bi bi-clock-history me-1"></i> {{ order.created_at|date:"d M, Y" }}
+                    <div class="text-charcoal-400 text-xs flex items-center gap-1">
+                        <i class="bi bi-calendar3"></i> {{ order.created_at|date:"d M, Y" }}
                     </div>
                 </div>
 
                 {# Status Badge #}
-                <div class="md:w-1/4 flex justify-center md:justify-start">
+                <div class="md:w-1/5">
                     {% if order.status == 'delivered' %}
-                    <div class="inline-flex items-center gap-2 text-sm font-bold tracking-wider uppercase px-3 py-1 rounded-full border text-green-600 bg-green-50 border-green-200">
-                        <span class="rounded-full w-2 h-2 bg-current"></span>
+                    <div class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border bg-green-50 text-green-700 border-green-200">
+                        <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
                         {{ order.get_status_display }}
                     </div>
                     {% elif order.status == 'cancelled' %}
-                    <div class="inline-flex items-center gap-2 text-sm font-bold tracking-wider uppercase px-3 py-1 rounded-full border text-red-600 bg-red-50 border-red-200">
-                        <span class="rounded-full w-2 h-2 bg-current"></span>
+                    <div class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border bg-red-50 text-red-700 border-red-200">
+                        <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
                         {{ order.get_status_display }}
                     </div>
                     {% elif order.status == 'pending' %}
-                    <div class="inline-flex items-center gap-2 text-sm font-bold tracking-wider uppercase px-3 py-1 rounded-full border text-amber-600 bg-amber-50 border-amber-200">
-                        <span class="rounded-full w-2 h-2 bg-current animate-pulse"></span>
+                    <div class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border bg-amber-50 text-amber-700 border-amber-200">
+                        <span class="w-1.5 h-1.5 rounded-full bg-current animate-pulse"></span>
                         {{ order.get_status_display }}
                     </div>
                     {% else %}
-                    <div class="inline-flex items-center gap-2 text-sm font-bold tracking-wider uppercase px-3 py-1 rounded-full border text-blue-600 bg-blue-50 border-blue-200">
-                        <span class="rounded-full w-2 h-2 bg-current"></span>
+                    <div class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border bg-blue-50 text-blue-700 border-blue-200">
+                        <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
                         {{ order.get_status_display }}
                     </div>
                     {% endif %}
                 </div>
 
-                {# Total Amount #}
-                <div class="md:w-1/4">
-                    <div class="font-black text-lg">
-                        <span class="text-xs font-medium align-super text-charcoal-400">{% if request.LANGUAGE_CODE == 'ar' %}ج.م{% else %}EGP{% endif %}</span>
-                        {{ order.total_amount|floatformat:2|intcomma }}
+                {# Items Count #}
+                <div class="md:w-1/5">
+                    <div class="text-charcoal-600 text-sm">
+                        <span class="font-semibold">{{ order.items.count }}</span>
+                        <span class="text-charcoal-400 text-xs">{% trans "items" %}</span>
                     </div>
                 </div>
 
-                {# View Details Button #}
-                <div class="md:w-1/4 md:text-end mt-4 md:mt-0">
-                    <button type="button" class="inline-flex items-center px-4 py-2 text-sm font-medium text-charcoal-700 bg-white border border-surface-200 rounded-lg hover:bg-corporate-50 hover:border-corporate-600 w-full md:w-auto justify-center transition-colors">
-                        {% trans "View Details" %} <i class="bi bi-arrow-right-short text-xl ms-1"></i>
+                {# Total Amount #}
+                <div class="md:w-1/5">
+                    <div class="font-bold text-lg text-charcoal-800">
+                        {% if request.LANGUAGE_CODE == 'ar' %}<span class="text-xs font-medium text-charcoal-400">ج.م</span>{% else %}<span class="text-xs font-medium text-charcoal-400">EGP</span>{% endif %}
+                        {{ order.total_amount|floatformat:0|intcomma }}
+                    </div>
+                </div>
+
+                {# View Action #}
+                <div class="md:w-1/5 md:text-end">
+                    <button type="button" class="inline-flex items-center px-3 py-1.5 text-xs font-semibold text-corporate-600 bg-corporate-50 rounded-lg hover:bg-corporate-100 w-full md:w-auto justify-center transition-colors">
+                        <i class="bi bi-eye me-1.5"></i>{% trans "View" %}
                     </button>
                 </div>
             </div>
@@ -76,15 +92,14 @@
     </div>
 
     {% else %}
-    {# Empty State #}
-    <div class="flex flex-col items-center justify-center py-20 px-4 bg-white border border-surface-200 rounded-2xl text-center">
-        <div class="bg-surface-100 rounded-full flex items-center justify-center w-24 h-24 mb-6 border border-surface-200">
-            <i class="bi bi-bag text-5xl text-charcoal-300"></i>
+    <div class="flex flex-col items-center justify-center py-16 px-4 bg-white border border-surface-200 rounded-2xl text-center">
+        <div class="w-16 h-16 rounded-2xl bg-surface-100 flex items-center justify-center mb-4">
+            <i class="bi bi-box-seam text-3xl text-charcoal-300"></i>
         </div>
-        <h4 class="font-bold text-2xl tracking-tight mb-2">{% trans "No orders yet" %}</h4>
-        <p class="text-charcoal-500 mb-8 max-w-sm">{% trans "Your order history will appear here once you make a purchase." %}</p>
-        <a href="{% url 'products:products' %}" class="inline-flex items-center px-6 py-3 text-sm font-semibold text-white bg-corporate-600 rounded-lg hover:bg-corporate-700 shadow-md transition-colors">
-            <i class="bi bi-bag-heart-fill text-lg me-2"></i>{% trans "Start Shopping" %}
+        <h4 class="font-bold text-lg text-charcoal-800 mb-1">{% trans "No orders yet" %}</h4>
+        <p class="text-charcoal-500 text-sm mb-6 max-w-xs">{% trans "Your order history will appear here once you make a purchase." %}</p>
+        <a href="{% url 'products:products' %}" class="inline-flex items-center px-5 py-2.5 text-sm font-semibold text-white bg-corporate-600 rounded-xl hover:bg-corporate-700 shadow-md transition-colors">
+            <i class="bi bi-bag-heart me-2"></i>{% trans "Start Shopping" %}
         </a>
     </div>
     {% endif %}
