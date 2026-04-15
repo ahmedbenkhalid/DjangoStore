@@ -1,11 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login as auth_login
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.contrib import messages
 from django.db.models import Count
 from django.views.decorators.csrf import csrf_exempt
 from django.middleware.csrf import rotate_token
+from django.http import HttpResponse
 from django.utils.translation import gettext as _
 from .forms import UserRegisterForm, ProfileUpdateForm, AddressForm
 from orders.models import Order
@@ -62,14 +63,9 @@ def register(request):
 @login_required
 def profile(request):
     profile_obj, __ = Profile.objects.get_or_create(user=request.user)
+    tab = request.GET.get("tab", "personal")
 
-    recent_orders = list(
-        Order.objects.filter(user=request.user)
-        .prefetch_related("items__product__brand")
-        .order_by("-created_at")[:5]
-    )
-
-    if request.method == "POST":
+    if tab == "personal" and request.method == "POST":
         form = ProfileUpdateForm(request.POST, request.FILES, instance=profile_obj)
         if form.is_valid():
             form.save()
@@ -77,6 +73,9 @@ def profile(request):
             u.first_name = form.cleaned_data.get("first_name", "")
             u.last_name = form.cleaned_data.get("last_name", "")
             u.save()
+
+            if request.headers.get("Hx-Request"):
+                return HttpResponse(_("Profile updated successfully!"))
             messages.success(request, _("Profile updated successfully!"))
             return redirect("profile")
         else:
@@ -90,19 +89,33 @@ def profile(request):
             },
         )
 
-    return render(
-        request,
-        "users/profile.html",
-        {
-            "profile_obj": profile_obj,
-            "recent_orders": recent_orders,
-            "order_count": Order.objects.filter(user=request.user).count(),
-            "wishlist_count": request.user.profile.wishlist.count(),
-            "review_count": request.user.profile.reviews.count(),
-            "address_count": Address.objects.filter(user=request.user).count(),
-            "form": form,
-        },
-    )
+    password_form = PasswordChangeForm(request.user)
+
+    context = {
+        "profile_obj": profile_obj,
+        "order_count": Order.objects.filter(user=request.user).count(),
+        "wishlist_count": request.user.profile.wishlist.count(),
+        "review_count": request.user.profile.reviews.count(),
+        "address_count": Address.objects.filter(user=request.user).count(),
+        "form": form,
+        "password_form": password_form,
+        "active_tab": tab,
+    }
+
+    if tab == "orders":
+        context["orders"] = Order.objects.filter(user=request.user).order_by(
+            "-created_at"
+        )
+    elif tab == "addresses":
+        context["addresses"] = Address.objects.filter(user=request.user).order_by(
+            "-is_default", "-created_at"
+        )
+    elif tab == "wishlist":
+        context["wishlist_items"] = request.user.profile.wishlist.select_related(
+            "product"
+        ).all()
+
+    return render(request, "users/profile.html", context)
 
 
 def checkout(request):
@@ -128,6 +141,15 @@ def address_add(request):
                 Address.objects.filter(user=request.user).update(is_default=False)
             address.save()
             messages.success(request, _("Address added successfully!"))
+
+            if request.headers.get("Hx-Request"):
+                addresses = Address.objects.filter(user=request.user).order_by(
+                    "-is_default", "-created_at"
+                )
+                return render(
+                    request, "users/profile/_addresses.html", {"addresses": addresses}
+                )
+
             return redirect("users:address_list")
         else:
             messages.error(request, _("Please fix the errors below."))
@@ -148,6 +170,15 @@ def address_edit(request, pk):
                 )
             form.save()
             messages.success(request, _("Address updated successfully!"))
+
+            if request.headers.get("Hx-Request"):
+                addresses = Address.objects.filter(user=request.user).order_by(
+                    "-is_default", "-created_at"
+                )
+                return render(
+                    request, "users/profile/_addresses.html", {"addresses": addresses}
+                )
+
             return redirect("users:address_list")
         else:
             messages.error(request, _("Please fix the errors below."))
@@ -161,6 +192,15 @@ def address_delete(request, pk):
     address = get_object_or_404(Address, pk=pk, user=request.user)
     address.delete()
     messages.success(request, _("Address deleted successfully!"))
+
+    if request.headers.get("Hx-Request"):
+        addresses = Address.objects.filter(user=request.user).order_by(
+            "-is_default", "-created_at"
+        )
+        return render(
+            request, "users/profile/_addresses.html", {"addresses": addresses}
+        )
+
     return redirect("users:address_list")
 
 
@@ -171,4 +211,53 @@ def address_set_default(request, pk):
     address.is_default = True
     address.save()
     messages.success(request, _("Default address updated!"))
+
+    if request.headers.get("Hx-Request"):
+        addresses = Address.objects.filter(user=request.user).order_by(
+            "-is_default", "-created_at"
+        )
+        return render(
+            request, "users/profile/_addresses.html", {"addresses": addresses}
+        )
+
     return redirect("users:address_list")
+
+
+@login_required
+def address_form_partial(request):
+    address_id = request.GET.get("id")
+
+    if address_id and address_id != "null":
+        try:
+            address = Address.objects.get(pk=int(address_id), user=request.user)
+            form = AddressForm(instance=address)
+            address_id = address.pk
+        except Address.DoesNotExist:
+            form = AddressForm()
+            address_id = None
+    else:
+        form = AddressForm()
+        address_id = None
+
+    return render(
+        request,
+        "users/profile/_address_form_modal.html",
+        {"form": form, "address_id": address_id},
+    )
+
+
+@login_required
+def profile_order_detail(request, order_id):
+    from orders.models import Order, OrderItem
+
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+    items = order.items.select_related("product__brand").all()
+
+    return render(
+        request,
+        "users/profile/_order_detail_drawer.html",
+        {
+            "order": order,
+            "items": items,
+        },
+    )

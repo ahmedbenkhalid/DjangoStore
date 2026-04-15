@@ -288,6 +288,15 @@ def cancel_order(request, order_id):
             _("Order cannot be cancelled in its current status: %(status)s.")
             % {"status": order.get_status_display()},
         )
+        if request.headers.get("Hx-Request"):
+            return render(
+                request,
+                "users/profile/_order_detail_drawer.html",
+                {
+                    "order": order,
+                    "items": order.items.select_related("product__brand").all(),
+                },
+            )
         return redirect("orders:order_detail", order_id=order.id)
 
     # Restore stock for each item (product already prefetched)
@@ -306,5 +315,15 @@ def cancel_order(request, order_id):
     from .tasks import send_order_cancelled_task
 
     send_order_cancelled_task.delay(order.id)
+
+    if request.headers.get("Hx-Request"):
+        return render(
+            request,
+            "users/profile/_order_detail_drawer.html",
+            {
+                "order": order,
+                "items": order.items.select_related("product__brand").all(),
+            },
+        )
 
     return redirect("orders:order_detail", order_id=order.id)

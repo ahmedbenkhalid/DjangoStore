@@ -1,0 +1,83 @@
+{% load i18n %}
+
+{# Addresses Header #}
+<div class="flex justify-between items-center mb-6">
+    <div>
+        <h2 class="font-bold text-2xl tracking-tight text-charcoal-900 flex items-center gap-2">
+            <i class="bi bi-geo-alt text-corporate-600"></i>{% trans "Address Book" %}
+        </h2>
+        <p class="text-charcoal-500 text-sm mt-1">{% trans "Manage your shipping addresses" %}</p>
+    </div>
+    <button @click="$dispatch('open-address-modal', null)" 
+            class="inline-flex items-center px-5 py-2.5 text-sm font-semibold text-white bg-corporate-600 rounded-lg hover:bg-corporate-700 shadow-md transition-colors">
+        <i class="bi bi-plus-circle text-lg me-1"></i> {% trans "Add New" %}
+    </button>
+</div>
+
+{# Addresses List #}
+<div id="addresses-container" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    {% if addresses %}
+        {% for addr in addresses %}
+        <div class="bg-white border {% if addr.is_default %}border-corporate-600 ring-2 ring-corporate-100{% else %}border-surface-200{% endif %} rounded-2xl h-full transition-all hover:shadow-lg p-6 flex flex-col">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <h5 class="font-bold text-xl mb-2">{{ addr.name }}</h5>
+                    {% if addr.is_default %}
+                        <span class="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-corporate-100 text-corporate-700 rounded-full font-bold uppercase tracking-wider">{% trans "Default" %}</span>
+                    {% endif %}
+                </div>
+                <div class="inline-flex items-center border border-surface-200 rounded-lg overflow-hidden bg-white">
+                    <button @click="$dispatch('open-address-modal', {{ addr.pk }})" 
+                            class="inline-flex items-center px-3 py-1.5 text-xs text-charcoal-500 hover:bg-surface-100 rounded-none border-0 transition-colors" 
+                            title="{% trans 'Edit' %}">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <div class="w-px bg-surface-200"></div>
+                    <button hx-post="{% url 'users:address_set_default' addr.pk %}"
+                            hx-target="#addresses-container"
+                            hx-swap="innerHTML"
+                            class="inline-flex items-center px-3 py-1.5 text-xs {% if addr.is_default %}text-corporate-600 opacity-50 cursor-not-allowed{% else %}text-charcoal-500 hover:bg-corporate-50 hover:text-corporate-600{% endif %} rounded-none border-0 transition-colors" 
+                            title="{% trans 'Set Default' %}">
+                        <i class="bi {% if addr.is_default %}bi-star-fill{% else %}bi-star{% endif %}"></i>
+                    </button>
+                    <div class="w-px bg-surface-200"></div>
+                    <button hx-post="{% url 'users:address_delete' addr.pk %}"
+                            hx-target="#addresses-container"
+                            hx-swap="innerHTML"
+                            hx-confirm="{% trans 'Are you sure you want to delete this address?' %}"
+                            class="inline-flex items-center px-3 py-1.5 text-xs text-red-600 hover:bg-red-50 rounded-none border-0 transition-colors" 
+                            title="{% trans 'Delete' %}">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="text-charcoal-700 flex flex-col gap-2 mt-auto pt-4 border-t border-surface-200 text-sm">
+                <p class="mb-0 flex items-center gap-2">
+                    <i class="bi bi-telephone text-charcoal-500"></i> 
+                    <strong class="text-charcoal-700">{{ addr.phone }}</strong>
+                </p>
+                <p class="mb-0 flex items-start gap-2">
+                    <i class="bi bi-geo-alt text-charcoal-500 mt-1"></i> 
+                    <span class="leading-tight">{{ addr.address }}</span>
+                </p>
+                <p class="mb-0 flex items-center gap-2 ps-5">{{ addr.city }}{% if addr.area %} - {{ addr.area }}{% endif %}</p>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        {# Empty State #}
+        <div class="md:col-span-2">
+            <div class="bg-white border border-surface-200 rounded-2xl p-12 text-center">
+                <div class="bg-surface-100 rounded-full flex items-center justify-center w-24 h-24 mx-auto mb-6 border border-surface-200">
+                    <i class="bi bi-geo-alt text-5xl text-charcoal-300"></i>
+                </div>
+                <p class="text-charcoal-500 text-lg mb-6">{% trans "You haven't added any addresses yet." %}</p>
+                <button @click="$dispatch('open-address-modal', null)" 
+                        class="inline-flex items-center px-6 py-3 text-sm font-semibold text-white bg-corporate-600 rounded-lg hover:bg-corporate-700 shadow-md transition-colors">
+                    <i class="bi bi-plus-circle text-lg me-2"></i>{% trans "Add Your First Address" %}
+                </button>
+            </div>
+        </div>
+    {% endif %}
+</div>

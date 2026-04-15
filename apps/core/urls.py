@@ -44,6 +44,16 @@ urlpatterns += i18n_patterns(
     path("login/", users_views.login_view, name="login"),
     path("logout/", auth_views.LogoutView.as_view(next_page="/"), name="logout"),
     path("profile/", users_views.profile, name="profile"),
+    path(
+        "profile/order/<int:order_id>/",
+        users_views.profile_order_detail,
+        name="profile_order_detail",
+    ),
+    path(
+        "profile/address/form/",
+        users_views.address_form_partial,
+        name="address_form_partial",
+    ),
     path("users/", include("users.urls", namespace="users")),
     prefix_default_language=True,
 )

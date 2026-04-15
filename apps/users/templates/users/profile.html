@@ -6,359 +6,353 @@
 
 {% block content %}
 
-<nav class="text-sm mb-6 text-charcoal-500 font-medium flex items-center gap-2">
-  <a href="{% url 'home' %}" class="hover:text-corporate-600 transition-colors flex items-center gap-1"><i class="bi bi-house pt-1"></i>{% trans "Home" %}</a>
-  <i class="bi bi-chevron-right text-[10px] mt-0.5"></i>
-  <span class="font-bold text-charcoal-700">{% trans "My Profile" %}</span>
-</nav>
+<div x-data="{
+    activeTab: new URLSearchParams(window.location.search).get('tab') || 'personal',
+    orderDrawer: null,
+    orderDetailLoading: false,
+    orderDetailContent: null,
+    addressModal: null,
+    
+    init() {
+        this.$watch('activeTab', value => {
+            const url = new URL(window.location);
+            url.searchParams.set('tab', value);
+            history.pushState({}, '', url);
+        });
+        
+        window.addEventListener('popstate', () => {
+            this.activeTab = new URLSearchParams(window.location.search).get('tab') || 'personal';
+        });
+        
+        this.$watch('orderDrawer', value => {
+            if (value !== null) {
+                this.loadOrderDetail(value);
+            }
+        });
+    },
+    
+    async loadOrderDetail(orderId) {
+        this.orderDetailLoading = true;
+        this.orderDetailContent = null;
+        
+        try {
+            const response = await fetch(`/profile/order/${orderId}/`);
+            if (response.ok) {
+                this.orderDetailContent = await response.text();
+            }
+        } catch (error) {
+            console.error('Failed to load order detail:', error);
+        } finally {
+            this.orderDetailLoading = false;
+        }
+    },
+    
+    switchTab(tab) {
+        this.activeTab = tab;
+    },
+    
+    closeOrderDrawer() {
+        this.orderDrawer = null;
+        this.orderDetailContent = null;
+    },
+    
+    closeAddressModal() {
+        this.addressModal = null;
+    }
+}">
 
-<div class="flex flex-col lg:flex-row gap-8">
-    <div class="lg:w-1/3 xl:w-1/4">
-        <div class="bg-white border border-surface-200 rounded-2xl overflow-hidden sticky top-24">
+    {# Breadcrumb #}
+    <nav class="text-sm mb-6 text-charcoal-500 font-medium flex items-center gap-2">
+        <a href="{% url 'home' %}" class="hover:text-corporate-600 transition-colors flex items-center gap-1">
+            <i class="bi bi-house pt-1"></i>{% trans "Home" %}
+        </a>
+        <i class="bi bi-chevron-right text-[10px] mt-0.5"></i>
+        <span class="font-bold text-charcoal-700">{% trans "My Profile" %}</span>
+    </nav>
+
+    {# Main Layout #}
+    <div class="flex flex-col lg:flex-row gap-8">
+        
+        {# Sidebar (Desktop) #}
+        <div class="lg:w-64 xl:w-72 lg:hidden xl:block">
+            <div class="bg-white border border-surface-200 rounded-2xl overflow-hidden sticky top-24">
+                
+                {# Avatar & Names #}
+                <div class="p-6 text-center border-b border-surface-200 bg-surface-50">
+                    <form method="post" enctype="multipart/form-data" id="avatarForm">
+                        {% csrf_token %}
+                        <input type="file" name="avatar" id="id_avatar" class="hidden" onchange="document.getElementById('avatarForm').submit()">
+                    </form>
+
+                    <div class="relative inline-block mb-4">
+                        {% if profile_obj.avatar %}
+                            <img src="{{ profile_obj.avatar.url }}" class="rounded-full shadow-md w-24 h-24 object-cover border-4 border-corporate-100" alt="{{ user.username }}">
+                        {% else %}
+                            <div class="rounded-full flex items-center justify-center text-corporate-600 font-bold text-4xl shadow-md w-24 h-24 bg-corporate-50 border-4 border-corporate-100">
+                                {{ user.username|first|upper }}
+                            </div>
+                        {% endif %}
+                        <button type="button" class="inline-flex items-center justify-center w-8 h-8 text-white bg-corporate-600 rounded-full hover:bg-corporate-700 absolute bottom-0 end-0 shadow-lg min-h-0" 
+                                onclick="document.getElementById('id_avatar').click();">
+                            <i class="bi bi-camera-fill text-xs"></i>
+                        </button>
+                    </div>
+
+                    <h6 class="font-bold text-xl tracking-tight mb-1">
+                        {% if user.get_full_name %}{{ user.get_full_name }}{% else %}{{ user.username }}{% endif %}
+                    </h6>
+                    <p class="text-charcoal-500 text-sm mb-3 truncate px-2">{{ user.email }}</p>
+
+                    {# Verified badge #}
+                    <div class="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium bg-green-100 text-green-700 rounded-full border border-green-200">
+                        <i class="bi bi-patch-check-fill text-green-600"></i>
+                        {% trans "Verified" %}
+                    </div>
+
+                    {# Member since #}
+                    <div class="text-charcoal-400 mt-3 text-xs font-semibold uppercase tracking-wider">
+                        <i class="bi bi-calendar3 me-1"></i>
+                        {% trans "Member since" %} {{ user.date_joined|date:"M Y" }}
+                    </div>
+                </div>
+
+                {# Quick Stats #}
+                <div class="flex border-b border-surface-200 text-center py-4 bg-white">
+                    <a href="#" @click.prevent="switchTab('orders')" class="flex-1 hover:text-corporate-600 transition-colors">
+                        <div class="font-black text-xl">{{ order_count }}</div>
+                        <div class="text-charcoal-500 text-xs font-semibold uppercase tracking-wider">{% trans "Orders" %}</div>
+                    </a>
+                    <div class="w-px bg-surface-200"></div>
+                    <a href="#" @click.prevent="switchTab('wishlist')" class="flex-1 hover:text-corporate-600 transition-colors">
+                        <div class="font-black text-xl">{{ wishlist_count }}</div>
+                        <div class="text-charcoal-500 text-xs font-semibold uppercase tracking-wider">{% trans "Wishlist" %}</div>
+                    </a>
+                    <div class="w-px bg-surface-200"></div>
+                    <a href="#" @click.prevent="switchTab('addresses')" class="flex-1 hover:text-corporate-600 transition-colors">
+                        <div class="font-black text-xl">{{ address_count }}</div>
+                        <div class="text-charcoal-500 text-xs font-semibold uppercase tracking-wider">{% trans "Addrs" %}</div>
+                    </a>
+                </div>
+
+                {# Nav Links #}
+                <div class="flex flex-col p-3 gap-1">
+                    <button @click="switchTab('personal')" 
+                            class="inline-flex items-center px-3 py-2.5 text-sm text-charcoal-700 hover:bg-surface-100 rounded-lg justify-start transition-all w-full text-start"
+                            :class="activeTab === 'personal' ? 'bg-corporate-50 text-corporate-600 font-semibold' : ''">
+                        <i class="bi bi-person-gear text-lg me-3 w-5"></i>
+                        <span>{% trans "Personal Info" %}</span>
+                    </button>
+                    <button @click="switchTab('orders')" 
+                            class="inline-flex items-center px-3 py-2.5 text-sm text-charcoal-700 hover:bg-surface-100 rounded-lg justify-start transition-all w-full text-start"
+                            :class="activeTab === 'orders' ? 'bg-corporate-50 text-corporate-600 font-semibold' : ''">
+                        <i class="bi bi-bag-check text-lg me-3 w-5"></i>
+                        <span class="flex-grow text-start">{% trans "My Orders" %}</span>
+                        {% if order_count > 0 %}
+                        <span class="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-corporate-100 text-corporate-700 rounded-full">{{ order_count }}</span>
+                        {% endif %}
+                    </button>
+                    <button @click="switchTab('addresses')" 
+                            class="inline-flex items-center px-3 py-2.5 text-sm text-charcoal-700 hover:bg-surface-100 rounded-lg justify-start transition-all w-full text-start"
+                            :class="activeTab === 'addresses' ? 'bg-corporate-50 text-corporate-600 font-semibold' : ''">
+                        <i class="bi bi-geo-alt text-lg me-3 w-5"></i>
+                        <span>{% trans "Addresses" %}</span>
+                    </button>
+                    <button @click="switchTab('wishlist')" 
+                            class="inline-flex items-center px-3 py-2.5 text-sm text-charcoal-700 hover:bg-surface-100 rounded-lg justify-start transition-all w-full text-start"
+                            :class="activeTab === 'wishlist' ? 'bg-corporate-50 text-corporate-600 font-semibold' : ''">
+                        <i class="bi bi-heart text-lg me-3 w-5"></i>
+                        <span class="flex-grow text-start">{% trans "Wishlist" %}</span>
+                        {% if wishlist_count > 0 %}
+                        <span class="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-corporate-100 text-corporate-700 rounded-full">{{ wishlist_count }}</span>
+                        {% endif %}
+                    </button>
+                    <button @click="switchTab('security')" 
+                            class="inline-flex items-center px-3 py-2.5 text-sm text-charcoal-700 hover:bg-surface-100 rounded-lg justify-start transition-all w-full text-start"
+                            :class="activeTab === 'security' ? 'bg-corporate-50 text-corporate-600 font-semibold' : ''">
+                        <i class="bi bi-shield-lock text-lg me-3 w-5"></i>
+                        <span>{% trans "Security" %}</span>
+                    </button>
+
+                    <div class="h-px bg-surface-200 my-2"></div>
+
+                    {# Logout #}
+                    <form action="{% url 'users:logout' %}" method="post" class="m-0">
+                        {% csrf_token %}
+                        <button type="submit" class="inline-flex items-center px-3 py-2.5 text-sm text-red-600 hover:bg-red-50 rounded-lg justify-start w-full">
+                            <i class="bi bi-box-arrow-right text-lg me-3 w-5"></i>
+                            <span>{% trans "Logout" %}</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        {# Content Area #}
+        <div class="flex-1 min-h-[60vh] pb-24 lg:pb-0">
             
-            {# Avatar & Names #}
-            <div class="p-6 text-center border-b border-surface-200 bg-surface-50">
-                <form method="post" enctype="multipart/form-data" id="avatarForm">
-                    {% csrf_token %}
-                    <input type="file" name="avatar" id="id_avatar" class="hidden" onchange="document.getElementById('avatarForm').submit()">
-                </form>
-
-                <div class="relative inline-block mb-4">
-                    {% if profile_obj.avatar %}
-                        <img src="{{ profile_obj.avatar.url }}" class="rounded-full shadow-md w-24 h-24 object-cover border-4 border-corporate-100" alt="{{ user.username }}">
-                    {% else %}
-                        <div class="rounded-full flex items-center justify-center text-corporate-600 font-bold text-4xl shadow-md w-24 h-24 bg-corporate-50 border-4 border-corporate-100">
-                            {{ user.username|first|upper }}
-                        </div>
-                    {% endif %}
-                    <button type="button" class="inline-flex items-center justify-center w-8 h-8 text-white bg-corporate-600 rounded-full hover:bg-corporate-700 absolute bottom-0 end-0 shadow-lg min-h-0" 
-                            onclick="document.getElementById('id_avatar').click();">
-                        <i class="bi bi-camera-fill text-xs"></i>
-                    </button>
-                </div>
-
-                <h6 class="font-bold text-xl tracking-tight mb-1">
-                    {% if user.get_full_name %}{{ user.get_full_name }}{% else %}{{ user.username }}{% endif %}
-                </h6>
-                <p class="text-charcoal-500 text-sm mb-3 truncate px-2">{{ user.email }}</p>
-
-                {# Verified badge #}
-                <div class="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium bg-green-100 text-green-700 rounded-full border border-green-200">
-                    <i class="bi bi-patch-check-fill text-green-600"></i>
-                    {% trans "Verified" %}
-                </div>
-
-                {# Member since #}
-                <div class="text-charcoal-400 mt-3 text-xs font-semibold uppercase tracking-wider">
-                    <i class="bi bi-calendar3 me-1"></i>
-                    {% trans "Member since" %} {{ user.date_joined|date:"M Y" }}
-                </div>
+            {# Personal Tab #}
+            <div x-show="activeTab === 'personal'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
+                {% include 'users/profile/_personal.html' %}
             </div>
 
-            {# Quick Stats #}
-            <div class="flex border-b border-surface-200 text-center py-4 bg-white">
-                <a href="{% url 'orders:order_list' %}" class="flex-1 hover:text-corporate-600 transition-colors">
-                    <div class="font-black text-xl">{{ order_count }}</div>
-                    <div class="text-charcoal-500 text-xs font-semibold uppercase tracking-wider">{% trans "Orders" %}</div>
-                </a>
-                <div class="w-px bg-surface-200"></div>
-                <a href="{% url 'products:wishlist_list' %}" class="flex-1 hover:text-corporate-600 transition-colors">
-                    <div class="font-black text-xl">{{ wishlist_count }}</div>
-                    <div class="text-charcoal-500 text-xs font-semibold uppercase tracking-wider">{% trans "Wishlist" %}</div>
-                </a>
-                <div class="w-px bg-surface-200"></div>
-                <a href="{% url 'users:address_list' %}" class="flex-1 hover:text-corporate-600 transition-colors">
-                    <div class="font-black text-xl">{{ address_count }}</div>
-                    <div class="text-charcoal-500 text-xs font-semibold uppercase tracking-wider">{% trans "Addrs" %}</div>
-                </a>
+            {# Orders Tab #}
+            <div x-show="activeTab === 'orders'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
+                {% include 'users/profile/_orders.html' %}
             </div>
 
-            {# Nav Links #}
-            <div class="flex flex-col p-3 gap-1">
-                <a href="{% url 'profile' %}" class="inline-flex items-center px-3 py-2 text-sm text-charcoal-700 hover:bg-surface-100 rounded-lg justify-start {% if request.resolver_match.url_name == 'profile' %}bg-corporate-50 text-corporate-600 hover:bg-corporate-100{% endif %}">
-                    <i class="bi bi-person-gear text-lg me-2"></i>
-                    <span>{% trans "Personal Info" %}</span>
-                </a>
-                <a href="{% url 'orders:order_list' %}" class="inline-flex items-center px-3 py-2 text-sm text-charcoal-700 hover:bg-surface-100 rounded-lg justify-start">
-                    <i class="bi bi-bag-check text-lg me-2"></i>
-                    <span class="flex-grow text-start">{% trans "My Orders" %}</span>
-                    {% if order_count > 0 %}<span class="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-corporate-100 text-corporate-700 rounded-full">{{ order_count }}</span>{% endif %}
-                </a>
-                <a href="{% url 'users:address_list' %}" class="inline-flex items-center px-3 py-2 text-sm text-charcoal-700 hover:bg-surface-100 rounded-lg justify-start">
-                    <i class="bi bi-geo-alt text-lg me-2"></i>
-                    <span>{% trans "Addresses" %}</span>
-                </a>
-                <a href="{% url 'products:wishlist_list' %}" class="inline-flex items-center px-3 py-2 text-sm text-charcoal-700 hover:bg-surface-100 rounded-lg justify-start">
-                    <i class="bi bi-heart text-lg me-2"></i>
-                    <span class="flex-grow text-start">{% trans "Wishlist" %}</span>
-                    {% if wishlist_count > 0 %}<span class="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-corporate-100 text-corporate-700 rounded-full">{{ wishlist_count }}</span>{% endif %}
-                </a>
-                <a href="{% url 'users:password_change' %}" class="inline-flex items-center px-3 py-2 text-sm text-charcoal-700 hover:bg-surface-100 rounded-lg justify-start">
-                    <i class="bi bi-shield-lock text-lg me-2"></i>
-                    <span>{% trans "Security" %}</span>
-                </a>
-
-                <div class="h-px bg-surface-200 my-1"></div>
-
-                {# Logout #}
-                <form action="{% url 'users:logout' %}" method="post" class="m-0">
-                    {% csrf_token %}
-                    <button type="submit" class="inline-flex items-center px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg justify-start w-full">
-                        <i class="bi bi-box-arrow-right text-lg me-2"></i>
-                        <span>{% trans "Logout" %}</span>
-                    </button>
-                </form>
+            {# Addresses Tab #}
+            <div x-show="activeTab === 'addresses'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
+                {% include 'users/profile/_addresses.html' %}
             </div>
+
+            {# Security Tab #}
+            <div x-show="activeTab === 'security'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
+                {% include 'users/profile/_security.html' %}
+            </div>
+
+            {# Wishlist Tab #}
+            <div x-show="activeTab === 'wishlist'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
+                {% include 'users/profile/_wishlist.html' %}
+            </div>
+            
         </div>
     </div>
 
-
-    <div class="lg:w-2/3 xl:w-3/4 flex flex-col gap-6">
-
-        {# Main Form wrapping both Personal Information and Notification Preferences #}
-        <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-
-            {# Personal Information #}
-            <div class="bg-white border border-surface-200 rounded-2xl overflow-hidden">
-                <div class="bg-surface-50 border-b border-surface-200 px-6 py-5">
-                    <h5 class="font-bold text-xl tracking-tight mb-1 flex items-center gap-2">
-                        <i class="bi bi-person-vcard text-corporate-600 pt-1"></i>{% trans "Personal Information" %}
-                    </h5>
-                    <p class="text-charcoal-500 text-sm mb-0">{% trans "Update your personal details" %}</p>
-                </div>
-                <div class="p-6 md:p-8">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-0">
-                        {# First Name #}
-                        <div>
-                            <label class="block pb-1">
-                                <span class="text-xs font-bold uppercase tracking-wider text-charcoal-700">{% trans "First Name" %}</span>
-                            </label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 start-0 flex items-center ps-4 pointer-events-none text-charcoal-500">
-                                    <i class="bi bi-person"></i>
-                                </div>
-                                <input type="text" name="first_name" class="block w-full ps-10 px-3 py-2 bg-surface-50 border border-surface-200 rounded-lg focus:ring-2 focus:ring-corporate-600 placeholder:text-charcoal-300" 
-                                       value="{{ form.first_name.value|default:user.first_name }}" placeholder="{% trans 'First name' %}">
-                            </div>
-                        </div>
-
-                        {# Last Name #}
-                        <div>
-                            <label class="block pb-1">
-                                <span class="text-xs font-bold uppercase tracking-wider text-charcoal-700">{% trans "Last Name" %}</span>
-                            </label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 start-0 flex items-center ps-4 pointer-events-none text-charcoal-500">
-                                    <i class="bi bi-person"></i>
-                                </div>
-                                <input type="text" name="last_name" class="block w-full ps-10 px-3 py-2 bg-surface-50 border border-surface-200 rounded-lg focus:ring-2 focus:ring-corporate-600 placeholder:text-charcoal-300" 
-                                       value="{{ form.last_name.value|default:user.last_name }}" placeholder="{% trans 'Last name' %}">
-                            </div>
-                        </div>
-
-                        {# Phone #}
-                        <div>
-                            <label class="block pb-1">
-                                <span class="text-xs font-bold uppercase tracking-wider text-charcoal-700">{% trans "Phone Number" %}</span>
-                            </label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 start-0 flex items-center ps-4 pointer-events-none text-charcoal-500">
-                                    <i class="bi bi-phone"></i>
-                                </div>
-                                <input type="text" name="phone" class="block w-full ps-10 px-3 py-2 bg-surface-50 border border-surface-200 rounded-lg focus:ring-2 focus:ring-corporate-600 placeholder:text-charcoal-300" 
-                                       value="{{ form.phone.value|default:'' }}" placeholder="+20 1xx xxxx xxx">
-                            </div>
-                        </div>
-
-                        {# Date of Birth #}
-                        <div>
-                            <label class="block pb-1">
-                                <span class="text-xs font-bold uppercase tracking-wider text-charcoal-700">{% trans "Date of Birth" %}</span>
-                            </label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 start-0 flex items-center ps-4 pointer-events-none text-charcoal-500">
-                                    <i class="bi bi-calendar-event"></i>
-                                </div>
-                                <input type="date" name="date_of_birth" class="block w-full ps-10 px-3 py-2 bg-surface-50 border border-surface-200 rounded-lg focus:ring-2 focus:ring-corporate-600 text-charcoal-700" 
-                                       value="{{ form.date_of_birth.value|default:'' }}">
-                            </div>
-                        </div>
-
-                        {# Gender #}
-                        <div>
-                            <label class="block pb-1">
-                                <span class="text-xs font-bold uppercase tracking-wider text-charcoal-700">{% trans "Gender" %}</span>
-                            </label>
-                            <select name="gender" class="block w-full px-3 py-2 bg-surface-50 border border-surface-200 rounded-lg focus:ring-2 focus:ring-corporate-600">
-                                <option value="" {% if not form.gender.value %}selected{% endif %}>{% trans "Select" %}</option>
-                                <option value="male" {% if form.gender.value == "male" %}selected{% endif %}>{% trans "Male" %}</option>
-                                <option value="female" {% if form.gender.value == "female" %}selected{% endif %}>{% trans "Female" %}</option>
-                                <option value="unspecified" {% if form.gender.value == "unspecified" %}selected{% endif %}>{% trans "Prefer not to say" %}</option>
-                            </select>
-                        </div>
-
-                        {# Email (read-only) #}
-                        <div>
-                            <label class="block pb-1">
-                                <span class="text-xs font-bold uppercase tracking-wider text-charcoal-700">{% trans "Email" %}</span>
-                            </label>
-                            <div class="relative opacity-60">
-                                <div class="absolute inset-y-0 start-0 flex items-center ps-4 pointer-events-none">
-                                    <i class="bi bi-envelope"></i>
-                                </div>
-                                <input type="email" class="block w-full ps-10 px-3 py-2 bg-surface-100 border border-surface-200 rounded-lg cursor-not-allowed" value="{{ user.email }}" disabled>
-                            </div>
-                            <div class="text-xs text-charcoal-500 mt-2 font-medium">
-                                <i class="bi bi-lock me-1"></i>{% trans "Contact support to change email" %}
-                            </div>
-                        </div>
-
-                        {# Address #}
-                        <div class="md:col-span-2">
-                            <label class="block pb-1">
-                                <span class="text-xs font-bold uppercase tracking-wider text-charcoal-700">{% trans "Default Address" %}</span>
-                            </label>
-                            <div class="relative">
-                                <div class="absolute top-3 start-0 flex items-center ps-4 pointer-events-none text-charcoal-500">
-                                    <i class="bi bi-geo-alt"></i>
-                                </div>
-                                <textarea name="address" rows="3" class="block w-full ps-10 px-3 py-2 bg-surface-50 border border-surface-200 rounded-lg focus:ring-2 focus:ring-corporate-600 placeholder:text-charcoal-300 resize-y min-h-[80px]" 
-                                          placeholder="{% trans 'Your default shipping address' %}">{{ form.address.value|default:'' }}</textarea>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {# Notification Preferences #}
-            <div class="bg-white border border-surface-200 rounded-2xl overflow-hidden" x-data="{ emailMkt: {% if form.email_marketing.value %}true{% else %}false{% endif %}, pushNotif: {% if form.push_notifications.value != False %}true{% else %}false{% endif %} }">
-                <div class="bg-surface-50 border-b border-surface-200 px-6 py-5">
-                    <h5 class="font-bold text-xl tracking-tight mb-1 flex items-center gap-2">
-                        <i class="bi bi-bell text-blue-600 pt-1"></i>{% trans "Notification Preferences" %}
-                    </h5>
-                    <p class="text-charcoal-500 text-sm mb-0">{% trans "Manage how you receive updates" %}</p>
-                </div>
-                <div class="p-6 md:p-8">
-                    <div class="flex flex-col gap-4 mb-0">
-                        {# Email Marketing #}
-                        <div class="flex items-center justify-between p-4 rounded-xl border border-surface-200 bg-white">
-                            <div class="flex items-center gap-4">
-                                <div class="bg-corporate-50 rounded-xl flex items-center justify-center w-12 h-12">
-                                    <i class="bi bi-envelope-heart text-corporate-600 text-xl"></i>
-                                </div>
-                                <div>
-                                    <div class="font-bold">{% trans "Email Promotions" %}</div>
-                                    <div class="text-charcoal-500 text-xs">{% trans "Receive deals and special offers" %}</div>
-                                </div>
-                            </div>
-                            <div>
-                                <input type="hidden" name="email_marketing" value="">
-                                <input type="checkbox" name="email_marketing" x-model="emailMkt" class="relative w-11 h-6 bg-surface-200 rounded-full peer-checked:bg-corporate-600 appearance-none cursor-pointer transition-colors before:content-[''] before:absolute before:top-[2px] before:start-[2px] before:bg-white before:rounded-full before:h-5 before:w-5 before:transition-all before:shadow checked:before:translate-x-full">
-                            </div>
-                        </div>
-
-                        {# Push Notifications #}
-                        <div class="flex items-center justify-between p-4 rounded-xl border border-surface-200 bg-white">
-                            <div class="flex items-center gap-4">
-                                <div class="bg-green-50 rounded-xl flex items-center justify-center w-12 h-12">
-                                    <i class="bi bi-app-indicator text-green-600 text-xl"></i>
-                                </div>
-                                <div>
-                                    <div class="font-bold">{% trans "Push Notifications" %}</div>
-                                    <div class="text-charcoal-500 text-xs">{% trans "Order updates and alerts" %}</div>
-                                </div>
-                            </div>
-                            <div>
-                                <input type="hidden" name="push_notifications" value="">
-                                <input type="checkbox" name="push_notifications" x-model="pushNotif" class="relative w-11 h-6 bg-surface-200 rounded-full peer-checked:bg-green-600 appearance-none cursor-pointer transition-colors before:content-[''] before:absolute before:top-[2px] before:start-[2px] before:bg-white before:rounded-full before:h-5 before:w-5 before:transition-all before:shadow checked:before:translate-x-full">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {# Single Save Button for both sections #}
-            <div class="flex gap-4">
-                <button type="submit" class="inline-flex items-center px-6 py-2.5 text-sm font-semibold text-white bg-corporate-600 rounded-lg hover:bg-corporate-700 shadow-sm">
-                    <i class="bi bi-check2-circle text-lg me-2"></i>{% trans "Save All Changes" %}
-                </button>
-                <a href="{% url 'profile' %}" class="inline-flex items-center px-6 py-2.5 text-sm font-medium text-charcoal-700 bg-white border border-surface-200 rounded-lg hover:bg-surface-50">
-                    {% trans "Cancel" %}
-                </a>
-            </div>
-        </form>
-
-        {# Recent Orders #}
-        <div class="bg-white border border-surface-200 rounded-2xl overflow-hidden mb-10">
-            <div class="bg-surface-50 border-b border-surface-200 px-6 py-5 flex justify-between items-center">
-                <div>
-                    <h5 class="font-bold text-xl tracking-tight mb-1 flex items-center gap-2">
-                        <i class="bi bi-bag-check text-charcoal-700 pt-1"></i>{% trans "Recent Orders" %}
-                    </h5>
-                    <p class="text-charcoal-500 text-sm mb-0">{% trans "Track your latest purchases" %}</p>
-                </div>
-                <a href="{% url 'orders:order_list' %}" class="inline-flex items-center px-3 py-1.5 text-xs text-charcoal-700 bg-white border border-surface-200 rounded-lg hover:bg-surface-50 font-bold">
-                    {% trans "View all" %} <i class="bi bi-arrow-right ms-1"></i>
-                </a>
-            </div>
-            <div class="p-0 overflow-x-auto">
-                {% if recent_orders %}
-                    <table class="table w-full">
-                        <thead>
-                            <tr class="bg-surface-50 text-charcoal-500 uppercase tracking-wider text-xs font-bold border-b border-surface-200">
-                                <th class="ps-6 py-4">{% trans "Order" %}</th>
-                                <th>{% trans "Date" %}</th>
-                                <th>{% trans "Status" %}</th>
-                                <th>{% trans "Total" %}</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for order in recent_orders %}
-                            <tr class="hover:bg-surface-50 whitespace-nowrap border-b border-surface-200 last:border-0">
-                                <td class="ps-6 font-bold text-corporate-600">#{{ order.id }}</td>
-                                <td class="text-charcoal-700 font-medium text-sm">{{ order.created_at|date:"d M Y" }}</td>
-                                <td>
-                                    {% if order.status == 'delivered' %}
-                                    <span class="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-green-100 text-green-700 rounded-full border border-green-200">
-                                    {% elif order.status == 'cancelled' %}
-                                    <span class="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-red-100 text-red-700 rounded-full border border-red-200">
-                                    {% elif order.status == 'pending' %}
-                                    <span class="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-amber-100 text-amber-700 rounded-full border border-amber-200">
-                                    {% else %}
-                                    <span class="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-700 rounded-full border border-blue-200">
-                                    {% endif %}
-                                        {{ order.get_status_display }}
-                                    </span>
-                                </td>
-                                <td class="font-black text-sm">
-                                    {% if request.LANGUAGE_CODE == 'ar' %}ج.م{% else %}EGP{% endif %} {{ order.total_amount|floatformat:2|intcomma }}
-                                </td>
-                                <td class="text-end pe-6">
-                                    <a href="{% url 'orders:order_detail' order.id %}" class="inline-flex items-center justify-center w-8 h-8 text-charcoal-500 hover:bg-surface-100 rounded-full">
-                                        <i class="bi bi-arrow-right text-lg"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                {% else %}
-                    <div class="text-center py-16 flex flex-col items-center">
-                        <div class="bg-surface-100 text-charcoal-300 rounded-full flex items-center justify-center w-20 h-20 mb-4">
-                            <i class="bi bi-bag text-4xl"></i>
-                        </div>
-                        <h6 class="font-bold text-xl mb-1 tracking-tight">{% trans "No orders yet" %}</h6>
-                        <p class="text-charcoal-500 text-sm mb-6">{% trans "Your order history will appear here" %}</p>
-                        <a href="{% url 'products:products' %}" class="inline-flex items-center px-6 py-2.5 text-sm font-semibold text-white bg-corporate-600 rounded-lg hover:bg-corporate-700">
-                            <i class="bi bi-shop text-lg me-2"></i>{% trans "Start shopping" %}
-                        </a>
-                    </div>
+    {# Mobile Bottom Navigation #}
+    <nav class="lg:hidden fixed bottom-0 start-0 end-0 bg-white border-t border-surface-200 z-40 safe-area-pb">
+        <div class="flex justify-around">
+            <button @click="switchTab('personal')" 
+                    class="flex flex-col items-center py-3 px-4 transition-colors"
+                    :class="activeTab === 'personal' ? 'text-corporate-600' : 'text-charcoal-500'">
+                <i class="bi bi-person-gear text-xl"></i>
+                <span class="text-[10px] mt-1 font-medium">{% trans "Profile" %}</span>
+            </button>
+            
+            <button @click="switchTab('orders')" 
+                    class="flex flex-col items-center py-3 px-4 transition-colors relative"
+                    :class="activeTab === 'orders' ? 'text-corporate-600' : 'text-charcoal-500'">
+                <i class="bi bi-bag-check text-xl"></i>
+                <span class="text-[10px] mt-1 font-medium">{% trans "Orders" %}</span>
+                {% if order_count > 0 %}
+                <span class="absolute top-2 end-2 w-4 h-4 bg-red-500 text-white text-[8px] font-bold rounded-full flex items-center justify-center">{{ order_count }}</span>
                 {% endif %}
+            </button>
+            
+            <button @click="switchTab('addresses')" 
+                    class="flex flex-col items-center py-3 px-4 transition-colors"
+                    :class="activeTab === 'addresses' ? 'text-corporate-600' : 'text-charcoal-500'">
+                <i class="bi bi-geo-alt text-xl"></i>
+                <span class="text-[10px] mt-1 font-medium">{% trans "Address" %}</span>
+            </button>
+            
+            <button @click="switchTab('wishlist')" 
+                    class="flex flex-col items-center py-3 px-4 transition-colors"
+                    :class="activeTab === 'wishlist' ? 'text-corporate-600' : 'text-charcoal-500'">
+                <i class="bi bi-heart text-xl"></i>
+                <span class="text-[10px] mt-1 font-medium">{% trans "Wishlist" %}</span>
+            </button>
+            
+            <button @click="switchTab('security')" 
+                    class="flex flex-col items-center py-3 px-4 transition-colors"
+                    :class="activeTab === 'security' ? 'text-corporate-600' : 'text-charcoal-500'">
+                <i class="bi bi-shield-lock text-xl"></i>
+                <span class="text-[10px] mt-1 font-medium">{% trans "Security" %}</span>
+            </button>
+        </div>
+    </nav>
+
+    {# Order Detail Drawer #}
+    <div x-show="orderDrawer !== null"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         @open-order-drawer.window="orderDrawer = $event.detail"
+         @close-order-drawer.window="closeOrderDrawer()"
+         class="fixed inset-0 z-50"
+         style="display: none;">
+        
+        {# Backdrop #}
+        <div @click="closeOrderDrawer()" class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+        
+        {# Drawer #}
+        <div x-show="orderDrawer !== null"
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="translate-x-full"
+             x-transition:enter-end="translate-x-0"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="translate-x-0"
+             x-transition:leave-end="translate-x-full"
+             class="absolute end-0 top-0 bottom-0 w-full max-w-xl bg-white shadow-2xl overflow-y-auto">
+            
+            {# Loading State #}
+            <div x-show="orderDetailLoading" class="flex items-center justify-center h-full min-h-[50vh]">
+                <div class="text-center">
+                    <i class="bi bi-arrow-repeat animate-spin text-4xl text-corporate-600"></i>
+                    <p class="text-charcoal-500 mt-2">{% trans "Loading..." %}</p>
+                </div>
+            </div>
+            
+            {# Order Content #}
+            <div x-show="!orderDetailLoading && orderDetailContent" x-html="orderDetailContent"></div>
+            
+        </div>
+    </div>
+
+    {# Address Modal #}
+    <div x-show="addressModal !== null"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         @open-address-modal.window="addressModal = $event.detail"
+         @close-address-modal.window="closeAddressModal()"
+         @click="closeAddressModal()"
+         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+         style="display: none;">
+        
+        <div @click.stop
+             x-show="addressModal !== null"
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 scale-95"
+             x-transition:enter-end="opacity-100 scale-100"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100 scale-100"
+             x-transition:leave-end="opacity-0 scale-95"
+             class="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+            
+            {# Modal Header #}
+            <div class="sticky top-0 bg-surface-50 border-b border-surface-200 flex items-center justify-between p-4 z-10">
+                <h3 class="font-bold text-lg" x-text="addressModal === null ? '' : addressModal === 'new' ? '{% trans "Add Address" %}' : '{% trans "Edit Address" %}'"></h3>
+                <button @click="closeAddressModal()" class="p-2 hover:bg-surface-100 rounded-lg transition-colors">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            
+            {# Modal Content - Loaded via HTMX #}
+            <div class="p-6"
+                 hx-get="{% url 'users:address_form_partial' %}"
+                 :hx-vals="addressModal !== null ? `{'id': ${addressModal === 'new' ? 'null' : addressModal}}` : '{}'"
+                 hx-trigger="addressModal from:window"
+                 hx-swap="innerHTML">
+                
+                <div class="flex items-center justify-center py-8">
+                    <i class="bi bi-arrow-repeat animate-spin text-2xl text-corporate-600"></i>
+                </div>
             </div>
         </div>
-
     </div>
+
 </div>
+
+<style>
+.safe-area-pb {
+    padding-bottom: env(safe-area-inset-bottom);
+}
+</style>
+
 {% endblock %}

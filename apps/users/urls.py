@@ -9,6 +9,7 @@ urlpatterns = [
     path("auth/login/", views.login_view, name="login"),
     path("auth/logout/", auth_views.LogoutView.as_view(next_page="/"), name="logout"),
     path("auth/profile/", views.profile, name="profile"),
+    path("auth/profile/update/", views.profile, name="profile_update"),
     path(
         "auth/password-change/",
         auth_views.PasswordChangeView.as_view(
@@ -23,6 +24,14 @@ urlpatterns = [
             template_name="pages/users/password_change_done.html"
         ),
         name="password_change_done",
+    ),
+    path(
+        "profile/order/<int:order_id>/",
+        views.profile_order_detail,
+        name="profile_order_detail",
+    ),
+    path(
+        "profile/address/form/", views.address_form_partial, name="address_form_partial"
     ),
     path("addresses/", views.address_list, name="address_list"),
     path("addresses/add/", views.address_add, name="address_add"),

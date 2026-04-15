@@ -1,0 +1,58 @@
+{% load i18n %}
+
+<div id="address-form-container">
+    <form method="post" 
+          hx-post="{% if address_id %}{% url 'users:address_edit' address_id %}{% else %}{% url 'users:address_add' %}{% endif %}"
+          hx-target="#address-form-container"
+          hx-swap="innerHTML"
+          x-data="{ submitting: false }"
+          @htmx:after-request="submitting = false"
+          @htmx:after-on-load="
+            if(event.detail.successful) { 
+                Alpine.store('toast').show('{% trans "Address saved successfully!" %}', 'success');
+                $dispatch('close-address-modal');
+                $dispatch('refresh-addresses');
+            }
+          ">
+        {% csrf_token %}
+        
+        <div class="space-y-5">
+            <div>
+                <label for="id_name" class="block text-xs font-bold uppercase tracking-wider text-charcoal-500 mb-2">{% trans "Address Name" %}</label>
+                <input type="text" name="name" id="id_name" class="block w-full px-3 py-2.5 bg-surface-50 border border-surface-200 rounded-lg focus:ring-2 focus:ring-corporate-600 focus:border-corporate-600" value="{{ form.name.value|default:'' }}" placeholder="{% trans 'Home, Work, etc.' %}" required>
+            </div>
+            <div>
+                <label for="id_phone" class="block text-xs font-bold uppercase tracking-wider text-charcoal-500 mb-2">{% trans "Phone Number" %}</label>
+                <input type="text" name="phone" id="id_phone" class="block w-full px-3 py-2.5 bg-surface-50 border border-surface-200 rounded-lg focus:ring-2 focus:ring-corporate-600 focus:border-corporate-600" value="{{ form.phone.value|default:'' }}" placeholder="{% trans 'Phone Number' %}" required>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label for="id_city" class="block text-xs font-bold uppercase tracking-wider text-charcoal-500 mb-2">{% trans "City" %}</label>
+                    <input type="text" name="city" id="id_city" class="block w-full px-3 py-2.5 bg-surface-50 border border-surface-200 rounded-lg focus:ring-2 focus:ring-corporate-600 focus:border-corporate-600" value="{{ form.city.value|default:'' }}" placeholder="{% trans 'City' %}" required>
+                </div>
+                <div>
+                    <label for="id_area" class="block text-xs font-bold uppercase tracking-wider text-charcoal-500 mb-2">{% trans "Area" %}</label>
+                    <input type="text" name="area" id="id_area" class="block w-full px-3 py-2.5 bg-surface-50 border border-surface-200 rounded-lg focus:ring-2 focus:ring-corporate-600 focus:border-corporate-600" value="{{ form.area.value|default:'' }}" placeholder="{% trans 'Area (Optional)' %}">
+                </div>
+            </div>
+            <div>
+                <label for="id_address" class="block text-xs font-bold uppercase tracking-wider text-charcoal-500 mb-2">{% trans "Address" %}</label>
+                <textarea name="address" id="id_address" rows="3" class="block w-full px-3 py-2.5 bg-surface-50 border border-surface-200 rounded-lg focus:ring-2 focus:ring-corporate-600 focus:border-corporate-600 resize-y min-h-[80px]" placeholder="{% trans 'Full address details' %}" required>{{ form.address.value|default:'' }}</textarea>
+            </div>
+            <div class="flex items-center gap-3">
+                <input type="checkbox" name="is_default" id="id_is_default" class="relative w-11 h-6 bg-surface-200 rounded-full peer-checked:bg-corporate-600 appearance-none cursor-pointer transition-colors before:content-[''] before:absolute before:top-[2px] before:start-[2px] before:bg-white before:rounded-full before:h-5 before:w-5 before:transition-all before:shadow checked:before:translate-x-full" {% if form.is_default.value %}checked{% endif %}>
+                <label for="id_is_default" class="font-bold text-sm cursor-pointer">{% trans "Set as default address" %}</label>
+            </div>
+        </div>
+        
+        <div class="flex gap-3 mt-6 pt-4 border-t border-surface-200">
+            <button type="submit" class="inline-flex items-center px-5 py-2.5 text-sm font-semibold text-white bg-corporate-600 rounded-lg hover:bg-corporate-700 transition-colors flex-grow justify-center" :disabled="submitting" :class="submitting ? 'opacity-50 cursor-not-allowed' : ''">
+                <i class="bi bi-check2 me-2"></i>
+                <span x-text="submitting ? '{% trans "Saving..." %}' : '{% if address_id %}{% trans "Update Address" %}{% else %}{% trans "Add Address" %}{% endif %}'"></span>
+            </button>
+            <button type="button" @click="$dispatch('close-address-modal')" class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-charcoal-700 bg-white border border-surface-200 rounded-lg hover:bg-surface-50 transition-colors">
+                {% trans "Cancel" %}
+            </button>
+        </div>
+    </form>
+</div>
