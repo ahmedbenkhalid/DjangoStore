@@ -1,9 +1,6 @@
-import asyncio
-from asgiref.sync import sync_to_async
 from django.core.cache import cache
 from django.shortcuts import render
 from django.db.models import Count
-from django.utils.http import url_has_allowed_host_and_scheme
 from products.models import Category, Product
 from .models import Banner
 from django.urls import translate_url
@@ -151,6 +148,12 @@ def home(request):
             .order_by("-updated_at")[:8]
         )
         cache.set("sale_products", sale_products, 3600)
+
+    # Annotate wishlist status for all lists
+    from apps.products.views import annotate_wishlist
+    annotate_wishlist(request.user, featured_products)
+    annotate_wishlist(request.user, most_liked)
+    annotate_wishlist(request.user, sale_products)
 
     context = {
         "categories": categories,

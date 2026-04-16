@@ -27,7 +27,7 @@
       </div>
       <a
         href="{% url 'products:products' %}"
-        class="inline-flex items-center px-6 py-3 text-base font-semibold text-charcoal-700 bg-white border border-surface-200 rounded-lg hover:bg-surface-50 rounded-full font-bold shadow-sm whitespace-nowrap"
+        class="inline-flex items-center px-6 py-3 text-base text-charcoal-700 bg-white border border-surface-200 rounded-full font-bold shadow-sm whitespace-nowrap"
       >
         <i class="bi bi-bag-heart-fill text-xl"></i> {% trans "Continue Shopping" %}
       </a>
@@ -46,7 +46,7 @@
 
 <div class="mb-6">
   <span
-    class="inline-flex items-center px-2.5 py-0.5 text-xs font-medium bg-red-100 text-red-700 rounded-full font-bold px-4 py-3 gap-2 shadow-sm"
+    class="inline-flex items-center text-xs bg-red-100 text-red-700 rounded-full font-bold px-4 py-3 gap-2 shadow-sm"
   >
     <i class="bi bi-heart-fill"></i>
     {{ wishlist_items|length }} {% trans "saved items" %}
@@ -136,7 +136,7 @@
           <input type="hidden" name="quantity" value="1" />
           <button
             type="submit"
-            class="inline-flex items-center px-3 py-1.5 text-sm font-semibold text-white bg-corporate-600 rounded-lg hover:bg-corporate-700 rounded-full shadow-sm font-bold px-4"
+            class="inline-flex items-center py-1.5 text-sm font-bold text-white bg-corporate-600 hover:bg-corporate-700 rounded-full shadow-sm px-4"
             :disabled="submitting"
             :class="submitting ? 'bg-green-600 hover:bg-green-700 text-white' : ''"
           >
@@ -173,7 +173,7 @@
   </p>
   <a
     href="{% url 'products:products' %}"
-    class="inline-flex items-center px-6 py-3 text-base font-semibold text-white bg-corporate-600 rounded-lg hover:bg-corporate-700 rounded-full font-bold px-8 shadow-md"
+    class="inline-flex items-center py-3 text-base font-bold text-white bg-corporate-600 hover:bg-corporate-700 rounded-full px-8 shadow-md"
   >
     <i class="bi bi-bag-heart-fill text-xl me-2"></i> {% trans "Start Shopping" %}
   </a>

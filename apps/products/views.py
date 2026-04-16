@@ -25,6 +25,24 @@ async def _get_cached_categories():
     return cats
 
 
+def annotate_wishlist(user, products):
+    """
+    Annotate a list/queryset of products with in_wishlist=True/False.
+    Optimized to use a single query for the user's wishlist IDs.
+    """
+    if not user.is_authenticated:
+        for p in products:
+            p.in_wishlist = False
+        return products
+
+    wishlist_ids = set(
+        Wishlist.objects.filter(user=user.profile).values_list("product_id", flat=True)
+    )
+    for p in products:
+        p.in_wishlist = p.id in wishlist_ids
+    return products
+
+
 # ── views ─────────────────────────────────────────────────────────────────────
 
 
@@ -119,6 +137,9 @@ async def product_list(request):
 
     brands = await sync_to_async(get_brands)()
 
+    # Annotate wishlist status
+    annotate_wishlist(request.user, page_obj.object_list)
+
     context = {
         "page_obj": page_obj,
         "categories": await _get_cached_categories(),
@@ -134,7 +155,7 @@ async def product_list(request):
     }
 
     if request.headers.get("X-Stock-Request") == "true":
-        products = Product.objects.filter(
+        products_qs = Product.objects.filter(
             id__in=[p.id for p in page_obj.object_list]
         ).only("id", "stock")
         stock_data = {
@@ -143,7 +164,7 @@ async def product_list(request):
             else "low_stock"
             if p.stock <= 5
             else "in_stock"
-            for p in products
+            for p in products_qs
         }
         return JsonResponse({"stock": stock_data})
 
@@ -317,6 +338,9 @@ async def category_detail(request, slug):
 
     page_obj = await sync_to_async(get_page_sync)()
 
+    # Annotate wishlist status
+    annotate_wishlist(request.user, page_obj.object_list)
+
     context = {"category": category, "page_obj": page_obj}
 
     if request.headers.get("HX-Target") == "category-products":
@@ -368,7 +392,11 @@ def toggle_wishlist(request, product_id):
     # Invalidate cached wishlist count
     cache.delete(f"wishlist_count_{request.user.id}")
 
-    if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+    # Detect AJAX reliably
+    is_ajax = request.headers.get("X-Requested-With") == "XMLHttpRequest" or \
+              request.headers.get("Accept") == "application/json"
+
+    if is_ajax:
         from .models import Wishlist as WL
 
         count = WL.objects.filter(user=request.user.profile).count()
@@ -383,6 +411,10 @@ def toggle_wishlist(request, product_id):
             }
         )
 
+    # For standard POST, redirect back to referer or product detail
+    referer = request.META.get("HTTP_REFERER")
+    if referer:
+        return redirect(referer)
     return redirect(product.get_absolute_url())
 
 
