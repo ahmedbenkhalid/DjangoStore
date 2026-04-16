@@ -4,9 +4,9 @@
 <div x-data="{}">
 
     <div class="flex justify-between items-center mb-4">
-        <h2 class="text-lg font-semibold text-gray-900">{% trans "My Orders" %}</h2>
+        <h2 class="text-lg font-semibold text-charcoal-900">{% trans "My Orders" %}</h2>
         {% if orders %}
-        <span class="text-sm text-gray-500">{{ orders|length }} {% trans "orders" %}</span>
+        <span class="text-sm text-charcoal-500">{{ orders|length }} {% trans "orders" %}</span>
         {% endif %}
     </div>
 
@@ -14,10 +14,10 @@
         {% if orders %}
         <div class="space-y-3">
             {% for order in orders %}
-            <div class="p-4 border border-gray-200 rounded-lg hover:border-corporate-300 hover:shadow-sm transition-all cursor-pointer"
+            <div class="p-4 border border-surface-200 rounded-lg hover:border-corporate-300 hover:shadow-sm transition-all cursor-pointer"
                  @click="$dispatch('open-order-drawer', {{ order.id }})">
                 <div class="flex items-center justify-between mb-2">
-                    <span class="text-sm font-medium text-gray-900">Order #{{ order.id }}</span>
+                    <span class="text-sm font-medium text-charcoal-900">Order #{{ order.id }}</span>
                     {% if order.status == 'delivered' %}
                     <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-green-100 text-green-800">{% trans "Delivered" %}</span>
                     {% elif order.status == 'cancelled' %}
@@ -29,8 +29,8 @@
                     {% endif %}
                 </div>
                 <div class="flex items-center justify-between text-sm">
-                    <span class="text-gray-500">{{ order.created_at|date:"d M Y" }}</span>
-                    <span class="font-semibold text-gray-900">
+                    <span class="text-charcoal-500">{{ order.created_at|date:"d M Y" }}</span>
+                    <span class="font-semibold text-charcoal-900">
                         {% if request.LANGUAGE_CODE == 'ar' %}ج.م{% else %}EGP{% endif %} {{ order.total_amount|floatformat:0|intcomma }}
                     </span>
                 </div>
@@ -38,11 +38,11 @@
             {% endfor %}
         </div>
         {% else %}
-        <div class="text-center py-12 border border-gray-200 rounded-lg">
-            <div class="inline-flex items-center justify-center w-12 h-12 bg-gray-100 rounded-full mb-4">
-                <i class="bi bi-box-seam text-xl text-gray-400"></i>
+        <div class="text-center py-12 border border-surface-200 rounded-lg">
+            <div class="inline-flex items-center justify-center w-12 h-12 bg-surface-100 rounded-full mb-4">
+                <i class="bi bi-box-seam text-xl text-charcoal-400"></i>
             </div>
-            <p class="text-gray-500 mb-4">{% trans "No orders yet" %}</p>
+            <p class="text-charcoal-500 mb-4">{% trans "No orders yet" %}</p>
             <a href="{% url 'products:products' %}" class="inline-block px-4 py-2 bg-corporate-600 text-white text-sm font-medium rounded-lg hover:bg-corporate-700 transition-colors">
                 {% trans "Start Shopping" %}
             </a>

@@ -3,7 +3,7 @@
 <div x-data="{}">
 
     <div class="flex justify-between items-center mb-4">
-        <h2 class="text-lg font-semibold text-gray-900">{% trans "My Addresses" %}</h2>
+        <h2 class="text-lg font-semibold text-charcoal-900">{% trans "My Addresses" %}</h2>
         <button @click="$dispatch('open-address-modal', null)" 
                 class="inline-flex items-center gap-1 px-4 py-2 bg-corporate-600 text-white text-sm font-medium rounded-lg hover:bg-corporate-700 transition-colors">
             <i class="bi bi-plus-lg"></i>
@@ -14,33 +14,33 @@
     <div id="addresses-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
         {% if addresses %}
             {% for addr in addresses %}
-            <div class="p-4 border {% if addr.is_default %}border-corporate-500 bg-corporate-50{% else %}border-gray-200{% endif %} rounded-lg relative">
+            <div class="p-4 border {% if addr.is_default %}border-corporate-500 bg-corporate-50{% else %}border-surface-200{% endif %} rounded-lg relative">
                 {% if addr.is_default %}
                 <span class="absolute top-3 end-3 text-xs font-medium px-2 py-0.5 bg-corporate-100 text-corporate-700 rounded-full">{% trans "Default" %}</span>
                 {% endif %}
                 
                 <div class="flex items-start gap-3">
-                    <div class="p-2 bg-gray-100 rounded-lg">
-                        <i class="bi bi-geo-alt text-gray-500"></i>
+                    <div class="p-2 bg-surface-100 rounded-lg">
+                        <i class="bi bi-geo-alt text-charcoal-500"></i>
                     </div>
                     <div>
-                        <p class="font-medium text-gray-900">{{ addr.name }}</p>
-                        <p class="text-sm text-gray-500">{{ addr.phone }}</p>
-                        <p class="text-sm text-gray-500">{{ addr.address }}</p>
-                        <p class="text-sm text-gray-500">{{ addr.city }}{% if addr.area %} - {{ addr.area }}{% endif %}</p>
+                        <p class="font-medium text-charcoal-900">{{ addr.name }}</p>
+                        <p class="text-sm text-charcoal-500">{{ addr.phone }}</p>
+                        <p class="text-sm text-charcoal-500">{{ addr.address }}</p>
+                        <p class="text-sm text-charcoal-500">{{ addr.city }}{% if addr.area %} - {{ addr.area }}{% endif %}</p>
                     </div>
                 </div>
                 
-                <div class="flex gap-3 mt-3 pt-3 border-t border-gray-100">
+                <div class="flex gap-3 mt-3 pt-3 border-t border-surface-100">
                     <button @click="$dispatch('open-address-modal', {{ addr.pk }})" 
-                            class="text-sm text-gray-500 hover:text-corporate-600">
+                            class="text-sm text-charcoal-500 hover:text-corporate-600">
                         <i class="bi bi-pencil me-1"></i>{% trans "Edit" %}
                     </button>
                     {% if not addr.is_default %}
                     <button hx-post="{% url 'users:address_set_default' addr.pk %}"
                             hx-target="#addresses-container"
                             hx-swap="innerHTML"
-                            class="text-sm text-gray-500 hover:text-corporate-600">
+                            class="text-sm text-charcoal-500 hover:text-corporate-600">
                         <i class="bi bi-star me-1"></i>{% trans "Default" %}
                     </button>
                     {% endif %}
@@ -55,11 +55,11 @@
             </div>
             {% endfor %}
         {% else %}
-        <div class="md:col-span-2 text-center py-12 border border-gray-200 rounded-lg">
-            <div class="inline-flex items-center justify-center w-12 h-12 bg-gray-100 rounded-full mb-4">
-                <i class="bi bi-geo-alt text-xl text-gray-400"></i>
+        <div class="md:col-span-2 text-center py-12 border border-surface-200 rounded-lg">
+            <div class="inline-flex items-center justify-center w-12 h-12 bg-surface-100 rounded-full mb-4">
+                <i class="bi bi-geo-alt text-xl text-charcoal-400"></i>
             </div>
-            <p class="text-gray-500 mb-4">{% trans "No addresses saved" %}</p>
+            <p class="text-charcoal-500 mb-4">{% trans "No addresses saved" %}</p>
             <button @click="$dispatch('open-address-modal', null)" 
                     class="inline-block px-4 py-2 bg-corporate-600 text-white text-sm font-medium rounded-lg hover:bg-corporate-700">
                 {% trans "Add Address" %}

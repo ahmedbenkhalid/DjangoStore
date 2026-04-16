@@ -9,7 +9,7 @@ Full-stack e-commerce platform for laptops & smartphones. Arabic/English (RTL) s
 | Backend | Django 6.0.3, Python 3.14+ |
 | Database | SQLite3 (dev) |
 | Frontend | Tailwind CSS 3 + Alpine.js, HTMX |
-| UI Components | django-cotton (`<c-*>` tags) |
+| UI Components | **Flowbite ONLY** - no custom CSS |
 | Admin | django-jazzmin (dark theme) |
 | i18n | EN/AR with `Readex Pro` font |
 | Async | Celery + Redis |
@@ -26,142 +26,245 @@ apps/
 └── orders/        ← Checkout, order management
 
 templates/
-├── cotton/        ← Django Cotton UI component library
 ├── shared/        ← base.html + global partials
 └── emails/        ← Email templates
 
 users/templates/users/
 ├── dashboard.html         ← Single-view dashboard with tab navigation
-├── dashboard/            ← Dashboard fragment templates
-│   ├── _personal.html
-│   ├── _orders.html
-│   ├── _addresses.html
-│   ├── _security.html
-│   ├── _wishlist.html
-│   ├── _order_detail_drawer.html
-│   └── _address_form_modal.html
+└── dashboard/            ← Dashboard fragment templates
+    ├── _personal.html
+    ├── _orders.html
+    ├── _addresses.html
+    ├── _security.html
+    └── _wishlist.html
 
 static/
 ├── css/           ← Tailwind output (tailwind.css)
 └── js/            ← Alpine.js stores (alpine-store.js)
 ```
 
+---
+
+## Commands
+
+### Development
+```bash
+./joi server              # Start dev server (port 8000)
+./joi migrate            # Run database migrations
+./joi seed               # Seed database with fixtures
+./joi admin              # Create admin user
+```
+
+### CSS Build
+```bash
+npm run build:css        # Build Tailwind CSS (production)
+npm run watch:css        # Watch mode for development
+```
+
+### Linting
+```bash
+ruff check .             # Lint all files
+ruff check --fix .       # Lint and auto-fix
+ruff check path/to/file.py  # Lint single file
+```
+
+### Testing
+```bash
+python manage.py test                    # Run all tests
+python manage.py test app.tests           # Run specific app tests
+python manage.py test app.tests.TestClass # Run specific test class
+python manage.py test app.tests.TestClass.test_method  # Run single test
+python manage.py test --verbosity=2       # Verbose output
+```
+
+---
+
+## Code Style Guidelines
+
+### Python/Django
+
+**Imports (Alphabetical)**
+```python
+# Standard library first
+from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.db import models
+
+# Third party
+from celery import shared_task
+
+# Local apps
+from apps.products.models import Product
+```
+
+**Naming Conventions**
+- Classes: `PascalCase` (e.g., `ProductSerializer`)
+- Functions/variables: `snake_case` (e.g., `get_cart_total`)
+- Constants: `UPPER_SNAKE_CASE` (e.g., `DEFAULT_PAGE_SIZE`)
+- Models: singular, descriptive (e.g., `OrderItem` not `OrderItems`)
+
+**Django Best Practices**
+- Use `gettext_lazy` (`_`) for all user-facing strings
+- Use `select_related()` and `prefetch_related()` for query optimization
+- Use `get_object_or_404()` for single object retrieval
+- Use CBVs (Class-Based Views) for complex views
+- Keep business logic in models/services, not views
+
+**Error Handling**
+- Use Django's messaging framework for user feedback
+- Return appropriate HTTP status codes
+- Log errors with proper levels (`logger.error`, `logger.exception`)
+- Never expose sensitive data in error responses
+
+---
+
+### JavaScript (Alpine.js + HTMX)
+
+**Alpine.js Patterns**
+```html
+<!-- Basic component -->
+<div x-data="{ count: 0 }">
+    <button x-on:click="count++">Increment</button>
+    <span x-text="count"></span>
+</div>
+
+<!-- With methods -->
+<div x-data="{ 
+    submitting: false,
+    async submit() {
+        this.submitting = true;
+        // HTMX form submission
+        this.submitting = false;
+    }
+}">
+```
+
+**HTMX Patterns**
+```html
+<!-- HTMX form with Alpine state -->
+<form hx-post="/endpoint/"
+      hx-target="#result-container"
+      hx-swap="innerHTML"
+      @htmx:after-on-load="if(event.detail.successful) { /* success */ }">
+```
+
+**Alpine Store (Cart Example)**
+```javascript
+// static/js/alpine-store.js
+document.addEventListener('alpine:init', () => {
+    Alpine.store('cart', {
+        items: [],
+        addToCart(form) { /* implementation */ },
+        showOffcanvas() { /* implementation */ }
+    });
+});
+```
+
+**Guidelines**
+- Always use `{% csrf_token %}` with HTMX POST forms
+- Use `@htmx:after-on-load` for post-request actions
+- Use `hx-swap="innerHTML"` for partial updates
+- Initialize Flowbite components after HTMX swaps:
+  ```javascript
+  @htmx:after-on-load="if (window.initFlowbite) window.initFlowbite()"
+  ```
+
+---
+
+### Templates (Django + Tailwind + Flowbite)
+
+**⚠️ UI MANDATE: Flowbite Components ONLY**
+- **NO custom CSS** - Use only Flowbite component classes
+- **Use Tailwind utilities** for layout/spacing only
+- **Use custom color tokens** (see below), not default Tailwind colors
+
+**Flowbite Components to Use:**
+- Buttons: `bg-corporate-600 hover:bg-corporate-700 text-white`
+- Cards: `bg-white border border-surface-200 rounded-lg p-6`
+- Forms: `border border-surface-200 rounded-lg focus:ring-2 focus:ring-corporate-500`
+- Badges: `bg-green-100 text-green-800 rounded-full px-2.5 py-0.5`
+- Tabs: Flowbite tab component structure
+- Modals: Flowbite modal with Alpine triggers
+
+**Tailwind Custom Colors (REQUIRED):**
+```
+corporate-600: #1A56DB  (primary brand)
+surface-50/100/200:    (backgrounds, borders)
+charcoal-900/700/500/400: (text hierarchy)
+```
+⚠️ **NEVER use**: `text-gray-*`, `bg-gray-*`, `border-gray-*` - these won't render!
+
+**RTL Support:**
+- Use `start-`/`end-` instead of `left-`/`right-`
+- Use `ms-`/`me-` instead of `ml-`/`mr-`
+- Use `ps-`/`pe-` instead of `pl-`/`pr-`
+
+**Template Structure:**
+- Base template: `shared/base.html`
+- Partial templates: `shared/partials/`
+- App templates: `apps/{app}/templates/{app}/`
+
+---
+
+### HTML Template Example (Profile Dashboard)
+
+```html
+<!-- Flowbite Tabs -->
+<ul class="flex flex-wrap -mb-px text-sm font-medium text-center" role="tablist">
+    <li class="me-2">
+        <button @click="switchTab('personal')"
+                class="inline-flex items-center gap-2 p-4 border-b-2 rounded-t-lg"
+                :class="activeTab === 'personal' ? 'text-corporate-600 border-corporate-600' : 'text-charcoal-500 border-transparent'">
+            <i class="bi bi-person"></i>
+            <span>{% trans "Personal" %}</span>
+        </button>
+    </li>
+</ul>
+
+<!-- Flowbite Card -->
+<div class="bg-white border border-surface-200 rounded-lg p-6">
+    <h3 class="font-semibold text-charcoal-900 mb-4">{% trans "Personal Info" %}</h3>
+    <!-- Form fields -->
+</div>
+
+<!-- Flowbite Button -->
+<button type="submit" class="px-5 py-2.5 bg-corporate-600 text-white font-medium rounded-lg hover:bg-corporate-700">
+    {% trans "Save" %}
+</button>
+```
+
+---
+
 ## URL Routes
 
 | Path | View | Name |
 |------|------|------|
-| `/` | home view | `home` |
-| `/search/` | product_list | `search` |
+| `/` | home | `home` |
 | `/products/` | product_list | `products:products` |
 | `/products/<slug>/` | product_detail | `products:detail` |
-| `/products/wishlist/` | wishlist_list | `wishlist` |
-| `/categories/` | category_list | `categories:categories` |
-| `/categories/<slug>/` | category_detail | `categories:detail` |
 | `/cart/` | cart_detail | `cart:detail` |
-| `/cart/add/<id>/` | cart_add | `cart:add` |
-| `/cart/remove/<id>/` | cart_remove | `cart:remove` |
-| `/cart/fragment/` | offcanvas_fragment | `cart:offcanvas_fragment` |
 | `/orders/checkout/` | checkout | `orders:checkout` |
-| `/orders/create_order/` | create_order | `orders:create_order` |
-| `/orders/orders/` | order_list | `orders:order_list` |
-| `/orders/orders/<id>/` | order_detail | `orders:order_detail` |
-| `/login/` | login_view | `login` |
-| `/register/` | register | `register` |
-| `/logout/` | LogoutView | `logout` |
 | `/profile/` | profile | `profile` |
-| `/profile/?tab=orders` | profile (tab=orders) | - |
-| `/profile/?tab=addresses` | profile (tab=addresses) | - |
-| `/profile/?tab=security` | profile (tab=security) | - |
-| `/profile/?tab=wishlist` | profile (tab=wishlist) | - |
-| `/profile/order/<id>/` | profile_order_detail | `profile_order_detail` |
-| `/profile/address/form/` | address_form_partial | `address_form_partial` |
-| `/profile/password-change/` | password_change_partial | `users:password_change` |
-| `/users/addresses/` | address_list | `users:address_list` |
-| `/set-language/` | set_language_custom | `set_language_custom` |
 
-## Models
+---
+
+## Models Summary
 
 ### products
-- **Category**: name, name_ar, slug, image, image_link
-- **Brand**: name, name_ar, slug
-- **Product**: name, name_ar, slug, sku, img, img_link, price, discount_price, stock, description, description_ar, external_link, category(FK), brand(FK), tags(M2M)
-  - Properties: `current_price`, `on_sale`, `discount_percent`
-- **Review**: product(FK), user(FK→Profile), rating(1-5), comment
-- **Wishlist**: user(FK→Profile), product(FK)
+- **Product**: name, price, discount_price, stock, category(FK), brand(FK)
+- **Category**: name, slug, image
+- **Wishlist**: user(FK), product(FK)
 
 ### users
-- **Profile**: user(O2O→User), first_name, last_name, avatar, phone, address, date_of_birth, gender, email_marketing, push_notifications
-- **Address**: user(FK→User), name, phone, address, city, area, is_default
-
-### cart
-- **Cart**: user(O2O→User). Property: `total`
-- **CartItem**: cart(FK), product(FK), quantity. Property: `subtotal`
+- **Profile**: user(O2O), phone, avatar, date_of_birth, gender
+- **Address**: user(FK), name, phone, address, city, area, is_default
 
 ### orders
-- **Order**: user(FK), status, payment_method, payment_status, total_amount, shipping_address, phone, notes
-  - Status: PENDING, CONFIRMED, PROCESSING, SHIPPED, DELIVERED, CANCELLED, REFUNDED
-- **OrderItem**: order(FK), product(FK), quantity, price. Property: `subtotal`
+- **Order**: user(FK), status, total_amount, shipping_address, phone
+- **OrderItem**: order(FK), product(FK), quantity, price
 
-### core
-- **Banner**: image, title, title_ar, subtitle, subtitle_ar, link, link_text, link_text_ar, order, is_active
+---
 
-## Cotton Components (UI Library)
+## Context Processors
 
-All components use `<c-vars>` for props and support `class` and `attrs` passthrough.
-
-### Layout
-- `<c-navbar />` — Sticky navbar with mega menu, search, cart, auth
-- `<c-footer />` — Multi-column footer with newsletter
-- `<c-brand />` — Logo link
-
-### UI Elements
-- `<c-badge variant="" size="" />` — Variants: default, secondary, destructive, success, warning, info, outline, dark
-- `<c-button variant="" size="" tag="" />` — Variants: default, destructive, outline, secondary, ghost, link, dark. Sizes: xs, sm, default, lg, icon
-- `<c-input />` — Flowbite-styled input
-- `<c-textarea />` — Flowbite-styled textarea
-- `<c-select />` — Flowbite-styled select
-- `<c-checkbox />` — Flowbite-styled checkbox
-- `<c-label />` — Form label
-- `<c-separator />` — Horizontal/vertical divider
-- `<c-progress value="" min="" max="" />` — Progress bar
-- `<c-alert variant="" />` — Variants: default, success, error, warning, info, destructive
-
-### Complex Components
-- `<c-tabs default_value="">` — Alpine.js controlled tabs
-- `<c-dialog default_open="">` — Alpine.js modal
-- `<c-sheet default_open="" side="">` — Slide-over panel
-- `<c-dropdown_menu>` — Alpine.js dropdown
-- `<c-toast id="" title="" description="" type="">` — Toast notification
-- `<c-table>` — Flowbite table
-- `<c-card>` — Card wrapper
-
-### Feature Components
-- `<c-product_card :product="" />` — Product card with image, price, sale badge, stock badge, quick-add, zoom
-- `<c-filter.drawer />` — Mobile filter drawer with HTMX live filtering
-
-## Tailwind Color Tokens
-
-```
-corporate-600: #1A56DB  (primary)
-surface-50/100/200:      (backgrounds, borders)
-charcoal-900/700/500/400: (text hierarchy)
-```
-
-## Key Conventions
-
-- **RTL**: Use `start-`/`end-`/`ms-`/`me-`/`ps-`/`pe-` (never `left-`/`right-`/`ml-`/`mr-`/`pl-`/`pr-`)
-- **Arabic**: `text-lg` base, `leading-relaxed`, `font-readex`
-- **No custom CSS**: Only Tailwind utility classes
-- **Template paths**: App-level (e.g., `products/products.html`)
-- **Base template**: `shared/base.html`
-- **Context processors**: `menu_categories`, `wishlist`, `cart`
-
-## Commands
-
-```bash
-./joi run             # Start dev server
-npm run build:css     # Build CSS
-npm run watch:css     # Watch CSS
-ruff check .          # Lint
-python manage.py migrate
-```
+Available in all templates: `menu_categories`, `wishlist`, `cart`
