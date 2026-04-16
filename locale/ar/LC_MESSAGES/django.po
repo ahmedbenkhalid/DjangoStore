@@ -15,6 +15,15 @@ msgstr ""
 msgid "Your destination for premium electronics."
 msgstr "وجهتك للإلكترونيات المتميزة."
 
+msgid "Shop by Categories"
+msgstr "تسوق حسب الفئات"
+
+msgid "Offers"
+msgstr "العروض"
+
+msgid "EGP"
+msgstr "ج.م"
+
 msgid "Home"
 msgstr "الرئيسية"
 

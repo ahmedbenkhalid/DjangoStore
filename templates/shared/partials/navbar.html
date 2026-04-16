@@ -43,7 +43,7 @@
           <button
             class="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-charcoal-700 hover:text-corporate-600 transition-colors {% if 'categories' in request.path %}text-corporate-600{% endif %}"
           >
-            {% trans "Shop by Categories" %}
+            {% if request.LANGUAGE_CODE == 'ar' %}تسوق حسب الفئات{% else %}{% trans "Shop by Categories" %}{% endif %}
             <svg
               class="w-3 h-3 transition-transform"
               :class="open ? 'rotate-180' : ''"
@@ -104,7 +104,7 @@
           href="{% url 'products:products' %}?on_sale=true"
           class="text-xs font-bold uppercase tracking-wider text-charcoal-700 hover:text-corporate-600 transition-colors {% if 'on_sale=true' in request.get_full_path %}text-corporate-600{% endif %}"
         >
-          {% trans "Offers" %}
+          {% if request.LANGUAGE_CODE == 'ar' %}العروض{% else %}{% trans "Offers" %}{% endif %}
         </a>
 
         <a
@@ -124,22 +124,26 @@
 
       <!-- Right Side Actions -->
       <div class="flex items-center gap-1 md:gap-3">
-        <!-- Language Link (Clean) -->
-        <div
-          class="hidden sm:flex px-2 border-x border-gray-100 h-6 items-center mx-1"
-        >
+        <!-- Language Switcher (Always Visible) -->
+        <div class="px-1 border-x border-gray-100 flex items-center mx-1">
           {% if request.LANGUAGE_CODE == 'ar' %}
           <a
             href="{% url 'set_language_custom' %}?language=en&next={{ request.path|urlencode }}"
-            class="text-[10px] font-black uppercase text-charcoal-500 hover:text-corporate-600 transition-colors"
-            >EN</a
+            class="p-2 text-charcoal-700 hover:text-corporate-600 hover:bg-surface-50 rounded-full transition-all duration-300 group flex items-center gap-1"
+            title="Switch to English"
           >
+            <i class="bi bi-globe2 text-lg"></i>
+            <span class="text-[10px] font-black uppercase">EN</span>
+          </a>
           {% else %}
           <a
             href="{% url 'set_language_custom' %}?language=ar&next={{ request.path|urlencode }}"
-            class="text-[10px] font-black text-charcoal-500 hover:text-corporate-600 transition-colors"
-            >العربية</a
+            class="p-2 text-charcoal-700 hover:text-corporate-600 hover:bg-surface-50 rounded-full transition-all duration-300 group flex items-center gap-1"
+            title="تحويل للعربية"
           >
+            <i class="bi bi-globe2 text-lg"></i>
+            <span class="text-[10px] font-black">AR</span>
+          </a>
           {% endif %}
         </div>
 
