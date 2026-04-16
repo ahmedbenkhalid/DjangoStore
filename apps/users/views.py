@@ -100,20 +100,14 @@ def profile(request):
         "form": form,
         "password_form": password_form,
         "active_tab": tab,
-    }
-
-    if tab == "orders":
-        context["orders"] = Order.objects.filter(user=request.user).order_by(
-            "-created_at"
-        )
-    elif tab == "addresses":
-        context["addresses"] = Address.objects.filter(user=request.user).order_by(
+        "orders": Order.objects.filter(user=request.user).order_by("-created_at"),
+        "addresses": Address.objects.filter(user=request.user).order_by(
             "-is_default", "-created_at"
-        )
-    elif tab == "wishlist":
-        context["wishlist_items"] = request.user.profile.wishlist.select_related(
+        ),
+        "wishlist_items": request.user.profile.wishlist.select_related(
             "product", "product__brand"
-        ).all()
+        ).all(),
+    }
 
     return render(request, "users/dashboard.html", context)
 

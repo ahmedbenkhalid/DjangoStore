@@ -282,6 +282,22 @@
           {% endif %}
         </a>
 
+        <!-- Wishlist Icon & Badge -->
+        <a
+          href="{% url 'wishlist' %}"
+          hx-boost="false"
+          class="relative p-2.5 text-charcoal-700 hover:text-corporate-600 hover:bg-surface-50 rounded-full transition-all duration-300 group"
+        >
+          <i class="bi bi-heart text-xl group-hover:scale-110 transition-transform"></i>
+          {% if wishlist_count > 0 %}
+          <span
+            class="absolute top-1 right-1 flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[9px] font-black text-white bg-red-500 rounded-full ring-2 ring-white"
+          >
+            {{ wishlist_count }}
+          </span>
+          {% endif %}
+        </a>
+
         <!-- Mobile Toggle -->
         <button
           data-collapse-toggle="mobile-menu"
