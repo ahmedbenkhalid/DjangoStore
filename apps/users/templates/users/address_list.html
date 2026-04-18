@@ -4,7 +4,9 @@
 {% block title %}{% trans "Address Book" %}{% endblock %}
 
 {% block content %}
-<div class="mb-8 flex justify-between items-center bg-white p-6 rounded-2xl border border-surface-200">
+{# Address List Page - Full viewport height #}
+<div class="min-h-[calc(100vh-96px)] pt-4">
+    <div class="mb-8 flex justify-between items-center bg-white p-6 rounded-2xl border border-surface-200">
     <h4 class="font-bold text-3xl tracking-tight mb-0 flex items-center gap-3">
         <i class="bi bi-journal-richtext text-corporate-600"></i>
         {% trans "Address Book" %}

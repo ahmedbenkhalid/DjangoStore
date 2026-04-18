@@ -51,14 +51,17 @@
     <!-- Navbar (Uncommented - Essential for layout) -->
     {% include 'shared/partials/navbar.html' %}
 
-    <!-- 
-      Main Layout Wrapper:
-      - pt-24: Increased padding to clear the fixed navbar properly (Fixing overlap issue).
-      - flex-grow: Allows the footer to stick to the bottom if content is short.
-    -->
-    <div class="flex-grow pt-24">
-      <main id="main-content" class="container mx-auto px-4 py-8 relative min-h-[60vh]">
-        
+<!-- HTMX Progress Bar -->
+    <div id="htmx-progress" class="fixed top-[96px] start-0 h-0.5 bg-corporate-600 z-[60] transition-all duration-300 opacity-0"></div>
+
+    <!-- Fixed Sidebar (only on sidebar pages) -->
+    {% if has_sidebar %}
+    {% include 'shared/partials/sidebar.html' %}
+    {% endif %}
+
+    <!-- Main content wrapper: pt-20 clears navbar, ms-64 offsets sidebar (when present) -->
+    <div class="pt-24 {% if has_sidebar %}ms-0 lg:ms-64{% endif %}">
+      <main id="main-content" class="container mx-auto px-4 py-8 flex-grow relative">
         <!-- HTMX Loading Spinner -->
         <div id="htmx-spinner" class="absolute inset-0 flex items-center justify-center bg-white/80 z-[55] hidden transition-opacity duration-300">
           <div class="inline-block animate-spin rounded-full border-2 border-surface-200 border-t-corporate-600 h-8 w-8"></div>
