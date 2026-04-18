@@ -5,6 +5,51 @@
 set -euo pipefail
 
 # =============================================================================
+# Auto-install completion (if running as root or with sudo)
+# =============================================================================
+if [[ "${1:-}" == "install-completion" ]]; then
+  target="/etc/bash_completion.d/joi.bash"
+  if [[ -w "$(dirname "${target}" 2>/dev/null || echo "")" ]] || [[ $EUID -eq 0 ]]; then
+    cat > "${target}" << 'COMPLETION'
+#!/usr/bin/env bash
+
+_joi() {
+    local cur prev words cword
+    _init_completion || return
+
+    local commands="setup install migrate seed admin server check reset update help version"
+    local options="--help --version --yes --no-color --verbose --quiet --debug --port --clear --seed --no-seed --admin --no-admin --skip-migrations"
+
+    if [[ ${cword} -eq 1 ]]; then
+        COMPREPLY=($(compgen -W "${commands}" -- "${cur}"))
+        return
+    fi
+
+    case "${words[1]}" in
+        server)
+            COMPREPLY=($(compgen -W "${options} --port" -- "${cur}"))
+            ;;
+        seed)
+            COMPREPLY=($(compgen -W "${options} --clear" -- "${cur}"))
+            ;;
+        setup)
+            COMPREPLY=($(compgen -W "${options} --seed --no-seed --admin --no-admin --skip-migrations" -- "${cur}"))
+            ;;
+    esac
+}
+
+complete -F _joi joi
+COMPLETION
+    echo "Installed bash completion to ${target}"
+    echo "Restart shell or run: source ${target}"
+    exit 0
+  else
+    echo "Cannot install to ${target} - need sudo"
+    exit 1
+  fi
+fi
+
+# =============================================================================
 # Constants
 # =============================================================================
 readonly JOI_VERSION="0.2.0"
@@ -865,6 +910,7 @@ ${C_DIM}COMMANDS${C_RESET}
   ${C_CYAN}server${C_RESET}      Start development server
   ${C_CYAN}check${C_RESET}       Check environment status
   ${C_CYAN}reset${C_RESET}       Reset database
+  ${C_CYAN}install-completion${C_RESET} Install bash tab completion
   ${C_CYAN}help${C_RESET}        Show this help
 
 ${C_DIM}OPTIONS${C_RESET}

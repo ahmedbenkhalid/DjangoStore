@@ -158,14 +158,18 @@ async def product_list(request):
         products_qs = Product.objects.filter(
             id__in=[p.id for p in page_obj.object_list]
         ).only("id", "stock")
-        stock_data = {
-            str(p.id): "out_of_stock"
-            if p.stock == 0
-            else "low_stock"
-            if p.stock <= 5
-            else "in_stock"
-            for p in products_qs
-        }
+
+        def get_stock_data():
+            return {
+                str(p.id): "out_of_stock"
+                if p.stock == 0
+                else "low_stock"
+                if p.stock <= 5
+                else "in_stock"
+                for p in products_qs
+            }
+
+        stock_data = await sync_to_async(get_stock_data)()
         return JsonResponse({"stock": stock_data})
 
     if request.headers.get("HX-Target") == "product-grid":

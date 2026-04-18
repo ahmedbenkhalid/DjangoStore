@@ -1,13 +1,16 @@
 <!doctype html>
-{% load static %} {% load i18n %}
-<html
-  lang="{{ request.LANGUAGE_CODE }}"
-  dir="{% if request.LANGUAGE_CODE == 'ar' %}rtl{% else %}ltr{% endif %}"
->
+{% load static i18n %}
+{% get_current_language as lang %}
+{% if lang == 'ar' %}
+<html lang="ar" dir="rtl">
+{% else %}
+<html lang="en" dir="ltr">
+{% endif %}
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="color-scheme" content="light" />
+    <style>[x-cloak] { display: none !important; }</style>
     <link rel="icon" href="{% static 'img/favicon.ico' %}" type="image/x-icon" />
     <link
       rel="stylesheet"
@@ -23,7 +26,10 @@
       defer
       src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
     ></script>
-    <script src="{% static 'js/alpine-store.js' %}"></script>
+    <script
+      defer
+      src="{% static 'js/alpine-store.js' %}"
+    ></script>
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
     <script>
       window.CART_FRAGMENT_URL = "{% url 'cart:offcanvas_fragment' %}";
@@ -73,7 +79,7 @@
 
   <body
     hx-boost="true"
-    class="bg-white text-charcoal-900 min-h-screen flex flex-col font-readex {% if request.LANGUAGE_CODE == 'ar' %}text-lg leading-relaxed{% else %}text-base{% endif %} overflow-x-hidden touch-manipulation"
+    class="bg-white text-charcoal-900 min-h-screen flex flex-col font-readex {% if lang == 'ar' %}text-lg leading-relaxed{% else %}text-base{% endif %} overflow-x-hidden touch-manipulation"
   >
     <a
       href="#main-content"
@@ -84,16 +90,18 @@
 
     {% include 'shared/partials/navbar.html' %}
 
-    <main id="main-content" class="container mx-auto px-4 py-8 flex-grow">
-      {% include 'shared/partials/messages.html' %}
-      {% block content %}
-      {% endblock %}
-    </main>
+    <!-- Main content wrapper with padding-top for fixed navbar -->
+    <div class="pt-20">
+      <main id="main-content" class="container mx-auto px-4 py-8 flex-grow">
+        {% include 'shared/partials/messages.html' %}
+        {% block content %}{% endblock %}
+      </main>
+    </div>
 
-     {% include 'shared/partials/footer.html' %}
-     {% include 'shared/partials/auth_modal.html' %}
-     {% include 'shared/partials/search_modal.html' %}
-     {% include 'shared/partials/toast.html' %}
+    {% include 'shared/partials/footer.html' %}
+    {% include 'shared/partials/auth_modal.html' %}
+    {% include 'shared/partials/search_modal.html' %}
+    {% include 'shared/partials/toast.html' %}
 
     {% block extra_js %}{% endblock %}
     <script src="https://cdn.jsdelivr.net/npm/flowbite@2.4.1/dist/flowbite.min.js"></script>

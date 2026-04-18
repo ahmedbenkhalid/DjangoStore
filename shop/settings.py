@@ -72,6 +72,7 @@ MIDDLEWARE = [
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.locale.LocaleMiddleware",
+    "core.middleware.LanguageCodeMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -107,6 +108,7 @@ TEMPLATES = [
                 "cart.context_processors.cart",
                 "django.template.context_processors.i18n",
                 "django.template.context_processors.media",
+                "core.context_processors.language_info",
             ],
         },
     },
@@ -192,7 +194,7 @@ LANGUAGES = [
 ]
 LANGUAGE_COOKIE_NAME = "django_language"
 LANGUAGE_COOKIE_AGE = 60 * 60 * 24 * 365  # 1 year
-TIME_ZONE = "EET"
+TIME_ZONE = "Africa/Cairo"
 
 LOCALE_PATHS = [
     BASE_DIR / "locale",

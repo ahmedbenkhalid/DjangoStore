@@ -33,7 +33,7 @@
         </div>
         <div class="mb-2 flex items-center">
             <span class="font-bold text-corporate-600 text-sm">
-                {% if request.LANGUAGE_CODE == 'ar' %}ج.م{% else %}EGP{% endif %} {{ item.subtotal|floatformat:2|intcomma }}
+                {% if request.path|slice:'4' == '/ar/' %}ج.م{% else %}EGP{% endif %} {{ item.subtotal|floatformat:2|intcomma }}
             </span>
             <span class="text-charcoal-400 text-xs ms-2">x{{ item.quantity }}</span>
         </div>

@@ -5,7 +5,7 @@
     <div class="flex justify-between items-center mb-4">
         <span class="text-charcoal-500 font-semibold text-xs uppercase tracking-wider">{% trans "Subtotal" %}</span>
         <span class="text-lg font-bold m-0 text-charcoal-900">
-            {% if request.LANGUAGE_CODE == 'ar' %}ج.م{% else %}EGP{% endif %} {{ cart_total|floatformat:2|intcomma }}
+            {% if request.path|slice:'4' == '/ar/' %}ج.م{% else %}EGP{% endif %} {{ cart_total|floatformat:2|intcomma }}
         </span>
     </div>
 

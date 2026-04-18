@@ -177,15 +177,15 @@
       {% if product.on_sale %}
         <div class="flex items-baseline gap-2 flex-wrap">
           <span class="text-lg font-bold text-red-600 font-variant-numeric tabular-nums">
-            {% if request.LANGUAGE_CODE == 'ar' %}ج.م{% else %}EGP{% endif %} {{ product.discount_price|floatformat:2|intcomma }}
+            {% if request.path|slice:'4' == '/ar/' %}ج.م{% else %}EGP{% endif %} {{ product.discount_price|floatformat:2|intcomma }}
           </span>
           <span class="text-sm text-charcoal-400 line-through font-variant-numeric tabular-nums">
-            {% if request.LANGUAGE_CODE == 'ar' %}ج.م{% else %}EGP{% endif %} {{ product.price|floatformat:2|intcomma }}
+            {% if request.path|slice:'4' == '/ar/' %}ج.م{% else %}EGP{% endif %} {{ product.price|floatformat:2|intcomma }}
           </span>
         </div>
       {% else %}
         <span class="text-lg font-bold text-charcoal-900 font-variant-numeric tabular-nums">
-          {% if request.LANGUAGE_CODE == 'ar' %}ج.م{% else %}EGP{% endif %} {{ product.price|floatformat:2|intcomma }}
+          {% if request.path|slice:'4' == '/ar/' %}ج.م{% else %}EGP{% endif %} {{ product.price|floatformat:2|intcomma }}
         </span>
       {% endif %}
     </div>
