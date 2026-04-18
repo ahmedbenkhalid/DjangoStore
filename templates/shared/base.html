@@ -135,10 +135,15 @@
     {% include 'shared/partials/navbar.html' %}
 
     <!-- HTMX Progress Bar -->
-    <div id="htmx-progress" class="fixed top-[80px] start-0 h-0.5 bg-corporate-600 z-[60] transition-all duration-300 opacity-0"></div>
+    <div id="htmx-progress" class="fixed top-[96px] start-0 h-0.5 bg-corporate-600 z-[60] transition-all duration-300 opacity-0"></div>
 
-    <!-- Main content wrapper with padding-top for fixed navbar -->
-    <div class="pt-20">
+    <!-- Fixed Sidebar (only on sidebar pages) -->
+    {% if has_sidebar %}
+    {% include 'shared/partials/sidebar.html' %}
+    {% endif %}
+
+    <!-- Main content wrapper: pt-20 clears navbar, ms-64 offsets sidebar (when present) -->
+    <div class="pt-24 {% if has_sidebar %}ms-0 lg:ms-64{% endif %}">
       <main id="main-content" class="container mx-auto px-4 py-8 flex-grow relative">
         <!-- HTMX Loading Spinner -->
         <div id="htmx-spinner" class="absolute inset-0 flex items-center justify-center bg-white/80 z-40" style="display: none;">

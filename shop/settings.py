@@ -109,6 +109,7 @@ TEMPLATES = [
                 "django.template.context_processors.i18n",
                 "django.template.context_processors.media",
                 "core.context_processors.language_info",
+                "core.context_processors.page_layout",
             ],
         },
     },

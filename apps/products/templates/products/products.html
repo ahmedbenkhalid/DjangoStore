@@ -95,36 +95,8 @@
   </div>
 </div>
 
-{# Store Layout #}
+{# Store Layout - Sidebar is now included via base.html when has_sidebar=true #}
 <div class="flex gap-6 items-start">
-
-  {# Desktop Sidebar #}
-  <aside class="flex-shrink-0 bg-white border border-surface-200 rounded-xl p-5 hidden lg:block w-64 sticky top-28">
-    <p class="text-xs font-bold text-charcoal-400 uppercase tracking-widest mb-4">{% trans "Categories" %}</p>
-    <div class="flex flex-col gap-1">
-      <a href="{% url 'products:products' %}{% if current_sort %}?sort={{ current_sort }}{% endif %}"
-         class="flex items-center justify-between py-2 px-3 rounded-lg text-sm transition-colors {% if not current_category %}bg-corporate-50 text-corporate-600 font-semibold{% else %}text-charcoal-700 hover:bg-surface-50{% endif %}">
-        <span>{% trans "All products" %}</span>
-      </a>
-      {% for cat in categories %}
-      <a href="?category={{ cat.slug }}{% if current_sort %}&sort={{ current_sort }}{% endif %}"
-         class="flex items-center justify-between py-2 px-3 rounded-lg text-sm transition-colors {% if current_category == cat.slug %}bg-corporate-50 text-corporate-600 font-semibold{% else %}text-charcoal-700 hover:bg-surface-50{% endif %}">
-        <span>{{ cat.get_name }}</span>
-      </a>
-      {% endfor %}
-    </div>
-
-    <p class="text-xs font-bold text-charcoal-400 uppercase tracking-widest mt-8 mb-4">{% trans "Offers" %}</p>
-    <div class="flex flex-col gap-1">
-      <a href="?on_sale=true{% if current_sort %}&sort={{ current_sort }}{% endif %}"
-         class="flex items-center justify-between py-2 px-3 rounded-lg text-sm transition-colors {% if on_sale == 'true' %}bg-red-50 text-red-600 font-semibold{% else %}text-charcoal-700 hover:bg-surface-50{% endif %}">
-        <span class="flex items-center gap-2">
-          <i class="bi bi-percent text-red-500"></i>
-          {% trans "On Sale" %}
-        </span>
-      </a>
-    </div>
-  </aside>
 
   {# Product Grid #}
   <div class="flex-grow min-w-0">

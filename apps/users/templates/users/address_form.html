@@ -4,7 +4,9 @@
 {% block title %}{% if action == 'add' %}{% trans "Add Address" %}{% else %}{% trans "Edit Address" %}{% endif %}{% endblock %}
 
 {% block content %}
-<div class="max-w-2xl mx-auto">
+{# Address Form Page - Full viewport height with vertical centering #}
+<div class="flex items-center justify-center min-h-[calc(100vh-96px)] pt-24 pb-10 bg-gray-50">
+    <div class="max-w-2xl w-full">
     <div class="bg-white border border-surface-200 rounded-2xl overflow-hidden">
         <div class="bg-surface-50 border-b border-surface-200 px-6 py-5">
             <h4 class="font-bold text-xl tracking-tight mb-0">
