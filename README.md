@@ -1,55 +1,68 @@
 # Django E-Commerce Platform
 
-A full-stack e-commerce platform built with Django and PostgreSQL,
-featuring a modular architecture and Arabic language support.
+Full-stack e-commerce platform for laptops & smartphones with Arabic/English (RTL) support.
 
 ## Features
 
-- Product catalog with categories and filtering
+- Product catalog with categories, brands, and filtering
 - Shopping cart with session management
-- Order processing and management system
+- Order processing and management
 - User authentication and profile management
+- Wishlist and product reviews
 - Arabic/English internationalization (i18n)
-- Sqlite3 with optimized ORM queries
 
 ## Tech Stack
 
 | Layer | Technology |
 |---|---|
-| Backend | Django, Python |
-| Database | Sqlite3 |
-| Frontend | HTML, CSS, Bootstrap, JavaScript |
-| i18n | Django Translations (AR/EN) |
+| Backend | Django 6.0.3, Python 3.14+ |
+| Database | SQLite3 |
+| Frontend | Tailwind CSS 3, Alpine.js, HTMX |
+| UI Components | Flowbite |
+| Admin | django-jazzmin (dark theme) |
+| i18n | EN/AR with Readex Pro font |
+| Async | Celery + Redis |
 
 ## Quick Start
 
-### WSL
+### Prerequisites
+
+- Python 3.14+
+- Node.js 18+ (for Tailwind CSS)
+- Redis (for Celery)
+
+### Installation
 
 ```bash
-git clone https://github.com/vhmd0/store-p11
-cd store-p11
-chmod +x start.sh
-./start.sh
+./joi setup
+./joi server
 ```
 
-### Windows
-
-```bash
-git clone https://github.com/vhmd0/store-p11
-cd store-p11
-chmod +x start.bat
-./start.bat
-```
-
-Visit: <http://localhost>
+Visit: <http://localhost:8000>
 
 ## Project Structure
 
 ```
-├── products/     # Product catalog & categories
-├── cart/         # Shopping cart logic
-├── orders/       # Order processing
-├── users/        # Authentication & profiles
-├── shop/         # Main storefront
-└── core/         # Shared utilities
+apps/
+├── core/          # Home, banners, shared views
+├── users/        # Auth, dashboard, addresses
+├── products/     # Products, categories, wishlist, reviews
+├── cart/         # Session-based shopping cart
+└── orders/       # Checkout, order management
+
+templates/
+├── shared/       # base.html + global partials
+└── emails/       # Email templates
 ```
+
+## Commands
+
+| Command | Description |
+|---|---|
+| `./joi server` | Start dev server (port 8000) |
+| `./joi migrate` | Run database migrations |
+| `./joi seed` | Seed database with fixtures |
+| `./joi admin` | Create admin user |
+| `./joi lint` | Run linting checks |
+| `npm run build:css` | Build Tailwind CSS |
+| `npm run watch:css` | Watch mode for CSS |
