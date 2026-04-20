@@ -267,15 +267,24 @@ setup_uv_env() {
 }
 
 check_uv() {
-  if ! command -v uv &>/dev/null; then
+  if ! command -uv &>/dev/null 2>&1; then
     log_warn "uv is not installed"
     if confirm "Install uv now?" "y"; then
       start_timer
-      if show_progress "Installing uv" curl -LsSf https://astral.sh/uv/install.sh | sh; then
-        export PATH="${HOME}/.local/bin:${PATH}"
-        log_success "Installed uv in $(get_elapsed)"
+      local uv_install="${JOI_ROOT}/.uv_install.sh"
+      if show_progress "Downloading uv installer" curl -LsSf https://astral.sh/uv/install.sh -o "${uv_install}"; then
+        if show_progress "Installing uv" chmod +x "${uv_install}" && bash "${uv_install}"; then
+          rm -f "${uv_install}"
+          export PATH="${HOME}/.local/bin:${PATH}"
+          log_success "Installed uv in $(get_elapsed)"
+        else
+          rm -f "${uv_install}"
+          log_error "Failed to install uv"
+          return 1
+        fi
       else
-        log_error "Failed to install uv"
+        rm -f "${uv_install}"
+        log_error "Failed to download uv installer"
         return 1
       fi
     else
