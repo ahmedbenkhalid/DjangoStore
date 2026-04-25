@@ -8,55 +8,10 @@
 {% block content %}
 
 {# Hero Section - Simple Banner #}
-<div class="w-full mb-8 md:mb-12">
+<div class="w-full
+ mb-8 md:mb-12">
   <section class="bg-white py-6 md:py-8">
-    {% if banners and banners|length > 1 %}
-    <div class="mx-auto max-w-screen-xl">
-      {% for banner in banners %}
-      <div x-show="'{{ forloop.counter0 }}' == activeSlide"
-        class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-center">
-        <div class="text-center lg:text-start order-2 lg:order-1">
-          <h1 class="mb-3 md:mb-4 text-2xl md:text-3xl lg:text-4xl font-extrabold tracking-tight text-charcoal-900">
-            {% if banner.get_title %}{{ banner.get_title }}{% else %}{% trans "Premium Tech, Delivered" %}{% endif %}
-          </h1>
-          <p class="mb-6 md:mb-8 text-sm md:text-base text-charcoal-500">
-            {% if banner.subtitle %}{{ banner.subtitle }}{% else %}{% trans "Discover the latest laptops, smartphones,
-            and accessories at unbeatable prices." %}{% endif %}
-          </p>
-          <a href="{% if banner.link %}{{ banner.link }}{% else %}{% url 'products:products' %}{% endif %}"
-            class="inline-flex justify-center items-center py-2.5 md:py-3 px-5 md:px-6 text-sm md:text-base font-medium text-white bg-corporate-600 hover:bg-corporate-700 rounded-lg">
-            {% if banner.link_text %}{{ banner.link_text }}{% else %}{% trans "Shop now" %}{% endif %}
-            <svg class="ms-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-            </svg>
-          </a>
-        </div>
-        <div class="relative rounded-xl overflow-hidden h-40 sm:h-56 md:h-64 lg:h-72 order-1 lg:order-2">
-          {% if banner.image_link %}
-          <img src="{{ banner.image_link }}" alt="{{ banner.get_title }}" class="w-full h-full object-cover"
-            loading="lazy">
-          {% elif banner.image %}
-          <img src="{{ banner.image.url }}" alt="{{ banner.get_title }}" class="w-full h-full object-cover"
-            loading="lazy">
-          {% else %}
-          <div
-            class="w-full h-full bg-gradient-to-br from-corporate-600 to-corporate-800 flex items-center justify-center">
-            <i class="bi bi-laptop text-5xl md:text-6xl text-white/30"></i>
-          </div>
-          {% endif %}
-        </div>
-      </div>
-      {% endfor %}
-    </div>
-    <div class="flex justify-center gap-2 mt-6">
-      {% for banner in banners %}
-      <button @click="activeSlide = '{{ forloop.counter0 }}'; clearInterval(interval); startInterval()"
-        :class="activeSlide === '{{ forloop.counter0 }}' ? 'bg-corporate-600 w-8' : 'bg-charcoal-300 w-3'"
-        class="h-2 rounded-full transition-all duration-300" aria-label="Slide {{ forloop.counter }}">
-      </button>
-      {% endfor %}
-    </div>
-    {% elif banners %}
+    {% if banners %}
     <div class="mx-auto max-w-screen-xl">
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-center">
         <div class="text-center lg:text-start order-2 lg:order-1">
@@ -100,22 +55,20 @@
       <p class="mb-8 text-base font-normal text-charcoal-500 lg:text-lg">
         {% trans "Discover the latest laptops, smartphones, and accessories at unbeatable prices." %}
       </p>
-      <div class="flex flex-col space-y-4 sm:flex-row sm:justify-center sm:space-y-0">
-        <a href="{% url 'products:products' %}"
-          class="inline-flex justify-center items-center py-3 px-6 text-base font-medium text-center text-white rounded-lg bg-corporate-600 hover:bg-corporate-700">
-          {% trans "Shop now" %}
-          <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-          </svg>
-        </a>
-      </div>
+      <a href="{% url 'products:products' %}"
+        class="inline-flex justify-center items-center py-3 px-6 text-base font-medium text-center text-white rounded-lg bg-corporate-600 hover:bg-corporate-700">
+        {% trans "Shop now" %}
+        <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+        </svg>
+      </a>
     </div>
     {% endif %}
   </section>
 </div>
 
 
-{# Trust Bar - Shopify Style #}
+{# Trust Bar #}
 <section class="mb-12">
   <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
     <div
@@ -176,11 +129,10 @@
     </div>
     <a href="{% url 'products:products' %}?on_sale=true"
       class="inline-flex items-center text-sm font-semibold text-red-600 hover:text-red-700 transition-colors">
-      {% if request.LANGUAGE_CODE == 'ar' %}مشاهدة الكل{% else %}{% trans "View all offers" %}{% endif %} <i
-        class="bi bi-arrow-left ms-1 rtl:rotate-180"></i>
+      {% if request.LANGUAGE_CODE == 'ar' %}مشاهدة الكل{% else %}{% trans "View all offers" %}{% endif %}
+      <i class="bi bi-arrow-left ms-1 rtl:rotate-180"></i>
     </a>
   </div>
-
   <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6">
     {% for product in sale_products %}
     {% include 'partials/product_card.html' with product=product %}
@@ -205,11 +157,10 @@
     </div>
     <a href="{% url 'categories:categories' %}"
       class="inline-flex items-center text-sm font-semibold text-corporate-600 hover:text-corporate-700 transition-colors">
-      {% if request.LANGUAGE_CODE == 'ar' %}عرض الكل{% else %}{% trans "View all" %}{% endif %} <i
-        class="bi bi-arrow-left ms-1 rtl:rotate-180"></i>
+      {% if request.LANGUAGE_CODE == 'ar' %}عرض الكل{% else %}{% trans "View all" %}{% endif %}
+      <i class="bi bi-arrow-left ms-1 rtl:rotate-180"></i>
     </a>
   </div>
-
   <div class="grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-6">
     {% for cat in categories %}
     <a href="{{ cat.get_absolute_url }}"
@@ -256,11 +207,10 @@
     </div>
     <a href="{% url 'products:products' %}"
       class="inline-flex items-center text-sm font-semibold text-corporate-600 hover:text-corporate-700 transition-colors">
-      {% if request.LANGUAGE_CODE == 'ar' %}عرض الكل{% else %}{% trans "View all" %}{% endif %} <i
-        class="bi bi-arrow-left ms-1 rtl:rotate-180"></i>
+      {% if request.LANGUAGE_CODE == 'ar' %}عرض الكل{% else %}{% trans "View all" %}{% endif %}
+      <i class="bi bi-arrow-left ms-1 rtl:rotate-180"></i>
     </a>
   </div>
-
   <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6">
     {% for product in featured_products %}
     {% include 'partials/product_card.html' with product=product %}
@@ -284,11 +234,10 @@
     </div>
     <a href="{% url 'products:wishlist_list' %}"
       class="inline-flex items-center text-sm font-semibold text-corporate-600 hover:text-corporate-700 transition-colors">
-      {% if request.LANGUAGE_CODE == 'ar' %}قائمة رغباتي{% else %}{% trans "My wishlist" %}{% endif %} <i
-        class="bi bi-arrow-left ms-1 rtl:rotate-180"></i>
+      {% if request.LANGUAGE_CODE == 'ar' %}قائمة رغباتي{% else %}{% trans "My wishlist" %}{% endif %}
+      <i class="bi bi-arrow-left ms-1 rtl:rotate-180"></i>
     </a>
   </div>
-
   <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6">
     {% for product in most_liked_products %}
     {% include 'partials/product_card.html' with product=product %}
@@ -317,30 +266,6 @@
     "query-input": "required name=search_term_string"
   }
 }
-</script>
-
-<script>
-  document.addEventListener('alpine:init', () => {
-    Alpine.data('bannerCarousel', () => ({
-      activeSlide: '0',
-      slideCount: {{ banners| length |default: 0 }},
-    interval: null,
-    startInterval() {
-    if(this.slideCount <= 1) return;
-  this.interval = setInterval(() => {
-    let current = parseInt(this.activeSlide);
-    let next = (current + 1) % this.slideCount;
-    this.activeSlide = String(next);
-  }, 5000);
-        },
-  clearInterval() {
-    if (this.interval) {
-      window.clearInterval(this.interval);
-      this.interval = null;
-    }
-  }
-    }));
-});
 </script>
 
 <script type="application/ld+json">
